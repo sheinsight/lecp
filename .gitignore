@@ -1,0 +1,9 @@
+# node
+node_modules/
+
+# rust
+debug/
+target/
+
+# os
+.DS_Store

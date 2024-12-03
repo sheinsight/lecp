@@ -1,0 +1,17 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["import", "typescript", "unicorn"],
+	"env": {},
+	"categories": {},
+	"globals": {},
+	"settings": {},
+	"rules": {},
+	"overrides": [
+		{
+			"files": ["*.test.ts", "*.spec.ts"],
+			"rules": {
+				"@typescript-eslint/no-explicit-any": "off"
+			}
+		}
+	]
+}
