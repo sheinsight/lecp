@@ -2,6 +2,7 @@ import ts, { type CompilerOptions } from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
 import { createLogger, logger, type Logger } from "../util/logger.ts";
 import path from "node:path";
+import fs from "fs/promises";
 
 /**
  * 参考配置 @see https://github.com/Swatinem/rollup-plugin-dts/blob/master/src/program.ts
@@ -146,15 +147,9 @@ export const bundlessDts = async (config: IConfig, typesDir: string) => {
 
 	// 生成 d.ts文件
 	if (compilerOptions.isolatedDeclarations) {
-		// 生成 d.ts文件
-		fileNames.forEach(fileName => {
-			const code = ts.sys.readFile(fileName);
-			if (!code) {
-				logger.error(`文件不存在: ${fileName}`);
-				return;
-			}
-			transpileDeclaration(fileName, code, compilerOptions);
-		});
+		fileNames.forEach(fileName =>
+			transpileDeclaration(fileName, compilerOptions),
+		);
 	} else {
 		emitDeclaration(fileNames, compilerOptions);
 	}
@@ -189,9 +184,14 @@ export const emitDeclaration = (
  */
 export const transpileDeclaration = (
 	fileName: string,
-	code: string,
 	compilerOptions: CompilerOptions,
 ): void => {
+	const code = ts.sys.readFile(fileName);
+	if (!code) {
+		logger.error(`文件不存在: ${fileName}`);
+		return;
+	}
+
 	const { outputText, diagnostics, sourceMapText } = ts.transpileDeclaration(
 		code,
 		{
@@ -208,8 +208,15 @@ export const transpileDeclaration = (
 	const log = getDiagnosticsLog(diagnostics);
 	log && logger.error(log);
 
-	console.log(outputText, sourceMapText);
+	// .d.ts
+	const dtsFileName = fileName.replace(/(c|m)?ts(x)?$/, "d.$1ts$2");
+	fs.writeFile(dtsFileName, outputText);
+	// d.ts.map
+	sourceMapText && fs.writeFile(dtsFileName + ".map", sourceMapText);
 };
+
+// temp test
+// transpileDeclaration(path.join(import.meta.dirname, "./dts.ts"), {});
 
 /**
  * 编译 ts 到 dts (emitIsolatedDts, swc)
