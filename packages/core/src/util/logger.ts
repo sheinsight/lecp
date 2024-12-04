@@ -2,10 +2,10 @@ import pico from "picocolors";
 import randomColor from "./random-color.ts";
 
 /** 显示log级别: 默认 info(包含 error,info),  warn(包含 error), error, none 不显示 */
-export type LogLevel = "info" | "warn" | "error" | "none";
+export type LogLevel = "verbose" | "info" | "warn" | "error" | "none";
 
 // level权重
-const logLevelWeight = { info: 1, warn: 2, error: 3, none: 4 };
+const logLevelWeight = { verbose: 0, info: 1, warn: 2, error: 3, none: 4 };
 
 export type Logger = Record<
 	Exclude<LogLevel, "none">,
@@ -27,6 +27,7 @@ export const createLogger = (
 	};
 
 	const logger = {
+		verbose: (...msg: string[]) => log("info", ...msg),
 		info: (...msg: string[]) => log("info", ...msg),
 		warn: (...msg: string[]) =>
 			log(
