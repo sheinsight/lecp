@@ -60,3 +60,4 @@
     - 微前端 umd sourcemap 支持
 - [ ] check/doctor
     - package.json 导出检查
+- [ ] auto restart

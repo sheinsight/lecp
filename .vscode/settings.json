@@ -1,4 +1,4 @@
 {
 	"editor.defaultFormatter": "biomejs.biome",
-	"cSpell.words": ["browserlist", "bundless", "rspack"]
+	"cSpell.words": ["browserlist", "bundless", "pico", "rspack"]
 }
