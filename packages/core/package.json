@@ -1,22 +1,30 @@
 {
-	"name": "@shined/lecp-cli",
+	"name": "@shined/lecp",
 	"version": "0.0.1",
 	"description": "",
 	"keywords": [],
 	"license": "MIT",
 	"author": "",
 	"type": "module",
-	"main": "index.js",
+	"bin": {
+		"lecp": "bin/cli.js"
+	},
+	"exports": {
+		".": "./esm/index.js",
+		"./package.json": "./package.json"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
+		"@types/yargs": "^17.0.33",
 		"typescript": "catalog:"
 	},
 	"packageManager": "pnpm@9.14.4",
 	"dependencies": {
 		"jiti": "^2.4.1",
-		"picocolors": "^1.1.1"
+		"picocolors": "^1.1.1",
+		"yargs": "^17.7.2"
 	}
 }
