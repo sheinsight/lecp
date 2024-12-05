@@ -9,11 +9,11 @@
 		"ignoreUnknown": false,
 		"ignore": []
 	},
-	"organizeImports": {
-		"enabled": true
-	},
 	"linter": {
 		"enabled": false
+	},
+	"organizeImports": {
+		"enabled": true
 	},
 	"formatter": {
 		"enabled": true

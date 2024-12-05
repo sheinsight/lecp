@@ -1,4 +1,9 @@
 {
-	"editor.defaultFormatter": "biomejs.biome",
-	"cSpell.words": ["browserlist", "bundless", "pico", "rspack"]
+	"cSpell.words": ["browserlist", "bundless", "pico", "rspack"],
+	"editor.codeActionsOnSave": {
+		"quickfix.biome": "explicit",
+		"source.organizeImports.biome": "explicit",
+		"source.fixAll.biome": "explicit"
+	},
+	"editor.defaultFormatter": "biomejs.biome"
 }

@@ -1,8 +1,4 @@
-import {
-	coverageConfigDefaults,
-	defineConfig,
-	type ViteUserConfig,
-} from "vitest/config";
+import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
 	test: {
@@ -15,4 +11,4 @@ export default defineConfig({
 			exclude: ["**/{examples}/**", ...coverageConfigDefaults.exclude],
 		},
 	},
-}) as ViteUserConfig; // 不设置类型会报错 TS9037 --isolatedDeclarations
+}) as unknown; // 不设置类型会报错 TS9037 --isolatedDeclarations

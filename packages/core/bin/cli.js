@@ -9,4 +9,9 @@ if (enableCompileCache) {
 	} catch {}
 }
 
-import("../esm/cli.js");
+try {
+	await import("../esm/cli.js");
+} catch (e) {
+	console.error(e);
+	process.exit(1);
+}

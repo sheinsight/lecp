@@ -9,7 +9,8 @@ const logLevelWeight = { verbose: 0, info: 1, warn: 2, error: 3, none: 4 };
 
 export type Logger = Record<
 	Exclude<LogLevel, "none">,
-	(...message: string[]) => void
+	// TODO: fix any
+	(...message: (any | string)[]) => void
 > & {
 	level: LogLevel;
 };
@@ -27,8 +28,8 @@ export const createLogger = (
 	};
 
 	const logger = {
-		verbose: (...msg: string[]) => log("info", ...msg),
-		info: (...msg: string[]) => log("info", ...msg),
+		verbose: (...msg: any[]) => log("info", ...msg),
+		info: (...msg: any[]) => log("info", ...msg),
 		warn: (...msg: string[]) =>
 			log(
 				"warn",

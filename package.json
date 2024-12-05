@@ -6,7 +6,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"test": "vitest",
-		"format": "@biomejs/biome format --write ./",
+		"format": "@biomejs/biome format --write",
 		"lint": "oxlint"
 	},
 	"keywords": [],
