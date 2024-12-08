@@ -1,9 +1,10 @@
 {
-	"cSpell.words": ["browserlist", "bundless", "pico", "rspack"],
+	"cSpell.words": ["browserlist", "bundless", "lightningcss", "pico", "rspack"],
 	"editor.codeActionsOnSave": {
 		"quickfix.biome": "explicit",
 		"source.organizeImports.biome": "explicit",
 		"source.fixAll.biome": "explicit"
 	},
-	"editor.defaultFormatter": "biomejs.biome"
+	"editor.defaultFormatter": "biomejs.biome",
+	"typescript.tsdk": "node_modules/typescript/lib"
 }

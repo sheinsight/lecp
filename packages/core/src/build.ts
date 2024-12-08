@@ -1,13 +1,14 @@
 import path from "node:path";
-import { logger, type LogLevel } from "./util/logger.ts";
 import { getConfig } from "./config.ts";
 import type { UserConfig } from "./define-config.ts";
+import { type LogLevel, logger } from "./util/logger.ts";
 
-export const build = (config: UserConfig): void => {
+export const build = async (config: UserConfig): Promise<void> => {
 	logger.info("start build", config);
 };
 
 const CONFIG_FILE = "lecp.config.ts";
+// const CONFIG_FILE = "lecp2.config.ts";
 
 export interface Options {
 	cwd: string;

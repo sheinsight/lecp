@@ -1,8 +1,8 @@
 {
-	"name": "lego-cp-next",
+	"name": "lego-cp-root",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@9.14.4",
+	"packageManager": "pnpm@9.15.0",
 	"version": "0.0.1",
 	"scripts": {
 		"test": "vitest",
@@ -15,7 +15,7 @@
 	"description": "",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"oxlint": "^0.14.0",
+		"oxlint": "^0.14.1",
 		"tsx": "^4.19.2",
 		"typescript": "catalog:",
 		"vitest": "^2.1.8"

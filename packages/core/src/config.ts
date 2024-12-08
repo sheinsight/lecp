@@ -24,7 +24,9 @@ export const getConfig = async (
 	const files = new Set<string>([]);
 
 	if (!(await pathExists(configPath))) {
-		throw new Error(`配置文件不存在: ${configPath}`);
+		throw new Error(
+			`配置文件不存在: ${configPath.replace(process.cwd(), ".")}`,
+		);
 	}
 
 	files.add(configPath);
@@ -35,7 +37,7 @@ export const getConfig = async (
 	if (extendsFile) {
 		const file = path.resolve(path.dirname(configPath), config.extends);
 		if (files.has(file)) {
-			logger.warn(`配置文件: ${configPath} 被循环 extends,请检查!`);
+			logger.warn(`配置文件: ${configPath} 存在循环 extends`);
 		} else {
 			if (!(await pathExists(file))) {
 				logger.error("extends 配置文件不存在", file);
@@ -60,6 +62,6 @@ export const getConfig = async (
 	};
 };
 
-getConfig(path.resolve(import.meta.dirname, "../lecp.config.ts")).then(data =>
-	console.log(data),
-);
+// getConfig(path.resolve(import.meta.dirname, "../lecp.config.ts")).then(data =>
+// 	console.log(data),
+// );

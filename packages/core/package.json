@@ -14,12 +14,15 @@
 		"lecp": "bin/cli.js"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"dev": "node --experimental-strip-types ./src/cli.ts"
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.48.0",
+		"@rspack/core": "^1.1.5",
+		"@swc/core": "^1.10.0",
 		"chokidar": "^4.0.1",
 		"jiti": "^2.4.1",
+		"lightningcss": "^1.28.2",
 		"picocolors": "^1.1.1",
 		"tinyglobby": "^0.2.10",
 		"typescript-transform-paths": "^3.5.2",
@@ -30,5 +33,5 @@
 		"@types/yargs": "^17.0.33",
 		"typescript": "catalog:"
 	},
-	"packageManager": "pnpm@9.14.4"
+	"packageManager": "pnpm@9.15.0"
 }

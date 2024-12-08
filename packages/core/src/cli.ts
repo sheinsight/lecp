@@ -2,6 +2,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { build, init } from "./build.ts";
 import { watchConfig } from "./restart.ts";
+import { logger } from "./util/logger.ts";
 
 yargs(hideBin(process.argv))
 	.alias("v", "version")
@@ -26,7 +27,7 @@ yargs(hideBin(process.argv))
 					logLevel: argv.logLevel,
 				});
 
-				build(config);
+				await build(config);
 
 				if (argv.watch) {
 					watchConfig(Array.from(files), handler);
@@ -36,7 +37,9 @@ yargs(hideBin(process.argv))
 			try {
 				await handler();
 			} catch (error) {
-				// console.log(error);
+				logger.error(error);
+				// console.error(error);
+				process.exit(1);
 			}
 		},
 	)

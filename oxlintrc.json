@@ -2,7 +2,10 @@
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
 	"plugins": ["import", "typescript", "unicorn"],
 	"env": {},
-	"categories": {},
+	"categories": {
+		"correctness": "error",
+		"perf": "error"
+	},
 	"globals": {},
 	"settings": {},
 	"rules": {},
