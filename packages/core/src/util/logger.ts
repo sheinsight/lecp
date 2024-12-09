@@ -1,4 +1,4 @@
-import pico from "picocolors";
+import colors from "picocolors";
 import randomColor from "./random-color.ts";
 
 /** 显示log级别: 默认 info(包含 error,info),  warn(包含 error), error, none 不显示 */
@@ -33,11 +33,15 @@ export const createLogger = (
 		warn: (...msg: string[]) =>
 			log(
 				"warn",
-				pico.bgYellow(pico.white(" WARNING ")),
-				...msg.map(pico.yellow),
+				colors.bgYellow(colors.white(" WARNING ")),
+				...msg.map(colors.yellow),
 			),
 		error: (...msg: string[]) =>
-			log("error", pico.bgRed(pico.white(" ERROR ")), ...msg.map(pico.red)),
+			log(
+				"error",
+				colors.bgRed(colors.white(" ERROR ")),
+				...msg.map(colors.red),
+			),
 	} as Logger;
 
 	Object.defineProperty(logger, "level", {

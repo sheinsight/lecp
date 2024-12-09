@@ -14,13 +14,15 @@
 		"lecp": "bin/cli.js"
 	},
 	"scripts": {
-		"dev": "node --experimental-strip-types ./src/cli.ts"
+		"dev": "node --experimental-strip-types ./src/cli.ts -w",
+		"build": "node --experimental-strip-types ./src/cli.ts"
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.48.0",
 		"@rspack/core": "^1.1.5",
 		"@swc/core": "^1.10.0",
 		"chokidar": "^4.0.1",
+		"deepmerge": "^4.3.1",
 		"jiti": "^2.4.1",
 		"lightningcss": "^1.28.2",
 		"picocolors": "^1.1.1",

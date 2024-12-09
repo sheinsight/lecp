@@ -12,12 +12,17 @@ export interface Format {
 	type: FormatType;
 
 	/**
+	 * 编译模式
+	 */
+	mode?: "bundle" | "bundless";
+
+	/**
 	 * 编译引擎
 	 * @default
 	 * - bundless : swc
 	 * - bundle   : rspack
 	 */
-	builder: BuilderType;
+	builder?: BuilderType;
 
 	/**
 	 * 入口文件/文件夹
@@ -42,11 +47,15 @@ export interface Format {
 }
 
 export interface BundlessFormat extends Format {
+	mode?: "bundless";
+
 	type: Exclude<FormatType, "umd">;
 }
 
 export interface BundleFormat extends Format {
-	builder: "rspack";
+	mode?: "bundle";
+
+	builder?: "rspack";
 
 	/**
 	 * 包名称
@@ -90,7 +99,7 @@ export interface UserConfig {
 	 * 兼容目标环境
 	 * @default
 	 *  - node环境: { targets: {node: "18.12.0"} }
-	 *  - browser环境: { targets: { chrome: 48 } }
+	 *  - browser环境: { targets: { chrome: 55 } }
 	 */
 	targets?: BuildTarget;
 
@@ -107,6 +116,14 @@ export interface UserConfig {
 	 * @default true
 	 */
 	sourcemap?: boolean;
+
+	/**
+	 * 是否开启 shims
+	 * @description
+	 * - esm 产物, 支持 __dirname, __filename, require
+	 * - cjs 产物, 支持 import.meta.{url,dirname, filename}
+	 */
+	shims?: boolean;
 
 	/**
 	 * 编译时，忽略的目录或文件
@@ -170,6 +187,12 @@ export interface UserConfig {
 		 * 如有兼容代码需求.可以尝试使用 package.json的name作为前缀, `${pkgName}__[local]`
 		 */
 		cssModules?: string;
+
+		/**
+		 * bundless 模式下是否开启 less 编译
+		 * @default true
+		 */
+		lessCompile?: boolean;
 
 		// lessOptions?: LessOptions;
 

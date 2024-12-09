@@ -1,3 +1,5 @@
+import { cwd } from "node:process";
+import type { FSWatcher } from "chokidar";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { build, init } from "./build.ts";
@@ -20,14 +22,20 @@ yargs(hideBin(process.argv))
 			},
 		},
 		async argv => {
+			let watchers: FSWatcher[] = [];
+
 			const handler = async () => {
-				const { config, files } = await init({
+				watchers?.forEach(watcher => watcher.close());
+
+				const systemConfig = {
 					cwd: process.cwd(),
 					watch: argv.watch,
 					logLevel: argv.logLevel,
-				});
+				};
 
-				await build(config);
+				const { config, files } = await init(systemConfig);
+
+				watchers = await build(config, systemConfig);
 
 				if (argv.watch) {
 					watchConfig(Array.from(files), handler);

@@ -1,8 +1,10 @@
-import ts, { type CompilerOptions } from "typescript";
-import tsPathsTransformer from "typescript-transform-paths";
-import { createLogger, logger, type Logger } from "../util/logger.ts";
 import path from "node:path";
 import fs from "fs/promises";
+import ts, { type CompilerOptions } from "typescript";
+import tsPathsTransformer from "typescript-transform-paths";
+import type { SystemConfig } from "../build.ts";
+import { testPatternForTs } from "../constant.ts";
+import { type Logger, createLogger, logger } from "../util/logger.ts";
 
 /**
  * 参考配置 @see https://github.com/Swatinem/rollup-plugin-dts/blob/master/src/program.ts
@@ -50,23 +52,6 @@ export const getDiagnosticsLog = (diagnostics?: ts.Diagnostic[]): string => {
 		.trim();
 };
 
-/** @see https://www.typescriptlang.org/tsconfig#include 支持的glob格式比较少 */
-export const testPatternForTs: string[] = [
-	"**/fixtures",
-	"**/fixtures/**/*",
-	"**/demos",
-	"**/demos/**/*",
-	"**/mocks",
-	"**/mocks/**/*",
-	"**/__test__",
-	"**/__test__/**/*",
-	"**/__snapshots__",
-	"**/__snapshots__/**/*",
-	"**/*.test.*",
-	"**/*.e2e.*",
-	"**/*.spec.*",
-];
-
 export const getTsConfigFileContent = (options: {
 	cwd: string;
 	exclude?: string[];
@@ -98,23 +83,23 @@ export const getTsConfigFileContent = (options: {
  * 编译 ts 到 dts
  * // program.emit
  */
-export const bundlessDts = async (config: IConfig, typesDir: string) => {
+export const bundlessDts = async (
+	config: SystemConfig,
+	typesDir: string,
+): Promise<void> => {
 	const { cwd, watch } = config;
-	const { exclude, name } = config.buildConfig!;
-
-	const logger = createLogger(name, config.logLevel);
+	// const { exclude } = config.buildConfig!;
 
 	const src = path.join(cwd, "src");
 	logger.verbose("dts编译目录:", src);
 
-	const configContent = getTsConfigFileContent({ cwd, exclude, logger });
+	const configContent = getTsConfigFileContent({ cwd, exclude: [], logger });
 	const { fileNames, options } = configContent;
 	logger.verbose("dts编译文件: ", fileNames);
 
 	// 没有文件提前退出
-	// istanbul ignore next
 	if (!fileNames?.length && !watch) return;
-	logger.verbose("用户tsconfig配置: ", userOptions);
+	logger.verbose("用户tsconfig配置: ", options);
 
 	const overrideTsconfig = {
 		...OVERRIDE_TS_OPTIONS,

@@ -1,24 +1,47 @@
 import path from "node:path";
-import { getConfig } from "./config.ts";
+import type { FSWatcher } from "chokidar";
+import { bundlessFiles } from "./bundless/index.ts";
+import { getConfig, getFinalUserOptions } from "./config.ts";
 import type { UserConfig } from "./define-config.ts";
 import { type LogLevel, logger } from "./util/logger.ts";
 
-export const build = async (config: UserConfig): Promise<void> => {
-	logger.info("start build", config);
-};
-
-const CONFIG_FILE = "lecp.config.ts";
-// const CONFIG_FILE = "lecp2.config.ts";
-
-export interface Options {
+export interface SystemConfig {
 	cwd: string;
 	watch?: boolean;
 	logLevel?: string;
 }
 
+export const build = async (
+	config: UserConfig,
+	systemConfig: SystemConfig,
+): Promise<FSWatcher[]> => {
+	logger.info("start build", config);
+
+	const watchers: FSWatcher[] | undefined = [];
+	const userConfig = getFinalUserOptions(config);
+	const { format, ...others } = userConfig;
+
+	for (const task of format) {
+		if (task.mode === "bundless") {
+			const watcher = await bundlessFiles({ ...task, ...others }, systemConfig);
+			watchers.concat(watcher ?? []);
+		}
+
+		if (task.mode === "bundle") {
+			// const watcher = await bundleFiles(buildOptions, systemConfig);
+			// watchers.concat(watcher ?? []);
+		}
+	}
+
+	return watchers ?? [];
+};
+
+const CONFIG_FILE = "lecp.config.ts";
+// const CONFIG_FILE = "lecp2.config.ts";
+
 // cwd -> configFiles, config
 export const init = async (
-	options: Options,
+	options: SystemConfig,
 ): Promise<ReturnType<typeof getConfig>> => {
 	const { cwd, logLevel } = options;
 	if (logLevel) logger.level = logLevel as LogLevel;

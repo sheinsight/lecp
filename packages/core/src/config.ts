@@ -1,7 +1,14 @@
 import path from "node:path";
 import { createJiti } from "jiti";
-import type { UserConfig } from "./define-config.ts";
-import { pathExists } from "./util/index.ts";
+import { glob } from "tinyglobby";
+import { DEFAULT_NODE_TARGET, DEFAULT_WEB_TARGET } from "./constant.ts";
+import type {
+	BundleFormat,
+	BundlessFormat,
+	FormatType,
+	UserConfig,
+} from "./define-config.ts";
+import { merge, pathExists } from "./util/index.ts";
 import { logger } from "./util/logger.ts";
 
 export const loadConfig = async (configPath: string): Promise<UserConfig> => {
@@ -65,3 +72,82 @@ export const getConfig = async (
 // getConfig(path.resolve(import.meta.dirname, "../lecp.config.ts")).then(data =>
 // 	console.log(data),
 // );
+
+const defaultConfig: Partial<UserConfig> = {
+	dts: true,
+	sourcemap: true,
+	targets: {}, // 默认值不能放到这里.可能会导致多个target 同时生效
+	exclude: [],
+	externalHelpers: false,
+	react: {
+		jsxRuntime: "automatic",
+	},
+	alias: { "@": "./src" },
+	define: {},
+	css: {
+		lessCompile: true,
+	},
+};
+
+const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
+	esm: {
+		type: "esm",
+		mode: "bundless",
+		builder: "swc",
+		entry: "src",
+		outDir: "es",
+	} as BundlessFormat,
+	cjs: {
+		type: "cjs",
+		mode: "bundless",
+		builder: "swc",
+		entry: "src",
+		outDir: "lib",
+	} as BundlessFormat,
+	umd: {
+		type: "umd",
+		mode: "bundle",
+		builder: "rspack",
+		outDir: "umd",
+		fileName: "index",
+		// entry:
+		// name:
+	} as BundleFormat,
+};
+
+const getDefaultEntry = async (cwd: string) => {
+	const files = await glob(["./src/index.{tsx,ts,jsx,js}"], {
+		cwd,
+		absolute: true,
+	});
+	return files.sort().reverse().at(0);
+};
+
+export type Prettify<T> = { [K in keyof T]: T[K] } & {};
+
+export interface FinalUserConfig extends Required<Omit<UserConfig, "extend">> {
+	format: Required<BundlessFormat | BundleFormat>[];
+	name: string;
+}
+
+export const getFinalUserOptions = (userConfig: UserConfig) => {
+	const buildOptions = merge<UserConfig>(defaultConfig, userConfig);
+
+	if (!userConfig.targets) {
+		const isCjsOnly = userConfig.format.every(item => item.type === "cjs");
+		buildOptions.targets = isCjsOnly
+			? { node: DEFAULT_NODE_TARGET }
+			: { chrome: DEFAULT_WEB_TARGET };
+	}
+
+	buildOptions.format = userConfig.format.map(item => {
+		return {
+			...defaultFormatConfig[item.type],
+			...item,
+		};
+	});
+
+	// buildOptions.name
+
+	return buildOptions as FinalUserConfig;
+};
