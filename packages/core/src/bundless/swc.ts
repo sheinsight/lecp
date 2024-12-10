@@ -1,7 +1,7 @@
-import type { Options as SwcOptions } from "@swc/core";
+import type { GlobalPassOption, Options as SwcOptions } from "@swc/core";
 import deepmerge from "deepmerge";
 import type { SystemConfig } from "../build.ts";
-import type { UserConfig } from "../define-config.ts";
+import type { FormatType, UserConfig } from "../define-config.ts";
 
 // '@': './src' -> '@/*': ['./src/*'],
 // TODO: 兼容性 config 统一format
@@ -17,9 +17,6 @@ const aliasToTsPath = (alias: Record<string, string> = {}) => {
 		{} as Record<string, [string]>,
 	);
 };
-
-/** 编译类型 */
-export type FormatType = "esm" | "cjs" | "umd";
 
 interface GetOptions {
 	type: FormatType;
@@ -46,6 +43,31 @@ const getOutFileExtension = (format: FormatType, isModule: boolean) => {
 	return outFileExtension;
 };
 
+/**
+ * webpack define 格式转换成 swc `jsc.transform.optimizer.globals` 配置
+ */
+const getGlobalsFromDefine = (define?: Record<string, string>) => {
+	if (!define) return {};
+
+	const globals: Required<GlobalPassOption> = {
+		typeofs: {},
+		vars: {},
+		envs: {},
+	};
+
+	if (define) {
+		Object.entries(define).forEach(([key, value]) => {
+			if (key.startsWith("typeof ")) {
+				globals.typeofs[key.replace("typeof", "").trim()] = value;
+			} else {
+				globals.vars[key] = value;
+			}
+		});
+	}
+
+	return globals;
+};
+
 export const getSwcOptions = (
 	options: GetOptions,
 	config: SystemConfig,
@@ -63,16 +85,33 @@ export const getSwcOptions = (
 		css,
 	} = options;
 
-	// TODO: wasm 插件
 	const plugins: Array<[string, Record<string, any>]> = [];
-	// if (define) plugins.push(["transform-define", define]);
-	// if (css?.cssModules)
-	// 	plugins.push([
-	// 		"transform-css-modules",
-	// 		{ generate_scoped_name: css.cssModules },
-	// 	]);
-	// if (css?.lessCompile) plugins.push(["transform-less2css", {}]);
-	// if (format !== "umd") plugins.push(["transform-ts2js", {}]);
+
+	plugins.push([
+		"@swc/plugin-transform-imports",
+		{
+			// 是否判断 allowImportingTsExtensions:true 后开启
+			// TODO: cts, mts
+			"^(.*?)(\\.ts)$": {
+				handleDefaultImport: true,
+				transform: "{{matches.[1]}}.js",
+			},
+			...(css?.lessCompile && {
+				"^(.*?)(\\.less)$": {
+					handleDefaultImport: true,
+					transform: "{{matches.[1]}}.css",
+				},
+			}),
+		},
+	]);
+
+	if (css?.cssModules) {
+		// 注意顺序, 在 transform-imports 之后
+		plugins.push([
+			"swc-plugin-css-modules",
+			{ generate_scoped_name: css.cssModules },
+		]);
+	}
 
 	const defaultSwcOptions: SwcOptions = {
 		env: {
@@ -96,6 +135,9 @@ export const getSwcOptions = (
 				decoratorMetadata: true,
 				react: {
 					runtime: react?.jsxRuntime,
+				},
+				optimizer: {
+					globals: getGlobalsFromDefine(define),
 				},
 			},
 			baseUrl: cwd,

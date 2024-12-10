@@ -44,6 +44,9 @@ importers:
       '@swc/core':
         specifier: 1.9.2
         version: 1.9.2
+      '@swc/plugin-transform-imports':
+        specifier: 5.0.3
+        version: 5.0.3
       chokidar:
         specifier: ^4.0.1
         version: 4.0.1
@@ -62,6 +65,9 @@ importers:
       read-pkg:
         specifier: ^9.0.1
         version: 9.0.1
+      swc-plugin-css-modules:
+        specifier: 1.0.0
+        version: 1.0.0
       tinyglobby:
         specifier: ^0.2.10
         version: 0.2.10
@@ -740,6 +746,9 @@ packages:
   '@swc/counter@0.1.3':
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
 
+  '@swc/plugin-transform-imports@5.0.3':
+    resolution: {integrity: sha512-EvDyqSy7l5k6aErASVt2EESNeY++SE1VqVJZt3ZRwyMEyph+st8xrF/Gaq0mrhnaZhqkGPLa+InkLUcRAqtkQg==}
+
   '@swc/types@0.1.17':
     resolution: {integrity: sha512-V5gRru+aD8YVyCOMAjMpWR1Ui577DD5KSJsHP8RAxopAH22jFz6GZd/qxqjO6MJHQhcsjvjOFXyDhyLQUnMveQ==}
 
@@ -1216,6 +1225,9 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  swc-plugin-css-modules@1.0.0:
+    resolution: {integrity: sha512-R1da02rNAwlfkBJlM1i4iuXCMHo7m7EpGa0/f3RwycUdirszQh6Ca+kvNwBBCxCGVtAMHc3bm0H1bIJ+FJTSAQ==}
 
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
@@ -1812,6 +1824,10 @@ snapshots:
 
   '@swc/counter@0.1.3': {}
 
+  '@swc/plugin-transform-imports@5.0.3':
+    dependencies:
+      '@swc/counter': 0.1.3
+
   '@swc/types@0.1.17':
     dependencies:
       '@swc/counter': 0.1.3
@@ -2288,6 +2304,8 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  swc-plugin-css-modules@1.0.0: {}
 
   tinybench@2.9.0: {}
 
