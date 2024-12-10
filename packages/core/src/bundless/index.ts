@@ -9,12 +9,65 @@ import type { FinalUserConfig } from "../config.ts";
 import { testPattern } from "../constant.ts";
 import type { BundlessFormat } from "../define-config.ts";
 import { logger } from "../util/logger.ts";
+import {
+	type TransformLessOptions,
+	transformCSS,
+	transformLess,
+} from "./style.ts";
 import { getSwcOptions } from "./swc.ts";
 
-interface SourceMap {
+export interface SourceMap {
 	file?: string;
 	sources?: string[];
 }
+
+interface CompileStyleOptions {
+	srcDir: string;
+	outDir: string;
+	//
+	sourcemap: boolean;
+	targets: BundlessOptions["targets"];
+}
+
+export const compileStyle = async (
+	file: string,
+	{ srcDir, outDir, sourcemap, targets }: CompileStyleOptions,
+): Promise<void> => {
+	const filePath = file.replace(srcDir, "");
+	const outFilePath = path.join(outDir, filePath.replace(/\.less$/, ".css"));
+	const content = await fs.readFile(file, "utf-8");
+
+	const { code, map } = await Promise.resolve({ code: content, map: "" })
+		.then(({ code, map }) => {
+			if (isLess.test(file)) {
+				const options: TransformLessOptions = {
+					filename: file,
+					outFilePath,
+					sourcemap,
+				};
+				return transformLess(code, options);
+			}
+
+			return { code, map };
+		})
+		.then(({ code, map }) => {
+			const options = {
+				filename: file,
+				inputSourceMap: map,
+				sourcemap,
+				targets,
+			};
+			return transformCSS(code, options);
+		});
+
+	await fs.mkdir(path.dirname(outFilePath), { recursive: true });
+	await fs.writeFile(outFilePath, code);
+
+	if (map) {
+		const mapFilePath = outFilePath + ".map";
+		await fs.writeFile(mapFilePath, JSON.stringify(map));
+	}
+};
 
 interface CompileScriptOptions {
 	compile: (file: string) => Promise<{ code: string; map?: string }>;
@@ -84,6 +137,7 @@ export const bundlessFiles = async (
 ): Promise<FSWatcher[] | undefined> => {
 	const { cwd, watch } = config;
 	const { exclude, outDir: _outDir, css, type: format } = options;
+	const { sourcemap, targets } = options;
 
 	const srcDir = path.join(cwd, "src");
 	const outDir = path.join(cwd, _outDir);
@@ -96,7 +150,8 @@ export const bundlessFiles = async (
 		// console.log(fileRelPath);
 
 		if (isCss.test(file) || (isLess.test(file) && css?.lessCompile)) {
-			console.log("编译样式");
+			logger.info(colors.white(`编译样式:`), colors.yellow(fileRelPath));
+			await compileStyle(file, { srcDir, outDir, sourcemap, targets });
 			return;
 		}
 
@@ -111,7 +166,6 @@ export const bundlessFiles = async (
 				srcDir,
 				outDir,
 			});
-
 			return;
 		}
 
