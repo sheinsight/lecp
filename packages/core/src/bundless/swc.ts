@@ -1,5 +1,6 @@
 import type { Options as SwcOptions } from "@swc/core";
 import deepmerge from "deepmerge";
+import type { SystemConfig } from "../build.ts";
 import type { UserConfig } from "../define-config.ts";
 
 // '@': './src' -> '@/*': ['./src/*'],
@@ -34,7 +35,22 @@ interface GetOptions {
 
 const swcModuleMap = { esm: "es6", cjs: "commonjs", umd: "umd" } as const;
 
-export const getSwcOptions = (options: GetOptions, cwd: string): SwcOptions => {
+/**
+ *
+ * @param isModule isModule: package.json type: "module"
+ */
+const getOutFileExtension = (format: FormatType, isModule: boolean) => {
+	let outFileExtension = "js";
+	if (isModule && format === "cjs") outFileExtension = "cjs";
+	if (!isModule && format === "esm") outFileExtension = "mjs";
+	return outFileExtension;
+};
+
+export const getSwcOptions = (
+	options: GetOptions,
+	config: SystemConfig,
+): SwcOptions => {
+	const { cwd, pkg } = config;
 	const {
 		type: format,
 		swcOptions,
@@ -60,17 +76,16 @@ export const getSwcOptions = (options: GetOptions, cwd: string): SwcOptions => {
 
 	const defaultSwcOptions: SwcOptions = {
 		env: {
-			// targets:{}, // 不能 和 jsc.target: "" 同时使用
 			mode: "entry",
 			coreJs: "3",
 		},
 		// https://github.com/swc-project/swc/issues/4589
 		// swc isModule: true, defined multiple times will error
-		// isModule: format !== 'umd',
+		// isModule: format !== "umd",
 		jsc: {
 			// https://swc.rs/docs/configuration/compilation#jscexternalhelpers
 			externalHelpers, // @swc/helpers
-			// target: "es5", // 通过env设置提供兼容
+			// target: "es5", // `env` and `jsc.target` cannot be used together
 			parser: {
 				syntax: "typescript", //  isTs ? 'typescript' : 'ecmascript',
 				tsx: true,
@@ -102,6 +117,8 @@ export const getSwcOptions = (options: GetOptions, cwd: string): SwcOptions => {
 			configFile: false,
 			module: {
 				type: swcModuleMap[format],
+				resolveFully: true,
+				outFileExtension: getOutFileExtension(format, pkg.type === "module"), // 1.10.1 支持. 不生效 ??
 			},
 			env: { targets },
 			sourceMaps: sourcemap,

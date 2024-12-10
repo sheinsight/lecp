@@ -69,10 +69,6 @@ export const getConfig = async (
 	};
 };
 
-// getConfig(path.resolve(import.meta.dirname, "../lecp.config.ts")).then(data =>
-// 	console.log(data),
-// );
-
 const defaultConfig: Partial<UserConfig> = {
 	dts: true,
 	sourcemap: true,

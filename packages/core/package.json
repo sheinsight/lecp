@@ -20,12 +20,13 @@
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.48.0",
 		"@rspack/core": "^1.1.5",
-		"@swc/core": "^1.10.0",
+		"@swc/core": "^1.10.1",
 		"chokidar": "^4.0.1",
 		"deepmerge": "^4.3.1",
 		"jiti": "^2.4.1",
 		"lightningcss": "^1.28.2",
 		"picocolors": "^1.1.1",
+		"read-pkg": "^9.0.1",
 		"tinyglobby": "^0.2.10",
 		"typescript-transform-paths": "^3.5.2",
 		"yargs": "^17.7.2"

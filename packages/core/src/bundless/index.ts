@@ -105,9 +105,8 @@ export const bundlessFiles = async (
 
 			await compileScript(file, {
 				compile: async file => {
-					console.log("getSwcOptions", getSwcOptions(options, cwd));
-					return transformFile(file, getSwcOptions(options, cwd));
-					// return { code: "", map: "" };
+					const swcOptions = getSwcOptions(options, config);
+					return transformFile(file, swcOptions);
 				},
 				srcDir,
 				outDir,
