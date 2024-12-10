@@ -10,7 +10,7 @@ if (enableCompileCache) {
 }
 
 try {
-	await import("../esm/cli.js");
+	await import("../es/cli.js");
 } catch (e) {
 	console.error(e);
 	process.exit(1);

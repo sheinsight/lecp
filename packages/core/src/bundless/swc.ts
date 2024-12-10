@@ -53,7 +53,7 @@ export const getSwcOptions = (
 	const { cwd, pkg } = config;
 	const {
 		type: format,
-		swcOptions,
+		swcOptions = {},
 		targets,
 		sourcemap,
 		externalHelpers,
@@ -111,7 +111,7 @@ export const getSwcOptions = (
 
 	return deepmerge.all<SwcOptions>([
 		defaultSwcOptions,
-		swcOptions || {},
+		swcOptions,
 		{
 			swcrc: false,
 			configFile: false,
