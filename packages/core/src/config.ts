@@ -121,9 +121,11 @@ const getDefaultEntry = async (cwd: string) => {
 
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
-export interface FinalUserConfig extends Required<Omit<UserConfig, "extend">> {
+export interface FinalUserConfig
+	extends Required<Omit<UserConfig, "extend" | "dts">> {
 	format: Required<BundlessFormat | BundleFormat>[];
 	name: string;
+	dts?: Required<Exclude<UserConfig["dts"], boolean>>;
 }
 
 export const getFinalUserOptions = (userConfig: UserConfig) => {
@@ -143,7 +145,16 @@ export const getFinalUserOptions = (userConfig: UserConfig) => {
 		};
 	});
 
-	// buildOptions.name
+	if (buildOptions.dts) {
+		buildOptions.dts = {
+			type: "bundless",
+			builder: "swc",
+			// @ts-expect-error ...true ok
+			...buildOptions.dts,
+		};
+
+		console.log("buildOptions.dts", buildOptions.dts);
+	}
 
 	return buildOptions as FinalUserConfig;
 };

@@ -7,8 +7,13 @@ import { glob } from "tinyglobby";
 import type { SystemConfig } from "../build.ts";
 import type { FinalUserConfig } from "../config.ts";
 import { testPattern } from "../constant.ts";
-import type { BundlessFormat } from "../define-config.ts";
+import type { BundlessFormat, DtsBuilderType } from "../define-config.ts";
 import { logger } from "../util/logger.ts";
+import {
+	swcTransformDeclaration,
+	transformDts,
+	tsTransformDeclaration,
+} from "./dts.ts";
 import {
 	type TransformLessOptions,
 	transformCSS,
@@ -19,6 +24,11 @@ import { getSwcOptions } from "./swc.ts";
 export interface SourceMap {
 	file?: string;
 	sources?: string[];
+}
+
+export interface TransformResult {
+	code: string;
+	map?: string;
 }
 
 interface CompileStyleOptions {
@@ -61,12 +71,12 @@ export const compileStyle = async (
 		});
 
 	await fs.mkdir(path.dirname(outFilePath), { recursive: true });
+
+	// .js
 	await fs.writeFile(outFilePath, code);
 
-	if (map) {
-		const mapFilePath = outFilePath + ".map";
-		await fs.writeFile(mapFilePath, JSON.stringify(map));
-	}
+	// .js.map
+	map && (await fs.writeFile(outFilePath + ".map", JSON.stringify(map)));
 };
 
 interface CompileScriptOptions {
@@ -136,7 +146,7 @@ export const bundlessFiles = async (
 	config: SystemConfig,
 ): Promise<FSWatcher[] | undefined> => {
 	const { cwd, watch } = config;
-	const { exclude, outDir: _outDir, css, type: format } = options;
+	const { exclude, outDir: _outDir, css, type: format, dts } = options;
 	const { sourcemap, targets } = options;
 
 	const srcDir = path.join(cwd, "src");
@@ -166,6 +176,34 @@ export const bundlessFiles = async (
 				srcDir,
 				outDir,
 			});
+
+			if (
+				dts &&
+				dts.mode === "bundless" &&
+				config.tsconfig?.isolatedDeclarations
+			) {
+				logger.info(colors.white(`编译dts:`), colors.yellow(fileRelPath));
+
+				const dtsBuilders: Record<
+					DtsBuilderType,
+					() => Promise<TransformResult | undefined>
+				> = {
+					swc: () => swcTransformDeclaration(file),
+					ts: () =>
+						tsTransformDeclaration(file, {
+							...config.tsconfig,
+							outDir,
+							declarationDir: outDir,
+						}),
+				};
+
+				await transformDts(file, {
+					transform: dtsBuilders[dts.builder],
+					srcDir,
+					outDir,
+				});
+			}
+
 			return;
 		}
 

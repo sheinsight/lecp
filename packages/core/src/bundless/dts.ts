@@ -1,10 +1,12 @@
 import path from "node:path";
+import { transformFile as swcTransformFile } from "@swc/core";
 import fs from "fs/promises";
 import ts, { type CompilerOptions } from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
 import type { SystemConfig } from "../build.ts";
 import { testPatternForTs } from "../constant.ts";
-import { type Logger, createLogger, logger } from "../util/logger.ts";
+import { logger } from "../util/logger.ts";
+import type { TransformResult } from "./index.ts";
 
 /**
  * 参考配置 @see https://github.com/Swatinem/rollup-plugin-dts/blob/master/src/program.ts
@@ -55,9 +57,8 @@ export const getDiagnosticsLog = (diagnostics?: ts.Diagnostic[]): string => {
 export const getTsConfigFileContent = (options: {
 	cwd: string;
 	exclude?: string[];
-	logger: Logger;
 }): ts.ParsedCommandLine => {
-	const { cwd, exclude = [], logger } = options;
+	const { cwd, exclude = [] } = options;
 	const configFileName = ts.findConfigFile(cwd, ts.sys.fileExists);
 	if (!configFileName) {
 		logger.error(`${cwd}下未找到tsconfig.json`);
@@ -131,13 +132,15 @@ export const bundlessDts = async (
 	logger.verbose("最终tsconfig配置: ", compilerOptions);
 
 	// 生成 d.ts文件
-	if (compilerOptions.isolatedDeclarations) {
-		fileNames.forEach(fileName =>
-			transpileDeclaration(fileName, compilerOptions),
-		);
-	} else {
-		emitDeclaration(fileNames, compilerOptions);
-	}
+	// if (compilerOptions.isolatedDeclarations) {
+	// 	fileNames.forEach(fileName =>
+	// 		transpileDeclaration(fileName, compilerOptions),
+	// 	);
+	// } else {
+
+	// }
+
+	emitDeclaration(fileNames, compilerOptions);
 };
 
 /**
@@ -167,10 +170,10 @@ export const emitDeclaration = (
  * 编译 ts 到 dts (emitIsolatedDts, ts)
  * ts@5.5.2+ (ts.transpileDeclaration)
  */
-export const transpileDeclaration = (
+export const tsTransformDeclaration = async (
 	fileName: string,
 	compilerOptions: CompilerOptions,
-): void => {
+): Promise<TransformResult | undefined> => {
 	const code = ts.sys.readFile(fileName);
 	if (!code) {
 		logger.error(`文件不存在: ${fileName}`);
@@ -183,6 +186,7 @@ export const transpileDeclaration = (
 			compilerOptions,
 			fileName,
 			reportDiagnostics: true,
+			// other ts.TranspileOptions
 			// moduleName?: string;
 			// renamedDependencies?: MapLike<string>;
 			// transformers?: CustomTransformers;
@@ -193,11 +197,10 @@ export const transpileDeclaration = (
 	const log = getDiagnosticsLog(diagnostics);
 	log && logger.error(log);
 
-	// .d.ts
-	const dtsFileName = fileName.replace(/(c|m)?ts(x)?$/, "d.$1ts$2");
-	fs.writeFile(dtsFileName, outputText);
-	// d.ts.map
-	sourceMapText && fs.writeFile(dtsFileName + ".map", sourceMapText);
+	return {
+		code: outputText,
+		map: sourceMapText,
+	};
 };
 
 // temp test
@@ -207,3 +210,60 @@ export const transpileDeclaration = (
  * 编译 ts 到 dts (emitIsolatedDts, swc)
  * swc@1.6.4 支持 (`jsc.experimental.emitIsolatedDts:true`)
  */
+
+export const swcTransformDeclaration = async (
+	fileName: string,
+): Promise<TransformResult | undefined> => {
+	try {
+		const result = await swcTransformFile(fileName, {
+			filename: fileName,
+			jsc: {
+				parser: {
+					syntax: "typescript",
+					tsx: false,
+				},
+				experimental: {
+					emitIsolatedDts: true,
+				},
+			},
+		});
+
+		// @ts-expect-error
+		const output = JSON.parse(result.output);
+		return {
+			code: output.__swc_isolated_declarations__,
+		};
+	} catch (error: any) {
+		logger.error(error);
+	}
+};
+
+interface TransformDtsOption {
+	transform: () => Promise<TransformResult | undefined>;
+	srcDir: string;
+	outDir: string;
+}
+
+export const transformDts = async (
+	file: string,
+	{ transform, srcDir, outDir }: TransformDtsOption,
+): Promise<void> => {
+	const result = await transform();
+	if (!result) return;
+
+	const { code, map } = result;
+
+	const filePath = file.replace(srcDir, "");
+	const dtsFilePath = path.join(
+		outDir,
+		filePath.replace(/(c|m)?ts(x)?$/, "d.$1ts$2"),
+	);
+
+	await fs.mkdir(path.dirname(dtsFilePath), { recursive: true });
+
+	// .d.ts
+	fs.writeFile(dtsFilePath, code);
+
+	// d.ts.map
+	map && fs.writeFile(dtsFilePath + ".map", map);
+};

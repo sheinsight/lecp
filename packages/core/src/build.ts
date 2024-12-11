@@ -1,6 +1,8 @@
 import path from "node:path";
 import type { FSWatcher } from "chokidar";
 import { type NormalizedPackageJson, readPackage } from "read-pkg";
+import type { CompilerOptions } from "typescript";
+import { getTsConfigFileContent } from "./bundless/dts.ts";
 import { bundlessFiles } from "./bundless/index.ts";
 import { getConfig, getFinalUserOptions } from "./config.ts";
 import type { UserConfig } from "./define-config.ts";
@@ -17,6 +19,7 @@ export interface SystemConfig {
 	watch: boolean;
 	logLevel: string;
 	pkg: NormalizedPackageJson;
+	tsconfig?: CompilerOptions;
 }
 
 export const build = async (
@@ -33,6 +36,10 @@ export const build = async (
 		normalize: true,
 		cwd: systemConfig.cwd,
 	});
+
+	systemConfig.tsconfig ??= getTsConfigFileContent({
+		cwd: systemConfig.cwd,
+	}).options;
 
 	for (const task of format) {
 		if (task.mode === "bundless") {
@@ -62,6 +69,8 @@ export const init = async (
 	const configFile = path.resolve(cwd, CONFIG_FILE);
 
 	const { files, config } = await getConfig(configFile);
+
+	console.log("config file: ", config);
 
 	return { files, config };
 };

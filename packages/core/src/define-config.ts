@@ -4,6 +4,11 @@ export type FormatType = "esm" | "cjs" | "umd";
 /** 支持的编译引擎类型 */
 // babel, webpack, ...
 export type BuilderType = "swc" | "rspack";
+// postcss ...
+export type CssBuilderType = "lightningcss";
+export type DtsBuilderType = "ts" | "swc";
+
+export type FormatMode = "bundless" | "bundle";
 
 /** 兼容目标环境 */
 export type BuildTarget = Record<string, string | number>;
@@ -14,7 +19,7 @@ export interface Format {
 	/**
 	 * 编译模式
 	 */
-	mode?: "bundle" | "bundless";
+	mode?: FormatMode;
 
 	/**
 	 * 编译引擎
@@ -148,20 +153,23 @@ export interface UserConfig {
 
 	/**
 	 * 是否生成声明文件
-	 * @default true ("bundle" + "normal")
+	 * @default true (mode:"bundless" + builder: "ts")
 	 */
 	dts?:
 		| boolean
 		| {
 				/**
 				 * bundle 使用 @microsoft/api-extractor 生成单个文件
+				 * @default "bundless"
 				 */
-				type: "bundle" | "bundless";
+				mode: FormatMode;
 
 				/**
-				 * bundless + tsconfig.json 配置 `isolatedDeclaration:true` 自动使用 fast 模式
+				 * bundless + isolatedDeclaration 模式下的可选择的构建引擎
+				 * @default "ts"
+				 * 注: swc 速度更快, 但暂不支持生成 d.ts.map
 				 */
-				mode: "normal" | "fast"; // "isolated-decl"
+				builder?: DtsBuilderType;
 		  };
 
 	react?: {

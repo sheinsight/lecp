@@ -7,7 +7,7 @@ import {
 	transform,
 } from "lightningcss";
 import { logger } from "../util/logger.ts";
-import type { SourceMap } from "./index.ts";
+import type { SourceMap, TransformResult } from "./index.ts";
 
 interface TransformCSSOptions {
 	filename: string;
@@ -16,11 +16,6 @@ interface TransformCSSOptions {
 	targets: TransformOptions<any>["targets"];
 	plugins?: Visitor<any>[];
 	lightningcssOptions?: Omit<TransformOptions<any>, "code" | "filename">;
-}
-
-interface TransformResult {
-	code: string;
-	map: string;
 }
 
 export async function transformCSS(

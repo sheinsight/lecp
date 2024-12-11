@@ -1,4 +1,3 @@
-import { cwd } from "node:process";
 import type { FSWatcher } from "chokidar";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";

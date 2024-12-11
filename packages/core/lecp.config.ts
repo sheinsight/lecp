@@ -18,4 +18,8 @@ export default defineConfig({
 		cssModules: "[name]__[local]",
 		lessCompile: true,
 	},
+	dts: {
+		mode: "bundless",
+		builder: "ts",
+	},
 }) as unknown;
