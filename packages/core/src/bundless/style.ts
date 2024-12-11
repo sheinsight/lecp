@@ -11,7 +11,8 @@ import type { SourceMap, TransformResult } from "./index.ts";
 
 interface TransformCSSOptions {
 	filename: string;
-	inputSourceMap: string;
+	outFilePath: string;
+	inputSourceMap?: string;
 	sourcemap: boolean;
 	targets: TransformOptions<any>["targets"];
 	plugins?: Visitor<any>[];
@@ -22,8 +23,14 @@ export async function transformCSS(
 	content: string,
 	options: TransformCSSOptions,
 ): Promise<TransformResult> {
-	const { filename, inputSourceMap, sourcemap, targets, lightningcssOptions } =
-		options;
+	const {
+		filename,
+		inputSourceMap,
+		sourcemap,
+		targets,
+		lightningcssOptions,
+		outFilePath,
+	} = options;
 	const plugins: Visitor<any>[] = [];
 	const { code, map, warnings } = transform({
 		code: Buffer.from(content),
@@ -46,7 +53,9 @@ export async function transformCSS(
 
 	return {
 		code: new TextDecoder().decode(code),
-		map: map ? JSON.parse(new TextDecoder().decode(map)) : null,
+		map: map
+			? relativeSourcemap(new TextDecoder().decode(map), outFilePath)
+			: undefined,
 	};
 }
 
@@ -57,7 +66,10 @@ export function relativeSourcemap(rawMap: string, outFilePath: string): string {
 	// 绝对路径 -> 相对路径
 	if (map?.sources) {
 		map.sources = map.sources.map(filePath =>
-			path.relative(path.dirname(outFilePath), filePath),
+			path.relative(
+				path.dirname(outFilePath),
+				filePath.startsWith("/") ? filePath : `/${filePath}`, // lightningcss sources 开头无 /
+			),
 		);
 	}
 
@@ -66,14 +78,13 @@ export function relativeSourcemap(rawMap: string, outFilePath: string): string {
 
 export interface TransformLessOptions {
 	filename: string;
-	outFilePath: string;
 	lessOptions?: Less.Options;
 	sourcemap: boolean;
 }
 
 export async function transformLess(
 	content: string,
-	{ lessOptions, sourcemap, filename, outFilePath }: TransformLessOptions,
+	{ lessOptions, sourcemap, filename }: TransformLessOptions,
 ): Promise<TransformResult> {
 	const { css, map } = await less.render(content, {
 		...lessOptions,
@@ -83,6 +94,6 @@ export async function transformLess(
 
 	return {
 		code: css,
-		map: relativeSourcemap(map, outFilePath),
+		map,
 	};
 }

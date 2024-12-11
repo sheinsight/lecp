@@ -52,7 +52,6 @@ export const compileStyle = async (
 			if (isLess.test(file)) {
 				const options: TransformLessOptions = {
 					filename: file,
-					outFilePath,
 					sourcemap,
 				};
 				return transformLess(code, options);
@@ -63,6 +62,7 @@ export const compileStyle = async (
 		.then(({ code, map }) => {
 			const options = {
 				filename: file,
+				outFilePath,
 				inputSourceMap: map,
 				sourcemap,
 				targets,
