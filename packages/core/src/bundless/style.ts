@@ -17,6 +17,7 @@ interface TransformCSSOptions {
 	targets: TransformOptions<any>["targets"];
 	plugins?: Visitor<any>[];
 	lightningcssOptions?: Omit<TransformOptions<any>, "code" | "filename">;
+	cssModules?: string;
 }
 
 export async function transformCSS(
@@ -30,16 +31,15 @@ export async function transformCSS(
 		targets,
 		lightningcssOptions,
 		outFilePath,
+		cssModules,
 	} = options;
 	const plugins: Visitor<any>[] = [];
 	const { code, map, warnings } = transform({
 		code: Buffer.from(content),
 		targets,
-		cssModules: {
-			// 不支持 自定义 hash ([name]__[local]___[hash:base64:5])
-			// 不支持 :global, :local
-			pattern: "[name]__[local]___[hash]",
-		},
+		// 不支持 自定义 hash ([name]__[local]___[hash:base64:5])
+		// 不支持 :global, :local
+		cssModules: cssModules ? { pattern: cssModules } : false,
 		visitor: composeVisitors(plugins),
 		filename,
 		inputSourceMap,

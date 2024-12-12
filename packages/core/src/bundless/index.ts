@@ -38,11 +38,12 @@ interface CompileStyleOptions {
 	//
 	sourcemap: boolean;
 	targets: BundlessOptions["targets"];
+	cssModules: BundlessOptions["css"]["cssModules"];
 }
 
 const compileStyle = async (
 	file: string,
-	{ outFilePath, sourcemap, targets }: CompileStyleOptions,
+	{ outFilePath, sourcemap, targets, cssModules }: CompileStyleOptions,
 ): Promise<void> => {
 	const content = await fs.readFile(file, "utf-8");
 
@@ -65,6 +66,7 @@ const compileStyle = async (
 				inputSourceMap: map,
 				sourcemap,
 				targets,
+				cssModules,
 			};
 			return transformCSS(code, options);
 		});
@@ -199,6 +201,7 @@ export const bundlessFiles = async (
 				outFilePath: getOutFilePath(filePath, "style"),
 				sourcemap,
 				targets,
+				cssModules: css.cssModules,
 			});
 			return;
 		}
