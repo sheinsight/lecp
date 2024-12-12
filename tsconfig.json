@@ -10,12 +10,12 @@
 		"noEmit": false,
 		"emitDeclarationOnly": true,
 		"declaration": true,
+		"declarationMap": true,
 		"isolatedDeclarations": true,
 		"isolatedModules": true,
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"declarationMap": true
+		"forceConsistentCasingInFileNames": true
 	}
 }

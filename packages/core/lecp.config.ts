@@ -22,4 +22,8 @@ export default defineConfig({
 		mode: "bundless",
 		builder: "ts",
 	},
+	targets: {
+		node: "20.11.0",
+		// chrome: 55,
+	},
 }) as unknown;

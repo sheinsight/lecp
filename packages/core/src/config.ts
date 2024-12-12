@@ -142,7 +142,7 @@ export const getFinalUserOptions = (userConfig: UserConfig) => {
 		return {
 			...defaultFormatConfig[item.type],
 			...item,
-		};
+		} as BundlessFormat | BundleFormat;
 	});
 
 	if (buildOptions.dts) {

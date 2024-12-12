@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import type { FormatType } from "../define-config.ts";
 
 export const pathExists = (path: string): Promise<boolean> =>
 	fs
@@ -41,3 +42,26 @@ export const merge = <T extends object>(...args: Partial<T>[]): T => {
 	// return deepmerge.all<T>(args);
 	return args.reduce((prev, next) => Object.assign(prev, next), {}) as T;
 };
+
+/**
+ * |     | module | commonjs |
+ * | --- | ------ | -------- |
+ * | esm | .js     | .mjs    |
+ * | cjs | .cjs    | .js     |
+ *
+ * @description
+ * - target: browser 不处理后缀
+ * - target: node 处理后缀
+ */
+export function getOutJsExt(
+	isNode: boolean,
+	isModule: boolean,
+	format: FormatType,
+): string {
+	if (!isNode) return ".js";
+
+	if (isModule && format === "cjs") return ".cjs";
+	if (!isModule && format === "esm") return ".mjs";
+
+	return ".js";
+}

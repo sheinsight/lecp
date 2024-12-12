@@ -1,7 +1,6 @@
-import type { FSWatcher } from "chokidar";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { build, init } from "./build.ts";
+import { type Watcher, build, init } from "./build.ts";
 import { watchConfig } from "./restart.ts";
 import { logger } from "./util/logger.ts";
 
@@ -21,7 +20,7 @@ yargs(hideBin(process.argv))
 			},
 		},
 		async argv => {
-			let watchers: FSWatcher[] = [];
+			let watchers: Watcher[] = [];
 
 			const handler = async () => {
 				watchers?.forEach(watcher => watcher.close());

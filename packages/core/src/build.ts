@@ -1,5 +1,4 @@
 import path from "node:path";
-import type { FSWatcher } from "chokidar";
 import { type NormalizedPackageJson, readPackage } from "read-pkg";
 import type { CompilerOptions } from "typescript";
 import { getTsConfigFileContent } from "./bundless/dts.ts";
@@ -22,24 +21,30 @@ export interface SystemConfig {
 	tsconfig?: CompilerOptions;
 }
 
+export interface Watcher {
+	close(): Promise<void> | void;
+}
+
 export const build = async (
 	config: UserConfig,
-	systemConfig: SystemConfig,
-): Promise<FSWatcher[]> => {
+	inputSystemConfig: InputSystemConfig,
+): Promise<Watcher[]> => {
 	logger.info("start build", config);
 
-	const watchers: FSWatcher[] | undefined = [];
+	const watchers: Watcher[] = [];
 	const userConfig = getFinalUserOptions(config);
 	const { format, ...others } = userConfig;
 
-	systemConfig.pkg ??= await readPackage({
-		normalize: true,
-		cwd: systemConfig.cwd,
-	});
-
-	systemConfig.tsconfig ??= getTsConfigFileContent({
-		cwd: systemConfig.cwd,
-	}).options;
+	const systemConfig = {
+		...inputSystemConfig,
+		pkg: await readPackage({
+			normalize: true,
+			cwd: inputSystemConfig.cwd,
+		}),
+		tsconfig: getTsConfigFileContent({
+			cwd: inputSystemConfig.cwd,
+		}).options,
+	} as SystemConfig;
 
 	for (const task of format) {
 		if (task.mode === "bundless") {
@@ -68,9 +73,5 @@ export const init = async (
 
 	const configFile = path.resolve(cwd, CONFIG_FILE);
 
-	const { files, config } = await getConfig(configFile);
-
-	console.log("config file: ", config);
-
-	return { files, config };
+	return getConfig(configFile);
 };

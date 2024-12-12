@@ -33,17 +33,6 @@ interface GetOptions {
 const swcModuleMap = { esm: "es6", cjs: "commonjs", umd: "umd" } as const;
 
 /**
- *
- * @param isModule isModule: package.json type: "module"
- */
-const getOutFileExtension = (format: FormatType, isModule: boolean) => {
-	let outFileExtension = "js";
-	if (isModule && format === "cjs") outFileExtension = "cjs";
-	if (!isModule && format === "esm") outFileExtension = "mjs";
-	return outFileExtension;
-};
-
-/**
  * webpack define 格式转换成 swc `jsc.transform.optimizer.globals` 配置
  */
 const getGlobalsFromDefine = (define?: Record<string, string>) => {
@@ -71,8 +60,9 @@ const getGlobalsFromDefine = (define?: Record<string, string>) => {
 export const getSwcOptions = (
 	options: GetOptions,
 	config: SystemConfig,
+	outJsExt: string,
 ): SwcOptions => {
-	const { cwd, pkg } = config;
+	const { cwd } = config;
 	const {
 		type: format,
 		swcOptions = {},
@@ -160,7 +150,7 @@ export const getSwcOptions = (
 			module: {
 				type: swcModuleMap[format],
 				resolveFully: true,
-				outFileExtension: getOutFileExtension(format, pkg.type === "module"), // 1.10.1 支持. 不生效 ??
+				outFileExtension: outJsExt, // 1.10.1 支持. 不生效 ??
 			},
 			env: { targets },
 			sourceMaps: sourcemap,

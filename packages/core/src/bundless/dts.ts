@@ -3,7 +3,7 @@ import { transformFile as swcTransformFile } from "@swc/core";
 import fs from "fs/promises";
 import ts, { type CompilerOptions } from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
-import type { SystemConfig } from "../build.ts";
+import type { SystemConfig, Watcher } from "../build.ts";
 import { testPatternForTs } from "../constant.ts";
 import { logger } from "../util/logger.ts";
 import type { TransformResult } from "./index.ts";
@@ -65,7 +65,7 @@ export const getTsConfigFileContent = (options: {
 		return {} as never;
 	}
 
-	const { config, error } = ts.readConfigFile(configFileName!, ts.sys.readFile);
+	const { config, error } = ts.readConfigFile(configFileName, ts.sys.readFile);
 	if (error) {
 		logger.error(getDiagnosticsLog([error]));
 		return {} as never;
@@ -87,15 +87,14 @@ export const getTsConfigFileContent = (options: {
 export const bundlessDts = async (
 	config: SystemConfig,
 	typesDir: string,
-): Promise<void> => {
+): Promise<Watcher | void> => {
 	const { cwd, watch } = config;
 	// const { exclude } = config.buildConfig!;
 
 	const src = path.join(cwd, "src");
 	logger.verbose("dts编译目录:", src);
 
-	const configContent = getTsConfigFileContent({ cwd, exclude: [], logger });
-	const { fileNames, options } = configContent;
+	const { fileNames, options } = getTsConfigFileContent({ cwd, exclude: [] });
 	logger.verbose("dts编译文件: ", fileNames);
 
 	// 没有文件提前退出
@@ -116,29 +115,11 @@ export const bundlessDts = async (
 		...overrideTsconfig,
 	};
 
-	// check tsconfig.json
-	// try {
-	// 	config.rootPath;
-	// 	const configPath = ts
-	// 		.findConfigFile(process.cwd(), ts.sys.fileExists)!
-	// 		.replace(config.rootPath!, ".");
-
-	// 	checkTsconfig(options, overrideTsconfig, configPath);
-	// } catch (error: any) {
-	// 	// istanbul ignore next 不需要测试
-	// 	logger.warn(error?.message);
-	// }
-
 	logger.verbose("最终tsconfig配置: ", compilerOptions);
 
-	// 生成 d.ts文件
-	// if (compilerOptions.isolatedDeclarations) {
-	// 	fileNames.forEach(fileName =>
-	// 		transpileDeclaration(fileName, compilerOptions),
-	// 	);
-	// } else {
-
-	// }
+	if (watch) {
+		return watchDeclaration(fileNames, compilerOptions);
+	}
 
 	emitDeclaration(fileNames, compilerOptions);
 };
@@ -167,6 +148,30 @@ export const emitDeclaration = (
 };
 
 /**
+ * 编译 ts 到 dts (tsc --watch --emitDeclarationOnly --declaration)
+ */
+export const watchDeclaration = (
+	files: string[],
+	compilerOptions: CompilerOptions,
+): ts.WatchOfConfigFile<ts.BuilderProgram> => {
+	logger.verbose("watching dts...");
+	const host = ts.createWatchCompilerHost(
+		files,
+		compilerOptions,
+		ts.sys,
+		ts.createSemanticDiagnosticsBuilderProgram,
+		function reportDiagnostic(diagnostic) {
+			logger.error(getDiagnosticsLog([diagnostic]));
+		},
+		function reportWatchStatusChanged(diagnostic) {
+			logger.info(getDiagnosticsLog([diagnostic]));
+		},
+	);
+	const watcher = ts.createWatchProgram(host);
+	return watcher;
+};
+
+/**
  * 编译 ts 到 dts (emitIsolatedDts, ts)
  * ts@5.5.2+ (ts.transpileDeclaration)
  */
@@ -175,7 +180,7 @@ export const tsTransformDeclaration = async (
 	compilerOptions: CompilerOptions,
 ): Promise<TransformResult | undefined> => {
 	const code = ts.sys.readFile(fileName);
-	if (!code) {
+	if (code === undefined) {
 		logger.error(`文件不存在: ${fileName}`);
 		return;
 	}
@@ -203,12 +208,10 @@ export const tsTransformDeclaration = async (
 	};
 };
 
-// temp test
-// transpileDeclaration(path.join(import.meta.dirname, "./dts.ts"), {});
-
 /**
  * 编译 ts 到 dts (emitIsolatedDts, swc)
  * swc@1.6.4 支持 (`jsc.experimental.emitIsolatedDts:true`)
+ * @description 暂不支持生成 d.ts.map
  */
 
 export const swcTransformDeclaration = async (
@@ -240,30 +243,23 @@ export const swcTransformDeclaration = async (
 
 interface TransformDtsOption {
 	transform: () => Promise<TransformResult | undefined>;
-	srcDir: string;
-	outDir: string;
+	outFilePath: string;
 }
 
 export const transformDts = async (
 	file: string,
-	{ transform, srcDir, outDir }: TransformDtsOption,
+	{ transform, outFilePath }: TransformDtsOption,
 ): Promise<void> => {
 	const result = await transform();
 	if (!result) return;
 
 	const { code, map } = result;
 
-	const filePath = file.replace(srcDir, "");
-	const dtsFilePath = path.join(
-		outDir,
-		filePath.replace(/(c|m)?ts(x)?$/, "d.$1ts$2"),
-	);
-
-	await fs.mkdir(path.dirname(dtsFilePath), { recursive: true });
+	await fs.mkdir(path.dirname(outFilePath), { recursive: true });
 
 	// .d.ts
-	fs.writeFile(dtsFilePath, code);
+	fs.writeFile(outFilePath, code);
 
 	// d.ts.map
-	map && fs.writeFile(dtsFilePath + ".map", map);
+	map && fs.writeFile(outFilePath + ".map", map);
 };

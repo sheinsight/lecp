@@ -46,7 +46,7 @@ export async function transformCSS(
 		sourceMap: sourcemap,
 		...lightningcssOptions,
 	});
-	if (warnings) {
+	if (warnings.length) {
 		// TODO: 优化
 		logger.warn(warnings);
 	}

@@ -1,15 +1,17 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { transformFile } from "@swc/core";
-import chokidar, { type FSWatcher } from "chokidar";
+import chokidar from "chokidar";
 import colors from "picocolors";
 import { glob } from "tinyglobby";
-import type { SystemConfig } from "../build.ts";
+import type { SystemConfig, Watcher } from "../build.ts";
 import type { FinalUserConfig } from "../config.ts";
 import { testPattern } from "../constant.ts";
 import type { BundlessFormat, DtsBuilderType } from "../define-config.ts";
+import { getOutJsExt } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
 import {
+	bundlessDts,
 	swcTransformDeclaration,
 	transformDts,
 	tsTransformDeclaration,
@@ -32,22 +34,19 @@ export interface TransformResult {
 }
 
 interface CompileStyleOptions {
-	srcDir: string;
-	outDir: string;
+	outFilePath: string;
 	//
 	sourcemap: boolean;
 	targets: BundlessOptions["targets"];
 }
 
-export const compileStyle = async (
+const compileStyle = async (
 	file: string,
-	{ srcDir, outDir, sourcemap, targets }: CompileStyleOptions,
+	{ outFilePath, sourcemap, targets }: CompileStyleOptions,
 ): Promise<void> => {
-	const filePath = file.replace(srcDir, "");
-	const outFilePath = path.join(outDir, filePath.replace(/\.less$/, ".css"));
 	const content = await fs.readFile(file, "utf-8");
 
-	const { code, map } = await Promise.resolve({ code: content, map: "" })
+	let { code, map } = await Promise.resolve({ code: content, map: "" })
 		.then(({ code, map }) => {
 			if (isLess.test(file)) {
 				const options: TransformLessOptions = {
@@ -72,37 +71,33 @@ export const compileStyle = async (
 
 	await fs.mkdir(path.dirname(outFilePath), { recursive: true });
 
-	// .js
-	await fs.writeFile(outFilePath, code);
+	if (map) {
+		const mapFilePath = outFilePath + ".map";
+		code += `\n/*# sourceMappingURL=${path.basename(mapFilePath)}*/`;
 
-	// .js.map
-	map && (await fs.writeFile(outFilePath + ".map", JSON.stringify(map)));
+		// .css.map
+		await fs.writeFile(outFilePath + ".map", JSON.stringify(map));
+	}
+
+	// .css
+	await fs.writeFile(outFilePath, code);
 };
 
 interface CompileScriptOptions {
 	compile: (file: string) => Promise<{ code: string; map?: string }>;
-	srcDir: string;
-	outDir: string;
+	outFilePath: string;
 }
-export const compileScript = async (
+const compileScript = async (
 	file: string,
-	{ compile, srcDir, outDir }: CompileScriptOptions,
+	{ compile, outFilePath }: CompileScriptOptions,
 ): Promise<void> => {
 	let { code, map } = await compile(file);
 
-	const filePath = file.replace(srcDir, "");
-	// TODO: (c|m)ts -> (c|m)js
-	const outFilePath = path.join(
-		outDir,
-		filePath.replace(/\.tsx?$/, ".js").replace(/\.jsx$/, ".js"),
-	);
-
 	await fs.mkdir(path.dirname(outFilePath), { recursive: true });
-	await fs.writeFile(outFilePath, code);
 
 	if (map) {
 		const mapFilePath = outFilePath + ".map";
-		code += "\n//# sourceMappingURL=" + path.basename(mapFilePath);
+		code += `\n//# sourceMappingURL=${path.basename(mapFilePath)}`;
 
 		const mapJson: SourceMap = typeof map === "string" ? JSON.parse(map) : map;
 
@@ -115,15 +110,19 @@ export const compileScript = async (
 			);
 		}
 
+		// .js.map
 		await fs.writeFile(mapFilePath, JSON.stringify(mapJson));
 	}
+
+	// .js
+	await fs.writeFile(outFilePath, code);
 };
 
 interface CopyAssetOptions {
 	srcDir: string;
 	outDir: string;
 }
-export const copyAsset = async (
+const copyAsset = async (
 	file: string,
 	{ srcDir, outDir }: CopyAssetOptions,
 ): Promise<void> => {
@@ -137,6 +136,7 @@ const isLess = /\.less$/;
 const isCss = /\.css$/;
 const isScript = /\.(c|m)?(t|j)sx?$/;
 const isDts = /\.d\.(c|m)?tsx?$/;
+const isJsx = /\.(t|j)sx?$/;
 
 type BundlessOptions = Omit<FinalUserConfig, "format"> &
 	Required<BundlessFormat>;
@@ -144,7 +144,7 @@ type BundlessOptions = Omit<FinalUserConfig, "format"> &
 export const bundlessFiles = async (
 	options: BundlessOptions,
 	config: SystemConfig,
-): Promise<FSWatcher[] | undefined> => {
+): Promise<Watcher[] | undefined> => {
 	const { cwd, watch } = config;
 	const { exclude, outDir: _outDir, css, type: format, dts } = options;
 	const { sourcemap, targets } = options;
@@ -155,13 +155,51 @@ export const bundlessFiles = async (
 	const excludePatterns = testPattern.concat(exclude);
 	const files = await glob("**/*", { cwd: srcDir, ignore: excludePatterns });
 
+	const outJsExt = getOutJsExt(
+		!!targets.node,
+		config.pkg.type === "module",
+		format,
+	);
+
+	const getOutFilePath = (
+		filePath: string,
+		type: "script" | "style" | "dts",
+	) => {
+		let outFile = filePath;
+
+		if (type === "style") {
+			outFile = css?.lessCompile
+				? filePath.replace(/\.less$/, ".css")
+				: filePath;
+		}
+
+		if (type === "script") {
+			outFile = filePath
+				.replace(/\.(t|j)sx$/, ".js")
+				.replace(/\.(c|m)?(t|j)s$/, outJsExt);
+		}
+
+		if (type === "dts") {
+			outFile = filePath
+				.replace(/\.(t|j)sx?$/, ".d.ts")
+				.replace(/\.(c|m)ts$/, ".d.$1ts");
+		}
+
+		return path.join(outDir, outFile);
+	};
+
 	const compileFile = async (file: string) => {
 		const fileRelPath = file.replace(cwd, "");
-		// console.log(fileRelPath);
+		const filePath = file.replace(srcDir, "");
 
 		if (isCss.test(file) || (isLess.test(file) && css?.lessCompile)) {
 			logger.info(colors.white(`编译样式:`), colors.yellow(fileRelPath));
-			await compileStyle(file, { srcDir, outDir, sourcemap, targets });
+
+			await compileStyle(file, {
+				outFilePath: getOutFilePath(filePath, "style"),
+				sourcemap,
+				targets,
+			});
 			return;
 		}
 
@@ -170,18 +208,17 @@ export const bundlessFiles = async (
 
 			await compileScript(file, {
 				compile: async file => {
-					const swcOptions = getSwcOptions(options, config);
+					const swcOptions = getSwcOptions(
+						options,
+						config,
+						isJsx.test(file) ? "js" : outJsExt,
+					);
 					return transformFile(file, swcOptions);
 				},
-				srcDir,
-				outDir,
+				outFilePath: getOutFilePath(filePath, "script"),
 			});
 
-			if (
-				dts &&
-				dts.mode === "bundless" &&
-				config.tsconfig?.isolatedDeclarations
-			) {
+			if (dts?.mode === "bundless" && config.tsconfig?.isolatedDeclarations) {
 				logger.info(colors.white(`编译dts:`), colors.yellow(fileRelPath));
 
 				const dtsBuilders: Record<
@@ -199,8 +236,7 @@ export const bundlessFiles = async (
 
 				await transformDts(file, {
 					transform: dtsBuilders[dts.builder],
-					srcDir,
-					outDir,
+					outFilePath: getOutFilePath(filePath, "dts"),
 				});
 			}
 
@@ -213,6 +249,8 @@ export const bundlessFiles = async (
 
 	files.map(file => path.join(srcDir, file)).forEach(compileFile);
 
+	const watchers: Watcher[] = [];
+
 	if (watch) {
 		const watcher = chokidar.watch(".", {
 			cwd: srcDir,
@@ -220,6 +258,64 @@ export const bundlessFiles = async (
 			ignored: await glob(excludePatterns, { cwd: srcDir }),
 		});
 
-		return [watcher];
+		const handleChange = async (event: string, file: string) => {
+			if (event === "add" || event === "change")
+				return compileFile(path.join(srcDir, file));
+			if (event === "unlinkDir")
+				return fs.rm(path.join(outDir, file), {
+					recursive: true,
+					force: true,
+				});
+			if (event === "unlink") {
+				// style
+				if (isLess.test(file) || isCss.test(file)) {
+					const outFilePath = getOutFilePath(file, "style");
+					if (sourcemap) fs.rm(outFilePath + ".map");
+					fs.rm(outFilePath);
+					return;
+				}
+
+				// script
+				if (isScript.test(file) && !isDts.test(file)) {
+					const outFilePath = getOutFilePath(file, "script");
+
+					// .js
+					if (sourcemap) fs.rm(outFilePath + ".map");
+					fs.rm(outFilePath);
+
+					if (
+						dts?.mode === "bundless" &&
+						config.tsconfig?.isolatedDeclarations
+					) {
+						// d.ts
+						const outDtsFilePath = getOutFilePath(file, "script");
+						if (config.tsconfig?.declarationMap) fs.rm(outDtsFilePath + ".map");
+						fs.rm(outDtsFilePath);
+					}
+
+					return;
+				}
+
+				// copy asset
+				return fs.rm(path.join(outDir, file));
+			}
+		};
+
+		watcher.on("all", async (event, file) => {
+			try {
+				await handleChange(event, file);
+			} catch (error) {
+				logger.verbose(error);
+			}
+		});
+
+		watchers.push(watcher);
 	}
+
+	if (dts && !config.tsconfig?.isolatedDeclarations) {
+		const watch = await bundlessDts(config, outDir);
+		if (watch) watchers.push(watch);
+	}
+
+	if (watch) return watchers;
 };
