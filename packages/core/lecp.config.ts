@@ -5,7 +5,13 @@ export default defineConfig({
 	format: [
 		{
 			type: "esm",
-			builder: "swc",
+			// builder: "swc",
+			// outDir: "dist/es",
+		},
+		{
+			type: "cjs",
+			// builder: "swc",
+			// outDir: "dist/lib",
 		},
 	],
 	define: {

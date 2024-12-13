@@ -138,7 +138,7 @@ const isLess = /\.less$/;
 const isCss = /\.css$/;
 const isScript = /\.(c|m)?(t|j)sx?$/;
 const isDts = /\.d\.(c|m)?tsx?$/;
-const isJsx = /\.(t|j)sx?$/;
+const isJsx = /\.(t|j)sx$/;
 
 type BundlessOptions = Omit<FinalUserConfig, "format"> &
 	Required<BundlessFormat>;
@@ -175,6 +175,7 @@ export const bundlessFiles = async (
 				: filePath;
 		}
 
+		// 目前暂不考虑 .cjs, .mjs源文件后缀对产物后缀的影响
 		if (type === "script") {
 			outFile = filePath
 				.replace(/\.(t|j)sx$/, ".js")
@@ -214,7 +215,7 @@ export const bundlessFiles = async (
 					const swcOptions = getSwcOptions(
 						options,
 						config,
-						isJsx.test(file) ? "js" : outJsExt,
+						isJsx.test(file) ? ".js" : outJsExt,
 					);
 					return transformFile(file, swcOptions);
 				},

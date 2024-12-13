@@ -1,12 +1,12 @@
-import ts from "typescript";
 import path from "node:path";
 import {
 	Extractor,
 	ExtractorConfig,
 	type ExtractorLogLevel,
 } from "@microsoft/api-extractor";
-import { logger } from "../util/logger.ts";
+import ts from "typescript";
 import { OVERRIDE_TS_OPTIONS } from "../bundless/dts.ts";
+import { logger } from "../util/logger.ts";
 
 interface BundleDtsOptions {
 	srcDir: string;

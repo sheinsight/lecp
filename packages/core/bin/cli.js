@@ -11,6 +11,7 @@ if (enableCompileCache) {
 
 try {
 	await import("../es/cli.js");
+	// await import("../lib/cli.cjs");
 } catch (e) {
 	console.error(e);
 	process.exit(1);

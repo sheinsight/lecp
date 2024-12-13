@@ -1,4 +1,10 @@
-import type { GlobalPassOption, Options as SwcOptions } from "@swc/core";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import type {
+	GlobalPassOption,
+	ModuleConfig,
+	Options as SwcOptions,
+} from "@swc/core";
 import deepmerge from "deepmerge";
 import type { SystemConfig } from "../build.ts";
 import type { FormatType, UserConfig } from "../define-config.ts";
@@ -30,14 +36,16 @@ interface GetOptions {
 	define: UserConfig["define"];
 }
 
-const swcModuleMap = { esm: "es6", cjs: "commonjs", umd: "umd" } as const;
+const swcModuleMap = {
+	esm: "es6",
+	cjs: "commonjs",
+	umd: "umd",
+} satisfies Record<FormatType, ModuleConfig["type"]>;
 
 /**
  * webpack define 格式转换成 swc `jsc.transform.optimizer.globals` 配置
  */
 const getGlobalsFromDefine = (define?: Record<string, string>) => {
-	if (!define) return {};
-
 	const globals: Required<GlobalPassOption> = {
 		typeofs: {},
 		vars: {},
@@ -56,6 +64,9 @@ const getGlobalsFromDefine = (define?: Record<string, string>) => {
 
 	return globals;
 };
+
+// swc 支持 import.meta.url, 暂不支持 import.meta.dirname
+const dirname = path.dirname(fileURLToPath(import.meta.url)); // swc下， 同时支持 cjs 和 esm 的写法
 
 export const getSwcOptions = (
 	options: GetOptions,
@@ -77,26 +88,34 @@ export const getSwcOptions = (
 
 	const plugins: Array<[string, Record<string, any>]> = [];
 
+	// allowImportingTsExtensions (ts->js), 暂不保留原始后缀,统一为 .js
 	plugins.push([
-		"@swc/plugin-transform-imports",
+		path.resolve(dirname, "./swc_plugin_transform_ts2js.wasm"),
+		{},
+	]);
+
+	// 修正 后缀
+	// - 补全 cjs省略的 .js 后缀
+	// - 修正 type:module 省略的 .cjs/.mjs 后缀
+	// - 修正 less 编译导致的 .less -> .css 后缀
+	plugins.push([
+		path.resolve(dirname, "./swc_plugin_transform_extensions.wasm"),
 		{
-			// 是否判断 allowImportingTsExtensions:true 后开启
-			// TODO: cts, mts
-			"^(.*?)(\\.ts)$": {
-				handleDefaultImport: true,
-				transform: "{{matches.[1]}}.js",
+			extensions: {
+				".js": outJsExt,
+				".mjs": outJsExt,
+				".cjs": outJsExt,
+				/** lessCompile  */
+				...(css?.lessCompile && { ".less": ".css" }),
 			},
-			...(css?.lessCompile && {
-				"^(.*?)(\\.less)$": {
-					handleDefaultImport: true,
-					transform: "{{matches.[1]}}.css",
-				},
-			}),
+			addExtension: true,
 		},
 	]);
 
+	// TODO: format === "cjs" 时， import.meta.filename, import.meta.dirname
+
 	if (css?.cssModules) {
-		// 注意顺序, 在 transform-imports 之后
+		// 注意顺序, 在 transform-extensions 之后
 		plugins.push([
 			"swc-plugin-css-modules",
 			{ generate_scoped_name: css.cssModules },
@@ -108,8 +127,7 @@ export const getSwcOptions = (
 			mode: "entry",
 			coreJs: "3",
 		},
-		// https://github.com/swc-project/swc/issues/4589
-		// swc isModule: true, defined multiple times will error
+		// swc isModule: true, defined multiple times will error @see https://github.com/swc-project/swc/issues/4589
 		// isModule: format !== "umd",
 		jsc: {
 			// https://swc.rs/docs/configuration/compilation#jscexternalhelpers
@@ -127,11 +145,12 @@ export const getSwcOptions = (
 					runtime: react?.jsxRuntime,
 				},
 				optimizer: {
+					// @swc/core@1.2.101+ 支持无需插件实现 @see https://swc.rs/docs/configuration/compilation#jsctransformoptimizerglobals
 					globals: getGlobalsFromDefine(define),
 				},
 			},
 			baseUrl: cwd,
-			// https://github.com/swc-project/swc/issues/3614 暂不支持替换 require 和 require.resolve
+			// 暂不支持替换 require 和 require.resolve @see https://github.com/swc-project/swc/issues/3614
 			paths: aliasToTsPath(alias),
 
 			experimental: {
@@ -149,8 +168,7 @@ export const getSwcOptions = (
 			configFile: false,
 			module: {
 				type: swcModuleMap[format],
-				resolveFully: true,
-				outFileExtension: outJsExt, // 1.10.1 支持. 不生效 ??
+				resolveFully: true, // 和插件配合, 不加 导致 ./xx/index.ts -> ./xx ??
 			},
 			env: { targets },
 			sourceMaps: sourcemap,
