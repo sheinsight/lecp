@@ -1,6 +1,7 @@
 import path from "node:path";
 import { type NormalizedPackageJson, readPackage } from "read-pkg";
 import type { CompilerOptions } from "typescript";
+import { bundleFiles } from "./bundle/index.ts";
 import { getTsConfigFileContent } from "./bundless/dts.ts";
 import { bundlessFiles } from "./bundless/index.ts";
 import { getConfig, getFinalUserOptions } from "./config.ts";
@@ -52,9 +53,14 @@ export const build = async (
 			watchers.concat(watcher ?? []);
 		}
 
+		// TODO: bundleDts 依赖 bundless的 dts
+		if (userConfig.dts?.mode === "bundle") {
+			//
+		}
+
 		if (task.mode === "bundle") {
-			// const watcher = await bundleFiles(buildOptions, systemConfig);
-			// watchers.concat(watcher ?? []);
+			const watcher = await bundleFiles({ ...task, ...others }, systemConfig);
+			watchers.concat(watcher ?? []);
 		}
 	}
 
