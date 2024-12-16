@@ -18,8 +18,8 @@
 		"build": "node --experimental-strip-types ./src/cli.ts"
 	},
 	"dependencies": {
-		"@microsoft/api-extractor": "^7.48.0",
-		"@rspack/core": "^1.1.5",
+		"@microsoft/api-extractor": "^7.48.1",
+		"@rspack/core": "^1.1.6",
 		"@swc/core": "1.9.2",
 		"@swc/plugin-transform-imports": "5.0.3",
 		"chokidar": "^4.0.1",
