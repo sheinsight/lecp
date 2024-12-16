@@ -1,5 +1,4 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 import type {
 	GlobalPassOption,
 	ModuleConfig,
@@ -8,6 +7,8 @@ import type {
 import deepmerge from "deepmerge";
 import type { SystemConfig } from "../build.ts";
 import type { FormatType, UserConfig } from "../define-config.ts";
+
+const require = createRequire(import.meta.url);
 
 // '@': './src' -> '@/*': ['./src/*'],
 // TODO: 兼容性 config 统一format
@@ -65,9 +66,6 @@ const getGlobalsFromDefine = (define?: Record<string, string>) => {
 	return globals;
 };
 
-// swc 支持 import.meta.url, 暂不支持 import.meta.dirname
-const dirname = path.dirname(fileURLToPath(import.meta.url)); // swc下， 同时支持 cjs 和 esm 的写法
-
 export const getSwcOptions = (
 	options: GetOptions,
 	config: SystemConfig,
@@ -90,7 +88,8 @@ export const getSwcOptions = (
 
 	// allowImportingTsExtensions (ts->js), 暂不保留原始后缀,统一为 .js
 	plugins.push([
-		path.resolve(dirname, "./swc_plugin_transform_ts2js.wasm"),
+		// "@shined/swc-plugin-transform-ts2js", {}
+		require.resolve("@shined/swc-plugin-transform-ts2js"),
 		{},
 	]);
 
@@ -99,7 +98,7 @@ export const getSwcOptions = (
 	// - 修正 type:module 省略的 .cjs/.mjs 后缀
 	// - 修正 less 编译导致的 .less -> .css 后缀
 	plugins.push([
-		path.resolve(dirname, "./swc_plugin_transform_extensions.wasm"),
+		require.resolve("@shined/swc-plugin-transform-extensions"),
 		{
 			extensions: {
 				".js": outJsExt,

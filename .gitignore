@@ -1,15 +1,18 @@
 # node
 node_modules/
-
-# rust
-debug/
-target/
-
-# os
-.DS_Store
-
 # build
 dist/
 es/
 lib/
 umd/
+
+# rust
+debug/
+target/
+/target
+^target/
+target
+*.wasm
+
+# os
+.DS_Store

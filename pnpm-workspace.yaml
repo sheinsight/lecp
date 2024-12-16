@@ -1,5 +1,6 @@
 packages:
 - 'packages/*'
+- 'crates/*'
 
 catalog:
   typescript: ^5.7.2

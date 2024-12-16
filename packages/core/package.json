@@ -22,6 +22,8 @@
 		"@rspack/core": "^1.1.6",
 		"@swc/core": "1.9.2",
 		"@swc/plugin-transform-imports": "5.0.3",
+		"@shined/swc-plugin-transform-extensions": "workspace:*",
+		"@shined/swc-plugin-transform-ts2js": "workspace:*",
 		"chokidar": "^4.0.1",
 		"deepmerge": "^4.3.1",
 		"jiti": "^2.4.1",
