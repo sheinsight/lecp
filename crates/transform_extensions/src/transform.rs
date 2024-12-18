@@ -7,20 +7,9 @@ use swc_core::ecma::{
     visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
 };
 
-const JS_EXTS: [&str; 3] = [".js", ".mjs", ".cjs"];
-
 #[derive(Clone, Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
-    /**
-     * 自动给相对路径的导入添加扩展名
-     * cjs 源码 -> 编译 esm 运行需要扩展名
-     * ./foo, ./foo.js => ./foo.mjs 或 ./foo.cjs
-     * 暂不考虑混写 cjs/mjs 场景
-     */
-    #[serde(default)]
-    pub add_extension: bool,
-
     /**
      * {
      *  ".js": ".mjs",
@@ -50,22 +39,7 @@ fn replace_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
         }
     }
 
-    // without extension, append '.js' extension
-    if config.add_extension && no_ext(src) {
-        let name = src.value.as_str();
-        let ext = config.extensions.get(".js").map_or(".js", |v| v);
-        return Some(format!("{name}{ext}").into());
-    }
-
     None
-}
-
-/**
- * 判断 src 无后缀
- */
-fn no_ext(src: &ast::Str) -> bool {
-    let has_js_ext = JS_EXTS.iter().any(|ext| src.value.ends_with(ext));
-    !src.value[1..].contains('.') || !has_js_ext
 }
 
 struct RewriteImportingExtensions {
@@ -134,7 +108,6 @@ test_inline!(
                     ".js": ".cjs",
                     ".mjs": ".cjs"
                 },
-                "addExtension": true
             }"#
         )
         .unwrap()
@@ -160,7 +133,6 @@ test_inline!(
                     ".js": ".js",
                     ".mjs": ".js"
                 },
-                "addExtension": true
             }"#
         )
         .unwrap()
@@ -186,7 +158,6 @@ test_inline!(
                     ".cjs": ".mjs",
                     ".js": ".mjs"
                 },
-                "addExtension": true
             }"#
         )
         .unwrap()
@@ -195,12 +166,10 @@ test_inline!(
     r#"
         import a from "./a.cjs";
         import b from "./b.js";
-        import c from "./c";
     "#, // Input codes,
     r#"
         import a from "./a.mjs";
         import b from "./b.mjs";
-        import c from "./c.mjs";
     "# // Output codes after transformed with plugin
 );
 
@@ -214,7 +183,6 @@ test_inline!(
                     ".cjs": ".js",
                     ".js": ".js"
                 },
-                "addExtension": true
             }"#
         )
         .unwrap()

@@ -157,8 +157,6 @@ export const getFinalUserOptions = (
 			// @ts-expect-error ...true ok
 			...buildOptions.dts,
 		};
-
-		console.log("buildOptions.dts", buildOptions.dts);
 	}
 
 	if (buildOptions.css?.cssModules === true) {

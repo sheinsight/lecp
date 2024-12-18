@@ -109,7 +109,6 @@ export const getSwcOptions = (
 				/** lessCompile  */
 				...(css?.lessCompile && { ".less": ".css" }),
 			},
-			addExtension: true,
 		},
 	]);
 
@@ -169,7 +168,7 @@ export const getSwcOptions = (
 			configFile: false,
 			module: {
 				type: swcModuleMap[format],
-				resolveFully: true, // 和插件配合, 不加 导致 ./xx/index.ts -> ./xx ??
+				resolveFully: true,
 			},
 			minify,
 			env: { targets },
