@@ -1,6 +1,7 @@
 import path from "node:path";
 import { createJiti } from "jiti";
 import { glob } from "tinyglobby";
+import type { SystemConfig } from "./build.ts";
 import { DEFAULT_NODE_TARGET, DEFAULT_WEB_TARGET } from "./constant.ts";
 import type {
 	BundleFormat,
@@ -122,13 +123,17 @@ const getDefaultEntry = async (cwd: string) => {
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 export interface FinalUserConfig
-	extends Required<Omit<UserConfig, "extend" | "dts">> {
+	extends Required<Omit<UserConfig, "extend" | "dts" | "css">> {
 	format: Required<BundlessFormat | BundleFormat>[];
 	name: string;
 	dts?: Required<Exclude<UserConfig["dts"], boolean>>;
+	css?: Omit<UserConfig["css"], "cssModules"> & { cssModules?: string };
 }
 
-export const getFinalUserOptions = (userConfig: UserConfig) => {
+export const getFinalUserOptions = (
+	userConfig: UserConfig,
+	systemConfig: SystemConfig,
+) => {
 	const buildOptions = merge<UserConfig>(defaultConfig, userConfig);
 
 	if (!userConfig.targets) {
@@ -154,6 +159,11 @@ export const getFinalUserOptions = (userConfig: UserConfig) => {
 		};
 
 		console.log("buildOptions.dts", buildOptions.dts);
+	}
+
+	if (buildOptions.css?.cssModules === true) {
+		const pkgName = systemConfig.pkg.name;
+		buildOptions.css.cssModules = `${pkgName.replace("@", "").replace("/", "__")}__[local]`;
 	}
 
 	return buildOptions as FinalUserConfig;

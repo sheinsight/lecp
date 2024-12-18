@@ -33,8 +33,6 @@ export const build = async (
 	logger.info("start build", config);
 
 	const watchers: Watcher[] = [];
-	const userConfig = getFinalUserOptions(config);
-	const { format, ...others } = userConfig;
 
 	const systemConfig = {
 		...inputSystemConfig,
@@ -46,6 +44,9 @@ export const build = async (
 			cwd: inputSystemConfig.cwd,
 		}).options,
 	} as SystemConfig;
+
+	const userConfig = getFinalUserOptions(config, systemConfig);
+	const { format, ...others } = userConfig;
 
 	for (const task of format) {
 		if (task.mode === "bundless") {

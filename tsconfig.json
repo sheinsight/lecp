@@ -1,22 +1,25 @@
 {
 	"compilerOptions": {
+		// module
 		"target": "ESNext",
-		//   "module": "ESNext",
-		//   "moduleResolution": "bundler",
-		"module": "NodeNext",
-		"moduleResolution": "nodenext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		// "module": "NodeNext",
+		// "moduleResolution": "nodenext",
+		"esModuleInterop": true,
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
-		"noEmit": false,
+		"isolatedDeclarations": true, // perf
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		// lint
+		"strict": true,
+		"skipLibCheck": true, // perf
+		"forceConsistentCasingInFileNames": true,
+		// dts
+		"noEmit": true,
 		"emitDeclarationOnly": true,
 		"declaration": true,
-		"declarationMap": true,
-		"isolatedDeclarations": true,
-		"isolatedModules": true,
-		"strict": true,
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true
+		"declarationMap": true
 	}
 }

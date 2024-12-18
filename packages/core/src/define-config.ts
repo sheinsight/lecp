@@ -1,3 +1,7 @@
+import type { TransformOptions as LightningCssTransformOptions } from "lightningcss";
+
+import type Less from "less";
+
 /** 编译类型 */
 export type FormatType = "esm" | "cjs" | "umd";
 
@@ -12,6 +16,13 @@ export type FormatMode = "bundless" | "bundle";
 
 /** 兼容目标环境 */
 export type BuildTarget = Record<string, string | number>;
+
+export type LessOptions = Less.Options;
+
+export type LightningCssOptions = Omit<
+	LightningCssTransformOptions<any>,
+	"code" | "filename"
+>;
 
 export interface Format {
 	type: FormatType;
@@ -174,11 +185,12 @@ export interface UserConfig {
 
 	react?: {
 		/**
-		 * @default "automatic"
-		 * ?? 自动读取 tsconfig.json 中的 jsx 配置
-		 * "react" -> "classic"
-		 * "react-jsx", "react-jsxdev" -> "automatic"
-		 * "preserve" -> unchanged
+		 * @default "classic"
+		 * TODO: 自动读取 tsconfig.json 中的 jsx 配置
+		 *  @see https://www.typescriptlang.org/tsconfig/#jsx
+		 * - "react" -> "classic"
+		 * - "react-jsx", "react-jsxdev" -> "automatic"
+		 * - "preserve","react-native" -> unchanged
 		 */
 		jsxRuntime?: "automatic" | "classic";
 	};
@@ -189,12 +201,15 @@ export interface UserConfig {
 		 *
 		 * @description
 		 * 配置后,umd,esm,cjs格式都将开启cssModules
-		 * 可以配置如下格式: [name]__[local]___[hash:base64:5]
 		 *
-		 * 业务组件不推荐开启 cssModules, 特别是使用hash
-		 * 如有兼容代码需求.可以尝试使用 package.json的name作为前缀, `${pkgName}__[local]`
+		 * `true` -> `${pkgName}__[local]` 相当于加入 namespace
+		 *
+		 * 业务组件一般配置 `true` 即可,
+		 * 有真实 cssModules 需求可以自定义
+		 *  @see https://lightningcss.dev/css-modules.html#custom-naming-patterns
+		 *
 		 */
-		cssModules?: string;
+		cssModules?: string | boolean;
 
 		/**
 		 * bundless 模式下是否开启 less 编译
@@ -202,11 +217,15 @@ export interface UserConfig {
 		 */
 		lessCompile?: boolean;
 
-		// lessOptions?: LessOptions;
+		/**
+		 * less options
+		 */
+		lessOptions?: LessOptions;
 
 		/**
 		 * lightning css options
 		 */
+		lightningCssOptions?: LightningCssOptions;
 	};
 }
 

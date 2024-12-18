@@ -6,6 +6,7 @@ import {
 	composeVisitors,
 	transform,
 } from "lightningcss";
+import type { LessOptions, LightningCssOptions } from "../define-config.ts";
 import { logger } from "../util/logger.ts";
 import type { SourceMap, TransformResult } from "./index.ts";
 
@@ -16,7 +17,7 @@ interface TransformCSSOptions {
 	sourcemap: boolean;
 	targets: TransformOptions<any>["targets"];
 	plugins?: Visitor<any>[];
-	lightningcssOptions?: Omit<TransformOptions<any>, "code" | "filename">;
+	lightningcssOptions?: LightningCssOptions;
 	cssModules?: string;
 	minify: boolean;
 }
@@ -80,7 +81,7 @@ export function relativeSourcemap(rawMap: string, outFilePath: string): string {
 
 export interface TransformLessOptions {
 	filename: string;
-	lessOptions?: Less.Options;
+	lessOptions?: LessOptions;
 	sourcemap: boolean;
 }
 
