@@ -1,0 +1,25 @@
+{
+	"name": "demo-component",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"dev": "lecp --watch",
+		"build": "lecp"
+	},
+	"peerDependencies": {
+		"react": ">=16.8.0",
+		"react-dom": ">=16.8.0"
+	},
+	"devDependencies": {
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"@shined/lecp": "workspace:*",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"typescript": "catalog:"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": ""
+}
