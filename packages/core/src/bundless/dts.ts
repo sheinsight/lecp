@@ -137,7 +137,10 @@ export const emitDeclaration = (
 
 	const { diagnostics } = program.emit(undefined, undefined, undefined, true, {
 		// @ts-ignore 3.4.x ok why?
-		afterDeclarations: [tsPathsTransformer.default(program)],
+		afterDeclarations: [
+			// @ts-expect-error 兼容 cjs,esm加载
+			(tsPathsTransformer?.default ?? tsPathsTransformer)(program),
+		],
 	});
 
 	const log = getDiagnosticsLog(

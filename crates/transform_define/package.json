@@ -8,7 +8,7 @@
 	"main": "./swc_plugin_transform_define.wasm",
 	"files": [],
 	"scripts": {
-		"prepublishOnly": "cargo build-wasi --release && cp ../../target/wasm32-wasip1/release/swc_plugin_transform_define.wasm ."
+		"build": "cargo build-wasi --release && cp ../../target/wasm32-wasip1/release/swc_plugin_transform_define.wasm ."
 	},
 	"packageManager": "pnpm@9.15.0"
 }

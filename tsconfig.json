@@ -2,16 +2,22 @@
 	"compilerOptions": {
 		// module
 		"target": "ESNext",
+
+		// "module": "Preserve",
+
 		"module": "ESNext",
 		"moduleResolution": "bundler",
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+
 		// "module": "NodeNext",
 		// "moduleResolution": "nodenext",
-		"esModuleInterop": true,
+
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"isolatedDeclarations": true, // perf
 		"isolatedModules": true,
-		"resolveJsonModule": true,
+
 		// lint
 		"strict": true,
 		"skipLibCheck": true, // perf

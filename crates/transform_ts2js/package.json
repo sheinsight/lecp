@@ -8,7 +8,7 @@
 	"main": "swc_plugin_transform_ts2js.wasm",
 	"files": [],
 	"scripts": {
-		"prepack": "cargo build-wasi --release && cp ../../target/wasm32-wasip1/release/swc_plugin_transform_ts2js.wasm ."
+		"build": "cargo build-wasi --release && cp ../../target/wasm32-wasip1/release/swc_plugin_transform_ts2js.wasm ."
 	},
 	"packageManager": "pnpm@9.15.0"
 }

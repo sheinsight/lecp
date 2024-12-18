@@ -8,7 +8,7 @@
 	"main": "swc_plugin_transform_extensions.wasm",
 	"files": [],
 	"scripts": {
-		"prepack": "cargo build-wasi --release && cp ../../target/wasm32-wasip1/release/swc_plugin_transform_extensions.wasm ."
+		"build": "cargo build-wasi --release && cp ../../target/wasm32-wasip1/release/swc_plugin_transform_extensions.wasm ."
 	},
 	"packageManager": "pnpm@9.15.0"
 }
