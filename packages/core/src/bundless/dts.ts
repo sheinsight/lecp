@@ -86,13 +86,12 @@ export const getTsConfigFileContent = (options: {
  */
 export const bundlessDts = async (
 	config: SystemConfig,
+	srcDir: string,
 	typesDir: string,
 ): Promise<Watcher | void> => {
 	const { cwd, watch } = config;
-	// const { exclude } = config.buildConfig!;
 
-	const src = path.join(cwd, "src");
-	logger.verbose("dts编译目录:", src);
+	logger.verbose("dts编译目录:", srcDir);
 
 	const { fileNames, options } = getTsConfigFileContent({ cwd, exclude: [] });
 	logger.verbose("dts编译文件: ", fileNames);

@@ -150,10 +150,10 @@ export const bundlessFiles = async (
 	config: SystemConfig,
 ): Promise<Watcher[] | undefined> => {
 	const { cwd, watch } = config;
-	const { exclude, outDir: _outDir, css, type: format, dts } = options;
+	const { exclude, entry, outDir: _outDir, css, type: format, dts } = options;
 	const { sourcemap, targets, minify } = options;
 
-	const srcDir = path.join(cwd, "src");
+	const srcDir = path.join(cwd, entry);
 	const outDir = path.join(cwd, _outDir);
 
 	const excludePatterns = testPattern.concat(exclude);
@@ -320,7 +320,7 @@ export const bundlessFiles = async (
 	}
 
 	if (dts && !config.tsconfig?.isolatedDeclarations) {
-		const watch = await bundlessDts(config, outDir);
+		const watch = await bundlessDts(config, srcDir, outDir);
 		if (watch) watchers.push(watch);
 	}
 
