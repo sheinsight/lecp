@@ -1,5 +1,7 @@
 import { defineConfig } from "./src/define-config.ts";
 
+import pkg from "./package.json" assert { type: "json" };
+
 export default defineConfig({
 	extends: "./lecp.base.config.ts",
 	format: [
@@ -12,6 +14,7 @@ export default defineConfig({
 			type: "cjs",
 			// builder: "swc",
 			// outDir: "dist/lib",
+			// minify: true,
 		},
 	],
 	define: {
@@ -21,7 +24,7 @@ export default defineConfig({
 	},
 	css: {
 		// [name]__[local]___[hash:base64:5]
-		cssModules: "[name]__[local]",
+		cssModules: `${pkg.name.replace("@", "").replace("/", "__")}__[local]`,
 		lessCompile: true,
 	},
 	dts: {

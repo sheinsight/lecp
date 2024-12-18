@@ -6,7 +6,7 @@ import type {
 } from "@swc/core";
 import deepmerge from "deepmerge";
 import type { SystemConfig } from "../build.ts";
-import type { FormatType, UserConfig } from "../define-config.ts";
+import type { Format, FormatType, UserConfig } from "../define-config.ts";
 
 const require = createRequire(import.meta.url);
 
@@ -26,7 +26,8 @@ const aliasToTsPath = (alias: Record<string, string> = {}) => {
 };
 
 interface GetOptions {
-	type: FormatType;
+	type: Format["type"];
+	minify: Format["minify"];
 	swcOptions?: SwcOptions;
 	targets: UserConfig["targets"];
 	sourcemap: UserConfig["sourcemap"];
@@ -82,6 +83,7 @@ export const getSwcOptions = (
 		define,
 		react,
 		css,
+		minify,
 	} = options;
 
 	const plugins: Array<[string, Record<string, any>]> = [];
@@ -169,6 +171,7 @@ export const getSwcOptions = (
 				type: swcModuleMap[format],
 				resolveFully: true, // 和插件配合, 不加 导致 ./xx/index.ts -> ./xx ??
 			},
+			minify,
 			env: { targets },
 			sourceMaps: sourcemap,
 		} as SwcOptions,

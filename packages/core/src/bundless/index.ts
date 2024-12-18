@@ -39,11 +39,12 @@ interface CompileStyleOptions {
 	sourcemap: boolean;
 	targets: BundlessOptions["targets"];
 	cssModules: BundlessOptions["css"]["cssModules"];
+	minify: BundlessOptions["minify"];
 }
 
 const compileStyle = async (
 	file: string,
-	{ outFilePath, sourcemap, targets, cssModules }: CompileStyleOptions,
+	{ outFilePath, sourcemap, targets, cssModules, minify }: CompileStyleOptions,
 ): Promise<void> => {
 	const content = await fs.readFile(file, "utf-8");
 
@@ -67,6 +68,7 @@ const compileStyle = async (
 				sourcemap,
 				targets,
 				cssModules,
+				minify,
 			};
 			return transformCSS(code, options);
 		});
@@ -149,7 +151,7 @@ export const bundlessFiles = async (
 ): Promise<Watcher[] | undefined> => {
 	const { cwd, watch } = config;
 	const { exclude, outDir: _outDir, css, type: format, dts } = options;
-	const { sourcemap, targets } = options;
+	const { sourcemap, targets, minify } = options;
 
 	const srcDir = path.join(cwd, "src");
 	const outDir = path.join(cwd, _outDir);
@@ -203,6 +205,7 @@ export const bundlessFiles = async (
 				sourcemap,
 				targets,
 				cssModules: css.cssModules,
+				minify,
 			});
 			return;
 		}

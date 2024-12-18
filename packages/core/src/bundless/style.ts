@@ -18,6 +18,7 @@ interface TransformCSSOptions {
 	plugins?: Visitor<any>[];
 	lightningcssOptions?: Omit<TransformOptions<any>, "code" | "filename">;
 	cssModules?: string;
+	minify: boolean;
 }
 
 export async function transformCSS(
@@ -32,6 +33,7 @@ export async function transformCSS(
 		lightningcssOptions,
 		outFilePath,
 		cssModules,
+		minify,
 	} = options;
 	const plugins: Visitor<any>[] = [];
 	const { code, map, warnings } = transform({
@@ -44,6 +46,7 @@ export async function transformCSS(
 		filename,
 		inputSourceMap,
 		sourceMap: sourcemap,
+		minify,
 		...lightningcssOptions,
 	});
 	if (warnings.length) {
@@ -63,7 +66,6 @@ export function relativeSourcemap(rawMap: string, outFilePath: string): string {
 	const map: SourceMap =
 		typeof rawMap === "string" ? JSON.parse(rawMap) : rawMap;
 
-	// 绝对路径 -> 相对路径
 	if (map?.sources) {
 		map.sources = map.sources.map(filePath =>
 			path.relative(
