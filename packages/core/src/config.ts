@@ -76,7 +76,7 @@ const defaultConfig: Partial<UserConfig> = {
 	exclude: [],
 	externalHelpers: false,
 	react: {
-		jsxRuntime: "automatic",
+		jsxRuntime: "classic",
 	},
 	alias: { "@": "./src" },
 	define: {},

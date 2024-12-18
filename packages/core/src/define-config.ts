@@ -96,7 +96,7 @@ export interface UserConfig {
 	 * 继承的配置文件路径
 	 * @description 支持相对路径和绝对路径(参考 tsconfig.json 的 extends)
 	 */
-	extends: string;
+	extends?: string;
 
 	format: (BundlessFormat | BundleFormat)[];
 

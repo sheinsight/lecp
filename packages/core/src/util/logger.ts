@@ -28,7 +28,7 @@ export const createLogger = (
 	};
 
 	const logger = {
-		verbose: (...msg: any[]) => log("info", ...msg),
+		verbose: (...msg: any[]) => log("verbose", ...msg),
 		info: (...msg: any[]) => log("info", ...msg),
 		warn: (...msg: string[]) =>
 			log(

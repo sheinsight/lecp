@@ -118,7 +118,7 @@ export const getSwcOptions = (
 	if (css?.cssModules) {
 		// 注意顺序, 在 transform-extensions 之后
 		plugins.push([
-			"swc-plugin-css-modules",
+			require.resolve("swc-plugin-css-modules"),
 			{ generate_scoped_name: css.cssModules },
 		]);
 	}

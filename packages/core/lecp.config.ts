@@ -3,7 +3,6 @@ import { defineConfig } from "./src/define-config.ts";
 import pkg from "./package.json" assert { type: "json" };
 
 export default defineConfig({
-	extends: "./lecp.base.config.ts",
 	format: [
 		{
 			type: "esm",

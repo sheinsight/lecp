@@ -7,7 +7,7 @@
 	"author": "",
 	"type": "module",
 	"exports": {
-		".": "./esm/index.js",
+		".": "./es/index.js",
 		"./package.json": "./package.json"
 	},
 	"bin": {
