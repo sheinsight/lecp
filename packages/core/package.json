@@ -24,7 +24,7 @@
 		"@shined/swc-plugin-transform-ts2js": "workspace:*",
 		"@swc/core": "1.9.2",
 		"@swc/plugin-transform-imports": "5.0.3",
-		"chokidar": "^4.0.2",
+		"chokidar": "^4.0.3",
 		"deepmerge": "^4.3.1",
 		"jiti": "^2.4.2",
 		"less": "^4.2.1",
