@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import { enableCompileCache } from "node:module";
+import module from "node:module";
 
 // node@22.8.0+
-if (enableCompileCache) {
+if (module.enableCompileCache) {
 	try {
-		enableCompileCache();
+		module.enableCompileCache();
 	} catch {}
 }
 
