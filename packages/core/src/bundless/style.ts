@@ -1,12 +1,16 @@
 import path from "node:path";
 import less from "less";
 import {
-	type TransformOptions,
 	type Visitor,
+	browserslistToTargets,
 	composeVisitors,
 	transform,
 } from "lightningcss";
-import type { LessOptions, LightningCssOptions } from "../define-config.ts";
+import type {
+	LessOptions,
+	LightningCssOptions,
+	UserConfig,
+} from "../define-config.ts";
 import { logger } from "../util/logger.ts";
 import type { SourceMap, TransformResult } from "./index.ts";
 
@@ -15,11 +19,20 @@ interface TransformCSSOptions {
 	outFilePath: string;
 	inputSourceMap?: string;
 	sourcemap: boolean;
-	targets: TransformOptions<any>["targets"];
+	targets: UserConfig["targets"];
 	plugins?: Visitor<any>[];
 	lightningcssOptions?: LightningCssOptions;
 	cssModules?: string;
 	minify: boolean;
+}
+
+//                    ->  browserslist     -> lightningcss
+// {chrome: "x.y.z" } -> ["chrome x.y.z"]  -> { chrome: x << 16 | y << 8 | z }
+function getLightningcssTarget(targets: UserConfig["targets"] = {}) {
+	const browserslist = Object.keys(targets).map(
+		browser => `${browser} ${targets[browser]}`,
+	);
+	return browserslistToTargets(browserslist);
 }
 
 export async function transformCSS(
@@ -39,17 +52,20 @@ export async function transformCSS(
 	const plugins: Visitor<any>[] = [];
 	const { code, map, warnings } = transform({
 		code: Buffer.from(content),
-		targets,
-		// 不支持 自定义 hash ([name]__[local]___[hash:base64:5])
-		// 不支持 :global, :local
+		targets: getLightningcssTarget(targets),
+		// 不支持 自定义 hash (如: [name]__[local]___[hash:base64:5])
+		// 支持 :global(), :local(), 不支持 :global, :local
 		cssModules: cssModules ? { pattern: cssModules } : false,
 		visitor: composeVisitors(plugins),
 		filename,
 		inputSourceMap,
 		sourceMap: sourcemap,
 		minify,
+		// include: Features.VendorPrefixes,
+		// exclude: Features.VendorPrefixes,
 		...lightningcssOptions,
 	});
+
 	if (warnings.length) {
 		// TODO: 优化
 		logger.warn(warnings);
