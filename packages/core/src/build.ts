@@ -32,7 +32,7 @@ export const build = async (
 ): Promise<Watcher[]> => {
 	logger.info("start build", config);
 
-	const watchers: Watcher[] = [];
+	let watchers: Watcher[] = [];
 
 	const systemConfig = {
 		...inputSystemConfig,
@@ -51,7 +51,7 @@ export const build = async (
 	for (const task of format) {
 		if (task.mode === "bundless") {
 			const watcher = await bundlessFiles({ ...task, ...others }, systemConfig);
-			watchers.concat(watcher ?? []);
+			watchers = watchers.concat(watcher ?? []);
 		}
 
 		// TODO: bundleDts 依赖 bundless的 dts
@@ -61,7 +61,7 @@ export const build = async (
 
 		if (task.mode === "bundle") {
 			const watcher = await bundleFiles({ ...task, ...others }, systemConfig);
-			watchers.concat(watcher ?? []);
+			watchers = watchers.concat(watcher ?? []);
 		}
 	}
 

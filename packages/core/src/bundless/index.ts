@@ -204,7 +204,7 @@ export const bundlessFiles = async (
 				outFilePath: getOutFilePath(filePath, "style"),
 				sourcemap,
 				targets,
-				cssModules: css.cssModules,
+				cssModules: css?.cssModules,
 				minify,
 			});
 			return;

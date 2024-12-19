@@ -127,7 +127,7 @@ export interface FinalUserConfig
 	format: Required<BundlessFormat | BundleFormat>[];
 	name: string;
 	dts?: Required<Exclude<UserConfig["dts"], boolean>>;
-	css?: Omit<UserConfig["css"], "cssModules"> & { cssModules?: string };
+	css?: Prettify<UserConfig["css"] & { cssModules?: string }>;
 }
 
 export const getFinalUserOptions = (
