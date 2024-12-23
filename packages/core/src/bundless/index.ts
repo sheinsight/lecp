@@ -1,6 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { transformFile } from "@swc/core";
+import {
+	transform as swcTransform,
+	transformFile as swcTransformFile,
+} from "@swc/core";
 import chokidar from "chokidar";
 import colors from "picocolors";
 import { glob } from "tinyglobby";
@@ -165,6 +168,10 @@ export const bundlessFiles = async (
 		format,
 	);
 
+	const isDefaultFormat =
+		(format === "esm" && config.pkg.type === "module") ||
+		(format === "cjs" && config.pkg.type !== "module");
+
 	const getOutFilePath = (
 		filePath: string,
 		type: "script" | "style" | "dts",
@@ -220,7 +227,17 @@ export const bundlessFiles = async (
 						config,
 						isJsx.test(file) ? ".js" : outJsExt,
 					);
-					return transformFile(file, swcOptions);
+
+					// 非默认 format: 先处理后缀再编译
+					if (!isDefaultFormat) {
+						const { code } = await swcTransformFile(
+							file,
+							getSwcOptions({ ...options, type: "esm" }, config, ".js"),
+						);
+						return swcTransform(code, { filename: file, ...swcOptions });
+					}
+
+					return swcTransformFile(file, swcOptions);
 				},
 				outFilePath: getOutFilePath(filePath, "script"),
 			});
