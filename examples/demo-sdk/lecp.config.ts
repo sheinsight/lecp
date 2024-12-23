@@ -10,6 +10,7 @@ export default defineConfig({
 		},
 	],
 	dts: true,
+	shims: true,
 	targets: {
 		node: "20.11.0",
 	},

@@ -2,7 +2,8 @@
 members = [
     "crates/transform_define",
     "crates/transform_ts2js",
-    "crates/transform_extensions"
+    "crates/transform_extensions",
+    "crates/transform_shims"
 ]
 
 resolver = "2"

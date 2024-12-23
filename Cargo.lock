@@ -1672,6 +1672,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "swc_plugin_transform_shims"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "swc_core",
+]
+
+[[package]]
 name = "swc_plugin_transform_ts2js"
 version = "0.1.0"
 dependencies = [

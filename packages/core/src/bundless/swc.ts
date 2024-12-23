@@ -36,11 +36,14 @@ interface GetOptions {
 	css?: UserConfig["css"];
 	alias: UserConfig["alias"];
 	define: UserConfig["define"];
+	shims: UserConfig["shims"];
+	outJsExt: string;
+	resolveDir?: boolean;
 }
 
 const swcModuleMap = {
 	esm: "es6",
-	cjs: "commonjs",
+	cjs: "commonjs", // 和 nodenext 区别??
 	umd: "umd",
 } satisfies Record<FormatType, ModuleConfig["type"]>;
 
@@ -70,7 +73,6 @@ const getGlobalsFromDefine = (define?: Record<string, string>) => {
 export const getSwcOptions = (
 	options: GetOptions,
 	config: SystemConfig,
-	outJsExt: string,
 ): SwcOptions => {
 	const { cwd } = config;
 	const {
@@ -84,6 +86,9 @@ export const getSwcOptions = (
 		react,
 		css,
 		minify,
+		shims,
+		outJsExt,
+		resolveDir,
 	} = options;
 
 	const plugins: Array<[string, Record<string, any>]> = [];
@@ -112,7 +117,9 @@ export const getSwcOptions = (
 		},
 	]);
 
-	// TODO: format === "cjs" 时， import.meta.filename, import.meta.dirname
+	if (shims && format === "esm" && !resolveDir) {
+		plugins.push([require.resolve("@shined/swc-plugin-transform-shims"), {}]);
+	}
 
 	if (css?.cssModules) {
 		// 注意顺序, 在 transform-extensions 之后

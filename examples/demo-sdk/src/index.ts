@@ -15,10 +15,10 @@ console.log(a, a1, a2);
 // const { a: a3 } = require("./util");
 // console.log(a3);
 
-// TODO: auto shim
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-const _filename = fileURLToPath(import.meta.url);
-const _dirname = path.dirname(_filename);
+// import path from "node:path";
+// import { fileURLToPath } from "node:url";
+// const _filename = fileURLToPath(import.meta.url);
+// const _dirname = path.dirname(_filename);
+// console.log(_dirname, _filename);
 
-console.log(_dirname, _filename);
+console.log(__dirname, __filename);

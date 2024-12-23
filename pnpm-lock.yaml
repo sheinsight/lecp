@@ -49,6 +49,8 @@ importers:
 
   crates/transform_extensions: {}
 
+  crates/transform_shims: {}
+
   crates/transform_ts2js: {}
 
   examples/demo-component:
@@ -95,6 +97,9 @@ importers:
       '@shined/swc-plugin-transform-extensions':
         specifier: workspace:*
         version: link:../../crates/transform_extensions
+      '@shined/swc-plugin-transform-shims':
+        specifier: workspace:*
+        version: link:../../crates/transform_shims
       '@shined/swc-plugin-transform-ts2js':
         specifier: workspace:*
         version: link:../../crates/transform_ts2js

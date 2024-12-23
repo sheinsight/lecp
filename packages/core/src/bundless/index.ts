@@ -223,16 +223,18 @@ export const bundlessFiles = async (
 			await compileScript(file, {
 				compile: async file => {
 					const swcOptions = getSwcOptions(
-						options,
+						{ ...options, outJsExt: isJsx.test(file) ? ".js" : outJsExt },
 						config,
-						isJsx.test(file) ? ".js" : outJsExt,
 					);
 
 					// 非默认 format: 先处理后缀再编译
 					if (!isDefaultFormat) {
 						const { code } = await swcTransformFile(
 							file,
-							getSwcOptions({ ...options, type: "esm" }, config, ".js"),
+							getSwcOptions(
+								{ ...options, type: "esm", outJsExt: ".js", resolveDir: true },
+								config,
+							),
 						);
 						return swcTransform(code, { filename: file, ...swcOptions });
 					}
