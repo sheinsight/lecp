@@ -169,6 +169,7 @@ export const getSwcOptions = (
 			module: {
 				type: swcModuleMap[format],
 				resolveFully: true,
+				// outFileExtension: outJsExt.slice(1), // 1.10.1+ 支持
 			},
 			minify,
 			env: { targets },
