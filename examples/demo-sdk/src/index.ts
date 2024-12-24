@@ -25,8 +25,10 @@ console.log(a, a1, a2);
 console.log(__dirname, __filename);
 
 // cjs support import.meta
-// TODO: __dirname, __filename
-console.log(import.meta.dirname, import.meta.filename);
+console.log(import.meta.dirname, import.meta.filename, import.meta.url);
 
-// const { dirname, filename } = import.meta;
-// console.log(dirname, filename);
+const { dirname, filename, url } = import.meta;
+console.log(dirname, filename, url);
+
+const { dirname: d1, filename: f1, url: u1 } = import.meta;
+console.log(d1, f1, u1);
