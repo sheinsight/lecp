@@ -117,8 +117,11 @@ export const getSwcOptions = (
 		},
 	]);
 
-	if (shims && format === "esm" && !resolveDir) {
-		plugins.push([require.resolve("@shined/swc-plugin-transform-shims"), {}]);
+	if (shims && !resolveDir) {
+		plugins.push([
+			require.resolve("@shined/swc-plugin-transform-shims"),
+			{ target: format },
+		]);
 	}
 
 	if (css?.cssModules) {

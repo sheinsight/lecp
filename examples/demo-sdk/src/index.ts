@@ -21,4 +21,12 @@ console.log(a, a1, a2);
 // const _dirname = path.dirname(_filename);
 // console.log(_dirname, _filename);
 
+// esm support __dirname, __filename
 console.log(__dirname, __filename);
+
+// cjs support import.meta
+// TODO: __dirname, __filename
+console.log(import.meta.dirname, import.meta.filename);
+
+// const { dirname, filename } = import.meta;
+// console.log(dirname, filename);
