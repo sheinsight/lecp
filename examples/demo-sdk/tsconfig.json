@@ -3,7 +3,7 @@
 		// Modules
 		"target": "ESNext",
 
-		"module": "Preserve", // ts@5.4支持
+		"module": "Preserve", // ts@5.4支持, 支持 import x = require("dep")
 
 		// 默认开启("module": "Preserve") ↓↓↓
 		// "module": "ESNext",
@@ -29,6 +29,12 @@
 		"noEmit": true,
 		"emitDeclarationOnly": true,
 		"declaration": true,
-		"declarationMap": true
+		"declarationMap": true,
+
+		// alias
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["src/*"]
+		}
 	}
 }

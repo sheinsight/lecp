@@ -1,14 +1,21 @@
+import { a as a4 } from "@/util";
+import { a as a5 } from "@/util/index.js";
+import { a as a6 } from "@/util/index.ts"; // 不支持转换 index.js, paths再插件后处理 ??
 import { a } from "./util";
-import { a as a1 } from "./util/index.js";
-import { a as a2 } from "./util/index.ts";
+import { a as a2 } from "./util/index.js";
+import { a as a3 } from "./util/index.ts"; // 默认不支持, 插件转成 .js
 
-console.log(a, a1, a2);
+console.log(a, a2, a3, a4, a5, a6);
 
 (async () => {
-	const { a: a3 } = await import("./util");
-	const { a: a4 } = await import("./util/index.ts");
+	const { a } = await import("./util");
+	const { a: a2 } = await import("./util/index.js");
+	const { a: a3 } = await import("./util/index.ts"); // 默认不支持, 插件转成 .js
+	const { a: a4 } = await import("@/util");
+	const { a: a5 } = await import("@/util/index.js");
+	const { a: a6 } = await import("@/util/index.ts"); // 不支持转换 index.js
 
-	console.log(a3, a4);
+	console.log(a, a2, a3, a4, a5, a6);
 })();
 
 // swc module.resolveFully 不支持 require(省略后缀)

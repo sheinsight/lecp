@@ -14,4 +14,8 @@ export default defineConfig({
 	targets: {
 		node: "20.11.0",
 	},
+	// from tsconfig.json ??
+	alias: {
+		"@": "./src",
+	},
 }) as unknown;

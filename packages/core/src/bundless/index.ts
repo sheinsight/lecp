@@ -228,7 +228,8 @@ export const bundlessFiles = async (
 					);
 
 					// 非默认 format: 先处理后缀再编译
-					if (!isDefaultFormat) {
+					// esm: alias +.ts 后缀 无法同时处理, 需要二次编译
+					if (!isDefaultFormat || swcOptions.jsc?.paths) {
 						const { code } = await swcTransformFile(
 							file,
 							getSwcOptions(
