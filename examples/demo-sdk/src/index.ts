@@ -1,9 +1,12 @@
 import { a as a4 } from "@/util";
 import { a as a5 } from "@/util/index.js";
-import { a as a6 } from "@/util/index.ts"; // 不支持转换 index.js, paths再插件后处理 ??
+import { a as a6 } from "@/util/index.ts"; // 不支持转换 index.js, 二次编译支持
 import { a } from "./util";
 import { a as a2 } from "./util/index.js";
 import { a as a3 } from "./util/index.ts"; // 默认不支持, 插件转成 .js
+
+import type { TypeA } from "@/util/index.ts"; // ts: typescript-transform-paths 支持, swc 本身支持 paths
+export type { TypeA };
 
 console.log(a, a2, a3, a4, a5, a6);
 
@@ -13,7 +16,7 @@ console.log(a, a2, a3, a4, a5, a6);
 	const { a: a3 } = await import("./util/index.ts"); // 默认不支持, 插件转成 .js
 	const { a: a4 } = await import("@/util");
 	const { a: a5 } = await import("@/util/index.js");
-	const { a: a6 } = await import("@/util/index.ts"); // 不支持转换 index.js
+	const { a: a6 } = await import("@/util/index.ts"); // 不支持转换 index.js, 二次编译支持
 
 	console.log(a, a2, a3, a4, a5, a6);
 })();

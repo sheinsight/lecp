@@ -1,5 +1,8 @@
 import path from "node:path";
-import { transformFile as swcTransformFile } from "@swc/core";
+import {
+	type Options as SwcOptions,
+	transformFile as swcTransformFile,
+} from "@swc/core";
 import fs from "fs/promises";
 import ts, { type CompilerOptions } from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
@@ -136,9 +139,8 @@ export const emitDeclaration = (
 	});
 
 	const { diagnostics } = program.emit(undefined, undefined, undefined, true, {
-		// @ts-ignore 3.4.x ok why?
 		afterDeclarations: [
-			// @ts-expect-error 兼容 cjs,esm加载
+			// @ts-expect-error 兼容 cjs,esm 加载
 			(tsPathsTransformer?.default ?? tsPathsTransformer)(program),
 		],
 	});
@@ -169,6 +171,39 @@ export const watchDeclaration = (
 			logger.info(getDiagnosticsLog([diagnostic]));
 		},
 	);
+
+	const originalAfterProgramCreate = host.afterProgramCreate;
+
+	host.afterProgramCreate = program => {
+		const originalEmit = program.emit;
+		program.emit = (
+			targetSourceFile,
+			writeFile,
+			cancellationToken,
+			emitOnlyDtsFiles,
+			customTransformers,
+		): ts.EmitResult => {
+			const transformers = customTransformers ?? {};
+			transformers.afterDeclarations ??= [];
+			transformers.afterDeclarations.push(
+				// @ts-expect-error 兼容 cjs,esm 加载
+				(tsPathsTransformer?.default ?? tsPathsTransformer)(
+					program.getProgram(),
+				),
+			);
+
+			return originalEmit(
+				targetSourceFile,
+				writeFile,
+				cancellationToken,
+				emitOnlyDtsFiles,
+				transformers,
+			);
+		};
+
+		originalAfterProgramCreate?.(program);
+	};
+
 	const watcher = ts.createWatchProgram(host);
 	return watcher;
 };
@@ -187,6 +222,11 @@ export const tsTransformDeclaration = async (
 		return;
 	}
 
+	const program = ts.createProgram({
+		rootNames: [fileName],
+		options: compilerOptions,
+	});
+
 	const { outputText, diagnostics, sourceMapText } = ts.transpileDeclaration(
 		code,
 		{
@@ -196,7 +236,12 @@ export const tsTransformDeclaration = async (
 			// other ts.TranspileOptions
 			// moduleName?: string;
 			// renamedDependencies?: MapLike<string>;
-			// transformers?: CustomTransformers;
+			transformers: {
+				afterDeclarations: [
+					// @ts-expect-error 兼容 cjs,esm 加载
+					(tsPathsTransformer?.default ?? tsPathsTransformer)(program),
+				],
+			},
 			// jsDocParsingMode?: JSDocParsingMode;
 		},
 	);
@@ -215,12 +260,12 @@ export const tsTransformDeclaration = async (
  * swc@1.6.4 支持 (`jsc.experimental.emitIsolatedDts:true`)
  * @description 暂不支持生成 d.ts.map
  */
-
 export const swcTransformDeclaration = async (
 	fileName: string,
+	swcOptions: SwcOptions,
 ): Promise<TransformResult | undefined> => {
 	try {
-		const result = await swcTransformFile(fileName, {
+		const defaultSwcOptions = {
 			filename: fileName,
 			jsc: {
 				parser: {
@@ -231,7 +276,12 @@ export const swcTransformDeclaration = async (
 					emitIsolatedDts: true,
 				},
 			},
-		});
+		};
+
+		const result = await swcTransformFile(
+			fileName,
+			swcOptions ?? defaultSwcOptions,
+		);
 
 		// @ts-expect-error
 		const output = JSON.parse(result.output);

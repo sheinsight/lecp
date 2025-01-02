@@ -252,7 +252,22 @@ export const bundlessFiles = async (
 					DtsBuilderType,
 					() => Promise<TransformResult | undefined>
 				> = {
-					swc: () => swcTransformDeclaration(file),
+					swc: () => {
+						// baseUrl + paths
+						const swcOptions = getSwcOptions(
+							{
+								...options,
+								outJsExt: isJsx.test(file) ? ".js" : outJsExt,
+								swcOptions: {
+									// ...options.swcOptions,
+									jsc: { experimental: { emitIsolatedDts: true } },
+								},
+							},
+							config,
+						);
+
+						return swcTransformDeclaration(file, swcOptions);
+					},
 					ts: () =>
 						tsTransformDeclaration(file, {
 							...config.tsconfig,
@@ -340,6 +355,7 @@ export const bundlessFiles = async (
 	}
 
 	if (dts && !config.tsconfig?.isolatedDeclarations) {
+		logger.info(colors.white(`编译dts`));
 		const watch = await bundlessDts(config, srcDir, outDir);
 		if (watch) watchers.push(watch);
 	}

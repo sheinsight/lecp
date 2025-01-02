@@ -152,7 +152,7 @@ export const getFinalUserOptions = (
 
 	if (buildOptions.dts) {
 		buildOptions.dts = {
-			type: "bundless",
+			mode: "bundless",
 			builder: "swc",
 			// @ts-expect-error ...true ok
 			...buildOptions.dts,
