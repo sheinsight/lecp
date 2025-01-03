@@ -85,7 +85,6 @@ export const getTsConfigFileContent = (options: {
 
 /**
  * 编译 ts 到 dts
- * // program.emit
  */
 export const bundlessDts = async (
 	config: SystemConfig,
@@ -222,11 +221,6 @@ export const tsTransformDeclaration = async (
 		return;
 	}
 
-	const program = ts.createProgram({
-		rootNames: [fileName],
-		options: compilerOptions,
-	});
-
 	const { outputText, diagnostics, sourceMapText } = ts.transpileDeclaration(
 		code,
 		{
@@ -239,8 +233,13 @@ export const tsTransformDeclaration = async (
 			transformers: {
 				afterDeclarations: [
 					// @ts-expect-error 兼容 cjs,esm 加载
-					(tsPathsTransformer?.default ?? tsPathsTransformer)(program),
-				],
+					(tsPathsTransformer?.default ?? tsPathsTransformer)(
+						undefined,
+						undefined,
+						undefined,
+						{ fileNames: [fileName], compilerOptions: compilerOptions },
+					),
+				].filter(Boolean),
 			},
 			// jsDocParsingMode?: JSDocParsingMode;
 		},

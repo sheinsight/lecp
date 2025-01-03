@@ -17,13 +17,12 @@
 
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true, // ts@5.0支持
-		"isolatedDeclarations": true, // perf
+		// "isolatedDeclarations": true, // perf
 		// isolatedModules:true, // verbatimModuleSyntax:true 默认开启
 
 		// lint
 		"strict": true,
 		"skipLibCheck": true, // perf
-		"forceConsistentCasingInFileNames": true,
 
 		// dts
 		"noEmit": true,

@@ -38,10 +38,9 @@ export interface TransformResult {
 
 interface CompileStyleOptions {
 	outFilePath: string;
-	//
 	sourcemap: boolean;
 	targets: BundlessOptions["targets"];
-	cssModules: BundlessOptions["css"]["cssModules"];
+	cssModules: Exclude<BundlessOptions["css"], undefined>["cssModules"];
 	minify: BundlessOptions["minify"];
 }
 

@@ -9,7 +9,7 @@ export default defineConfig({
 			type: "esm",
 		},
 	],
-	dts: true,
+	// dts: { builder: "ts", mode: "bundless" },
 	shims: true,
 	targets: {
 		node: "20.11.0",

@@ -43,7 +43,7 @@ export const getConfig = async (
 	const { extends: extendsFile, ...restConfig } = config;
 
 	if (extendsFile) {
-		const file = path.resolve(path.dirname(configPath), config.extends);
+		const file = path.resolve(path.dirname(configPath), extendsFile);
 		if (files.has(file)) {
 			logger.warn(`配置文件: ${configPath} 存在循环 extends`);
 		} else {

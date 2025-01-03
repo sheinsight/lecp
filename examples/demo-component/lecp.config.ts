@@ -20,7 +20,7 @@ export default defineConfig({
 	// react: {
 	// 	jsxRuntime: "classic",
 	// },
-	dts: true,
+	// dts: { builder: "ts", mode: "bundless" },
 	targets: {
 		chrome: 55,
 	},

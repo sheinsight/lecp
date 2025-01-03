@@ -30,7 +30,7 @@ export const build = async (
 	config: UserConfig,
 	inputSystemConfig: InputSystemConfig,
 ): Promise<Watcher[]> => {
-	logger.info("start build", config);
+	logger.info("start build");
 
 	let watchers: Watcher[] = [];
 
