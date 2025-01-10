@@ -1,19 +1,17 @@
 [package]
 
-name = "swc_plugin_transform_shims"
-version = "0.1.0"
-description = ""
 authors      = { workspace = true }
+description  = ""
 edition      = { workspace = true }
+name         = "swc_plugin_transform_shims"
 repository   = { workspace = true }
 rust-version = { workspace = true }
+version      = "0.1.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-serde= {workspace = true}
-serde_json = { workspace = true}
-swc_core = { workspace = true, features = ["ecma_plugin_transform"] }
-
-
+serde      = { workspace = true }
+serde_json = { workspace = true }
+swc_core   = { workspace = true, features = ["ecma_plugin_transform"] }
