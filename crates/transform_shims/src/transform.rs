@@ -1,17 +1,28 @@
 use serde::Deserialize;
 use std::collections::HashMap;
+use swc_core::common::util::take::Take;
 
 use swc_core::{
     common::DUMMY_SP,
     ecma::{
         ast::{
-            Decl, EmptyStmt, Expr, Ident, Invalid, KeyValuePatProp, MemberProp, MetaPropExpr,
-            MetaPropKind, ObjectPat, ObjectPatProp, Pass, Pat, PropName, Stmt, VarDeclarator,
+            Decl, Expr, Ident, KeyValuePatProp, MemberProp, MetaPropExpr, MetaPropKind, ObjectPat,
+            ObjectPatProp, Pass, Pat, PropName, Stmt, VarDeclarator,
         },
         transforms::testing::test_inline,
         visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
     },
 };
+
+#[derive(Clone, Debug, Deserialize, Default, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum Target {
+    #[default]
+    UNKNOWN,
+
+    ESM,
+    CJS,
+}
 
 #[derive(Clone, Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -19,8 +30,7 @@ pub struct Config {
     #[serde(default)]
     pub legacy: bool,
 
-    // "cjs" | "esm"
-    pub target: String,
+    pub target: Target,
 }
 
 struct TransformShims {
@@ -29,52 +39,62 @@ struct TransformShims {
     id_map: HashMap<String, String>,
 }
 
+const CJS_DIRNAME: &str = "__dirname";
+const CJS_FILENAME: &str = "__filename";
+const CJS_URL: &str = "require(\"url\").pathToFileURL(__filename).toString()";
+
+const ESM_DIRNAME: &str = "import.meta.dirname";
+const ESM_FILENAME: &str = "import.meta.filename";
+
 impl VisitMut for TransformShims {
     noop_visit_mut_type!();
 
     // esm support __dirname, __filename
     fn visit_mut_ident(&mut self, i: &mut Ident) {
         // 暂不考虑 scope 中有 __dirname, __filename 的情况
-        if self.config.target == "esm" {
+        if self.config.target == Target::ESM {
             if self.config.legacy {
-                // url.fileURLToPath(import.meta.url), url.fileURLToPath(new URL('.', import.meta.url))
+                // import url from 'node:url';
+                // __filename: url.fileURLToPath(import.meta.url),
+                // __dirname: url.fileURLToPath(new URL('.', import.meta.url))
                 // TODO: Implement this
                 return;
             }
 
             let sym = match i.sym.as_ref() {
-                "__dirname" => "import.meta.dirname",
-                "__filename" => "import.meta.filename",
+                "__dirname" => ESM_DIRNAME,
+                "__filename" => ESM_FILENAME,
                 _ => return,
             };
 
             i.sym = sym.into();
         }
 
-        if self.config.target == "cjs" {
+        if self.config.target == Target::CJS {
             if let Some((_, value)) = self.id_map.get_key_value(&i.to_string()) {
-                if value == "dirname" {
-                    i.sym = "__dirname".into();
-                } else if value == "filename" {
-                    i.sym = "__filename".into();
-                } else if value == "url" {
-                    i.sym = "require(\"url\").pathToFileURL(__filename).toString()".into();
-                }
+                let sym = match value.as_str() {
+                    "dirname" => CJS_DIRNAME,
+                    "filename" => CJS_FILENAME,
+                    "url" => CJS_URL,
+                    _ => return,
+                };
+
+                i.sym = sym.into()
             }
         }
     }
 
     // cjs support import.meta.dirname, import.meta.filename
     fn visit_mut_expr(&mut self, e: &mut Expr) {
-        if self.config.target == "cjs" {
+        if self.config.target == Target::CJS {
             if let Expr::Member(n) = e {
                 if let (Expr::MetaProp(MetaPropExpr { kind, .. }), MemberProp::Ident(prop)) =
                     (&*n.obj, &n.prop)
                 {
                     if *kind == MetaPropKind::ImportMeta {
                         let sym = match prop.sym.as_ref() {
-                            "dirname" => "__dirname",
-                            "filename" => "__filename",
+                            "dirname" => CJS_DIRNAME,
+                            "filename" => CJS_FILENAME,
                             _ => return,
                         };
                         *e = Expr::Ident(Ident::new_no_ctxt(sym.into(), DUMMY_SP));
@@ -92,7 +112,7 @@ impl VisitMut for TransformShims {
     fn visit_mut_var_declarator(&mut self, v: &mut VarDeclarator) {
         v.visit_mut_children_with(self);
 
-        if self.config.target == "cjs" {
+        if self.config.target == Target::CJS {
             let is_import_meta = v.init.as_ref().map_or(false, |init| {
                 matches!(&**init, Expr::MetaProp(MetaPropExpr { kind, .. }) if *kind == MetaPropKind::ImportMeta)
             });
@@ -101,12 +121,11 @@ impl VisitMut for TransformShims {
                 if let Pat::Object(ObjectPat { props, .. }) = &v.name {
                     props.iter().for_each(|prop| match prop {
                         ObjectPatProp::KeyValue(KeyValuePatProp { key, value, .. }) => {
-                            if let Pat::Ident(ident) = &**value {
-                                if let PropName::Ident(name) = &key {
-                                    self.id_map.insert(ident.to_string(), name.sym.to_string());
-                                }
+                            if let (Pat::Ident(ident), PropName::Ident(name)) = (&**value, &key) {
+                                self.id_map.insert(ident.to_string(), name.sym.to_string());
                             }
                         }
+
                         ObjectPatProp::Assign(assign) => {
                             self.id_map
                                 .insert(assign.key.to_string(), assign.key.sym.to_string());
@@ -115,7 +134,7 @@ impl VisitMut for TransformShims {
                     });
                 }
 
-                v.name = Pat::Invalid(Invalid { span: DUMMY_SP })
+                v.name.take();
             }
         }
     }
@@ -143,11 +162,7 @@ impl VisitMut for TransformShims {
         match s {
             Stmt::Decl(Decl::Var(var)) => {
                 if var.decls.is_empty() {
-                    // Variable declaration without declarator is invalid.
-                    //
-                    // After this, `s` becomes `Stmt::Empty`.
-                    // s.take();
-                    *s = Stmt::Empty(EmptyStmt { span: DUMMY_SP });
+                    s.take();
                 }
             }
             _ => {}
@@ -170,7 +185,7 @@ impl VisitMut for TransformShims {
 pub fn init(config: Config) -> impl Pass {
     visit_mut_pass(TransformShims {
         config,
-        id_map: Default::default(),
+        id_map: HashMap::with_capacity(4),
     })
 }
 
