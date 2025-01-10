@@ -1,13 +1,16 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 use swc_core::common::util::take::Take;
+use swc_core::ecma::ast::{
+    ImportDecl, ImportNamedSpecifier, ImportSpecifier, ModuleDecl, ModuleItem, Stmt, Str,
+};
 
 use swc_core::{
     common::DUMMY_SP,
     ecma::{
         ast::{
             Decl, Expr, Ident, KeyValuePatProp, MemberProp, MetaPropExpr, MetaPropKind, ObjectPat,
-            ObjectPatProp, Pass, Pat, PropName, Stmt, VarDeclarator,
+            ObjectPatProp, Pass, Pat, PropName, VarDeclarator,
         },
         transforms::testing::test_inline,
         visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
@@ -35,8 +38,8 @@ pub struct Config {
 
 struct TransformShims {
     config: Config,
-
     id_map: HashMap<String, String>,
+    has_legacy_transform: bool,
 }
 
 const CJS_DIRNAME: &str = "__dirname";
@@ -45,6 +48,8 @@ const CJS_URL: &str = "require(\"url\").pathToFileURL(__filename).toString()";
 
 const ESM_DIRNAME: &str = "import.meta.dirname";
 const ESM_FILENAME: &str = "import.meta.filename";
+const ESM_DIRNAME_LEGACY: &str = "fileURLToPath(new URL('.', import.meta.url))";
+const ESM_FILENAME_LEGACY: &str = "fileURLToPath(import.meta.url)";
 
 impl VisitMut for TransformShims {
     noop_visit_mut_type!();
@@ -54,20 +59,22 @@ impl VisitMut for TransformShims {
         // 暂不考虑 scope 中有 __dirname, __filename 的情况
         if self.config.target == Target::ESM {
             if self.config.legacy {
-                // import url from 'node:url';
-                // __filename: url.fileURLToPath(import.meta.url),
-                // __dirname: url.fileURLToPath(new URL('.', import.meta.url))
-                // TODO: Implement this
-                return;
+                let sym = match i.sym.as_ref() {
+                    "__dirname" => ESM_DIRNAME_LEGACY,
+                    "__filename" => ESM_FILENAME_LEGACY,
+                    _ => return,
+                };
+                i.sym = sym.into();
+                self.has_legacy_transform = true;
+            } else {
+                let sym = match i.sym.as_ref() {
+                    "__dirname" => ESM_DIRNAME,
+                    "__filename" => ESM_FILENAME,
+                    _ => return,
+                };
+
+                i.sym = sym.into();
             }
-
-            let sym = match i.sym.as_ref() {
-                "__dirname" => ESM_DIRNAME,
-                "__filename" => ESM_FILENAME,
-                _ => return,
-            };
-
-            i.sym = sym.into();
         }
 
         if self.config.target == Target::CJS {
@@ -175,10 +182,57 @@ impl VisitMut for TransformShims {
 
         // We remove `Stmt::Empty` from the statement list.
         // This is optional, but it's required if you don't want extra `;` in output.
-        stmts.retain(|s| {
-            // We use `matches` macro as this match is trivial.
-            !matches!(s, Stmt::Empty(..))
+        stmts.retain(|s| !matches!(s, Stmt::Empty(..)));
+    }
+
+    fn visit_mut_module_items(&mut self, items: &mut Vec<ModuleItem>) {
+        items.visit_mut_children_with(self);
+
+        let is_has_import_url = items.iter().any(|item| {
+            if let ModuleItem::ModuleDecl(ModuleDecl::Import(decl)) = item {
+                if decl.src.value == "node:url"
+                    && decl.specifiers.iter().any(|specifier| {
+                        if let ImportSpecifier::Named(ImportNamedSpecifier { local, .. }) =
+                            specifier
+                        {
+                            return local.sym.as_ref() == "fileURLToPath";
+                        }
+                        false
+                    })
+                {
+                    return true;
+                }
+            }
+            false
         });
+
+        if self.config.target == Target::ESM
+            && self.config.legacy
+            && self.has_legacy_transform
+            && !is_has_import_url
+        {
+            // import { fileURLToPath } from "node:url";
+            let import_decl = ImportDecl {
+                span: DUMMY_SP,
+                specifiers: vec![ImportSpecifier::Named(ImportNamedSpecifier {
+                    span: DUMMY_SP,
+                    // TODO: fileURLToPath 重名问题
+                    local: "fileURLToPath".into(),
+                    imported: None,
+                    is_type_only: false,
+                })],
+                src: Box::new(Str {
+                    span: DUMMY_SP,
+                    value: "node:url".into(),
+                    raw: None,
+                }),
+                type_only: false,
+                with: None,
+                phase: Default::default(),
+            };
+
+            items.insert(0, ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+        }
     }
 }
 
@@ -186,6 +240,7 @@ pub fn init(config: Config) -> impl Pass {
     visit_mut_pass(TransformShims {
         config,
         id_map: HashMap::with_capacity(4),
+        has_legacy_transform: false,
     })
 }
 
@@ -200,6 +255,41 @@ test_inline!(
     r#"
         console.log(import.meta.dirname);
         console.log(import.meta.filename);
+    "# // Output codes after transformed with plugin
+);
+
+test_inline!(
+    Default::default(),
+    |_| init(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
+    fn_shims_esm_legacy,
+    r#"
+        console.log(__dirname);
+        console.log(__filename);
+        export {} // 临时加, 解析为 module
+    "#, // Input codes,
+    r#"
+        import { fileURLToPath } from "node:url";
+        console.log(fileURLToPath(new URL('.', import.meta.url)));
+        console.log(fileURLToPath(import.meta.url));
+        export {}
+    "# // Output codes after transformed with plugin
+);
+
+test_inline!(
+    Default::default(),
+    |_| init(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
+    fn_shims_esm_legacy_2,
+    r#"
+        import { fileURLToPath } from "node:url";
+        console.log(__dirname);
+        console.log(__filename);
+        export {} // 临时加, 解析为 module
+    "#, // Input codes,
+    r#"
+        import { fileURLToPath } from "node:url";
+        console.log(fileURLToPath(new URL('.', import.meta.url)));
+        console.log(fileURLToPath(import.meta.url));
+        export {}
     "# // Output codes after transformed with plugin
 );
 
