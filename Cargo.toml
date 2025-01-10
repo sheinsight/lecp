@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/transform_define", "crates/transform_ts2js", "crates/transform_extensions", "crates/transform_shims"]
+members = ["crates/transform_define", "crates/transform_ts2js", "crates/transform_extensions", "crates/transform_shims", "crates/lint"]
 
 resolver = "2"
 
@@ -16,6 +16,8 @@ env_logger = "0.11.5"
 futures    = "0.3"
 log        = "0.4.22"
 regex      = "1.11.0"
+rustc-hash = "2.1.0"
+bitflags = "2.7.0"
 
 # serde
 serde      = { version = "1.0", features = ["derive"] }
@@ -24,6 +26,8 @@ serde_json = "1.0"
 # swc
 swc_core = { version = "5.0.3", features = ["ecma_plugin_transform"] }
 
+# oxc
+oxc_linter = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.0", package = "oxc_linter" }
 # .cargo/config defines few alias to build plugin.
 # cargo build-wasi generates wasm-wasi32 binary
 # cargo build-wasm32 generates wasm32-unknown-unknown binary.

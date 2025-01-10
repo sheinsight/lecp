@@ -1,10 +1,23 @@
 {
 	"cSpell.words": [
+		"applescript",
+		"atomtest",
+		"bitflags",
 		"browserlist",
 		"bundless",
+		"embertest",
+		"jquery",
 		"lightningcss",
+		"nashorn",
+		"Oxlint",
+		"Oxlintrc",
+		"phantomjs",
 		"pico",
+		"prototypejs",
 		"rspack",
+		"rustc",
+		"serviceworker",
+		"shelljs",
 		"taplo"
 	],
 	"editor.codeActionsOnSave": {
