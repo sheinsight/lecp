@@ -12,36 +12,34 @@ pub struct Config {
     pub preserve_import_extension: bool,
 }
 
+const TS_EXTENSIONS: [(&str, &str); 4] = [
+    (".ts", ".js"),
+    (".tsx", ".js"),
+    (".mts", ".mjs"),
+    (".cts", ".cjs"),
+];
+
 fn replace_ts_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
     if !src.value.starts_with('.') {
         return None;
-    } else if src.value.ends_with(".ts") && !src.value.ends_with(".d.ts") {
-        if let Some(file) = src.value.strip_suffix(".ts") {
-            return Some(format!("{}.js", file).into());
-        }
-    } else if src.value.ends_with(".tsx") && !src.value.ends_with(".d.tsx") {
-        if let Some(file) = src.value.strip_suffix(".tsx") {
-            return Some(format!("{}.js", file).into());
-        }
-    } else if src.value.ends_with(".mts") && !src.value.ends_with(".d.mts") {
-        if let Some(file) = src.value.strip_suffix(".mts") {
-            if config.preserve_import_extension {
-                return Some(format!("{}.mjs", file).into());
-            } else {
-                return Some(format!("{}.js", file).into());
-            }
-        }
-    } else if src.value.ends_with(".cts") && !src.value.ends_with(".d.cts") {
-        if let Some(file) = src.value.strip_suffix(".cts") {
-            if config.preserve_import_extension {
-                return Some(format!("{}.cjs", file).into());
-            } else {
-                return Some(format!("{}.js", file).into());
-            }
-        }
     }
 
-    None
+    let path = &src.value;
+    TS_EXTENSIONS.iter().find_map(|(ts_ext, js_ext)| {
+        if path.ends_with(ts_ext) && !path.ends_with(&format!(".d{}", ts_ext)) {
+            dbg!(config.preserve_import_extension);
+            let ext = if config.preserve_import_extension {
+                js_ext
+            } else {
+                ".js"
+            };
+
+            path.strip_suffix(ts_ext)
+                .map(|file| format!("{}{}", file, ext).into())
+        } else {
+            None
+        }
+    })
 }
 
 struct RewriteImportExtensions {
@@ -98,4 +96,151 @@ impl VisitMut for RewriteImportExtensions {
 
 pub fn init(config: Config) -> impl Pass {
     visit_mut_pass(RewriteImportExtensions { config })
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::init;
+    use swc_core::ecma::transforms::testing::test_inline;
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        fn_ts,
+        r#"
+            import a from "./foo.ts";
+            import { b } from "./foo.ts";
+            export * from "./foo.ts"
+            export { foo } from "./foo.ts"
+            import("./foo.ts")
+        "#, // Input codes,
+        r#"
+            import a from "./foo.js";
+            import { b } from "./foo.js";
+            export * from "./foo.js"
+            export { foo } from "./foo.js"
+            import("./foo.js")
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        fn_tsx,
+        r#"
+            import a from "./foo.tsx";
+            import { b } from "./foo.tsx";
+            export * from "./foo.tsx"
+            export { foo } from "./foo.tsx"
+            import("./foo.tsx")
+        "#, // Input codes,
+        r#"
+            import a from "./foo.js";
+            import { b } from "./foo.js";
+            export * from "./foo.js"
+            export { foo } from "./foo.js"
+            import("./foo.js")
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        fn_js,
+        r#"
+            import a from "./foo.js";
+            import { b } from "./foo.js";
+            export * from "./foo.js"
+            export { foo } from "./foo.js"
+            import("./foo.js")
+        "#, // Input codes,
+        r#"
+            import a from "./foo.js";
+            import { b } from "./foo.js";
+            export * from "./foo.js"
+            export { foo } from "./foo.js"
+            import("./foo.js")
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        fn_mts,
+        r#"
+            import a from "./foo.mts";
+            import { b } from "./foo.mts";
+            export * from "./foo.mts"
+            export { foo } from "./foo.mts"
+            import("./foo.mts")
+        "#, // Input codes,
+        r#"
+            import a from "./foo.js";
+            import { b } from "./foo.js";
+            export * from "./foo.js"
+            export { foo } from "./foo.js"
+            import("./foo.js")
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{"preserveImportExtension":true}"#).unwrap()),
+        fn_mts_preserve,
+        r#"
+            import a from "./foo.mts";
+            import { b } from "./foo.mts";
+            export * from "./foo.mts"
+            export { foo } from "./foo.mts"
+            import("./foo.mts")
+        "#, // Input codes,
+        r#"
+            import a from "./foo.mjs";
+            import { b } from "./foo.mjs";
+            export * from "./foo.mjs"
+            export { foo } from "./foo.mjs"
+            import("./foo.mjs")
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        fn_cts,
+        r#"
+            import a from "./foo.cts";
+            import { b } from "./foo.cts";
+            export * from "./foo.cts"
+            export { foo } from "./foo.cts"
+            import("./foo.cts")
+        "#, // Input codes,
+        r#"
+            import a from "./foo.js";
+            import { b } from "./foo.js";
+            export * from "./foo.js"
+            export { foo } from "./foo.js"
+            import("./foo.js")
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{"preserveImportExtension":true}"#).unwrap()),
+        fn_cts_preserve,
+        r#"
+            import a from "./foo.cts";
+            import { b } from "./foo.cts";
+            export * from "./foo.cts"
+            export { foo } from "./foo.cts"
+            import("./foo.cts")
+        "#, // Input codes,
+        r#"
+            import a from "./foo.cjs";
+            import { b } from "./foo.cjs";
+            export * from "./foo.cjs"
+            export { foo } from "./foo.cjs"
+            import("./foo.cjs")
+        "# // Output codes after transformed with plugin
+    );
 }
