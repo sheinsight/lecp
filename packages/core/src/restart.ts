@@ -7,7 +7,7 @@ export function watchConfig(
 ): void {
 	const watcher = chokidar.watch(files, { ignoreInitial: true });
 
-	const handler = debounce(async (file: string) => {
+	const handler = debounce(async (event: unknown, file: string) => {
 		console.log("配置改变", file.replace(process.cwd(), ""));
 		await watcher.close();
 		await onUpdate();
