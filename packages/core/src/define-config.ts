@@ -137,9 +137,12 @@ export interface UserConfig {
 	 * 是否开启 shims
 	 * @description
 	 * - esm 产物, 支持 __dirname, __filename, require
+	 * 	- legacy: false(默认), 支持降级到(node@20.11+), 使用 import.meta.{dirname, filename}
+	 * 	- legacy: true,       支持降级到(node@10.12+), 使用 fileURLToPath
 	 * - cjs 产物, 支持 import.meta.{url,dirname, filename}
+	 *
 	 */
-	shims?: boolean;
+	shims?: boolean | { legacy?: boolean };
 
 	/**
 	 * 编译时，忽略的目录或文件

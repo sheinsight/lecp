@@ -6,7 +6,8 @@ import type {
 } from "@swc/core";
 import deepmerge from "deepmerge";
 import type { SystemConfig } from "../build.ts";
-import type { Format, FormatType, UserConfig } from "../define-config.ts";
+import type { FinalUserConfig } from "../config.ts";
+import type { Format, FormatType } from "../define-config.ts";
 
 const require = createRequire(import.meta.url);
 
@@ -29,14 +30,14 @@ interface GetOptions {
 	type: Format["type"];
 	minify: Format["minify"];
 	swcOptions?: SwcOptions;
-	targets: UserConfig["targets"];
-	sourcemap: UserConfig["sourcemap"];
-	externalHelpers?: UserConfig["externalHelpers"];
-	react?: UserConfig["react"];
-	css?: UserConfig["css"];
-	alias: UserConfig["alias"];
-	define: UserConfig["define"];
-	shims: UserConfig["shims"];
+	targets: FinalUserConfig["targets"];
+	sourcemap: FinalUserConfig["sourcemap"];
+	externalHelpers?: FinalUserConfig["externalHelpers"];
+	react?: FinalUserConfig["react"];
+	css?: FinalUserConfig["css"];
+	alias: FinalUserConfig["alias"];
+	define: FinalUserConfig["define"];
+	shims?: FinalUserConfig["shims"];
 	outJsExt: string;
 	resolveDir?: boolean;
 }
@@ -120,7 +121,7 @@ export const getSwcOptions = (
 	if (shims && !resolveDir) {
 		plugins.push([
 			require.resolve("@shined/swc-plugin-transform-shims"),
-			{ target: format },
+			{ target: format, legacy: shims?.legacy },
 		]);
 	}
 

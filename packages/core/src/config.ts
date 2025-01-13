@@ -123,11 +123,12 @@ const getDefaultEntry = async (cwd: string) => {
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 export interface FinalUserConfig
-	extends Required<Omit<UserConfig, "extend" | "dts" | "css">> {
+	extends Required<Omit<UserConfig, "extend" | "dts" | "css" | "shims">> {
 	format: Required<BundlessFormat | BundleFormat>[];
 	name: string;
 	dts?: Required<Exclude<UserConfig["dts"], boolean>>;
 	css?: Prettify<UserConfig["css"] & { cssModules?: string }>;
+	shims?: Exclude<UserConfig["shims"], boolean>;
 }
 
 export const getFinalUserOptions = (
@@ -157,6 +158,10 @@ export const getFinalUserOptions = (
 			// @ts-expect-error ...true ok
 			...buildOptions.dts,
 		};
+	}
+
+	if (buildOptions.shims === true) {
+		buildOptions.shims = { legacy: false };
 	}
 
 	if (buildOptions.css?.cssModules === true) {
