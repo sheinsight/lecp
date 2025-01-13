@@ -158,6 +158,10 @@ export const bundlessFiles = async (
 	const srcDir = path.join(cwd, entry);
 	const outDir = path.join(cwd, _outDir);
 
+	// 清除文件
+	logger.info(`🧹 清除${format}目录: ${outDir.replace(cwd, "")}`);
+	await fs.rm(outDir, { recursive: true, force: true });
+
 	const excludePatterns = testPattern.concat(exclude);
 	const files = await glob("**/*", { cwd: srcDir, ignore: excludePatterns });
 
@@ -244,6 +248,7 @@ export const bundlessFiles = async (
 				outFilePath: getOutFilePath(filePath, "script"),
 			});
 
+			// dts + isolatedDeclarations
 			if (dts?.mode === "bundless" && config.tsconfig?.isolatedDeclarations) {
 				logger.info(colors.white(`编译dts:`), colors.yellow(fileRelPath));
 
@@ -353,6 +358,7 @@ export const bundlessFiles = async (
 		watchers.push(watcher);
 	}
 
+	// dts + !isolatedDeclarations
 	if (dts && !config.tsconfig?.isolatedDeclarations) {
 		logger.info(colors.white(`编译dts`));
 		const watch = await bundlessDts(config, srcDir, outDir);
