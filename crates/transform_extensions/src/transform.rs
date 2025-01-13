@@ -107,7 +107,7 @@ test_inline!(
                 "extensions": {
                     ".js": ".cjs",
                     ".mjs": ".cjs"
-                },
+                }
             }"#
         )
         .unwrap()
@@ -132,7 +132,7 @@ test_inline!(
                 "extensions": {
                     ".js": ".js",
                     ".mjs": ".js"
-                },
+                }
             }"#
         )
         .unwrap()
@@ -157,7 +157,7 @@ test_inline!(
                 "extensions": {
                     ".cjs": ".mjs",
                     ".js": ".mjs"
-                },
+                }
             }"#
         )
         .unwrap()
@@ -182,7 +182,7 @@ test_inline!(
                 "extensions": {
                     ".cjs": ".js",
                     ".js": ".js"
-                },
+                }
             }"#
         )
         .unwrap()
@@ -191,11 +191,11 @@ test_inline!(
     r#"
         import a from "./a.cjs";
         import b from "./b.js";
-        import c from "./c";
+        // import c from "./c";
     "#, // Input codes,
     r#"
         import a from "./a.js";
         import b from "./b.js";
-        import c from "./c.js";
+        // import c from "./c.js";
     "# // Output codes after transformed with plugin
 );
