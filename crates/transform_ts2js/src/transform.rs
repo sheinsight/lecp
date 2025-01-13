@@ -27,7 +27,6 @@ fn replace_ts_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
     let path = &src.value;
     TS_EXTENSIONS.iter().find_map(|(ts_ext, js_ext)| {
         if path.ends_with(ts_ext) && !path.ends_with(&format!(".d{}", ts_ext)) {
-            dbg!(config.preserve_import_extension);
             let ext = if config.preserve_import_extension {
                 js_ext
             } else {

@@ -93,6 +93,8 @@ impl VisitMut for TransformShims {
 
     // cjs support import.meta.dirname, import.meta.filename
     fn visit_mut_expr(&mut self, e: &mut Expr) {
+        e.visit_mut_children_with(self);
+
         if self.config.target == Target::CJS {
             if let Expr::Member(n) = e {
                 if let (Expr::MetaProp(MetaPropExpr { kind, .. }), MemberProp::Ident(prop)) =
@@ -109,8 +111,6 @@ impl VisitMut for TransformShims {
                 }
             }
         }
-
-        e.visit_mut_children_with(self);
     }
 
     // cjs support {filename,dirname} = import.meta
@@ -163,13 +163,13 @@ impl VisitMut for TransformShims {
     }
 
     // const ; -> ;
-    fn visit_mut_stmt(&mut self, s: &mut Stmt) {
-        s.visit_mut_children_with(self);
+    fn visit_mut_stmt(&mut self, stmt: &mut Stmt) {
+        stmt.visit_mut_children_with(self);
 
-        match s {
+        match stmt {
             Stmt::Decl(Decl::Var(var)) => {
                 if var.decls.is_empty() {
-                    s.take();
+                    stmt.take();
                 }
             }
             _ => {}
