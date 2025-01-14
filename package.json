@@ -2,7 +2,7 @@
 	"name": "lego-cp-root",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@9.15.0",
+	"packageManager": "pnpm@9.15.4",
 	"version": "0.0.1",
 	"scripts": {
 		"test": "vitest",
@@ -18,9 +18,8 @@
 	"description": "",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"oxlint": "^0.14.1",
-		"tsx": "^4.19.2",
+		"oxlint": "^0.15.7",
 		"typescript": "catalog:",
-		"vitest": "^2.1.8"
+		"vitest": "catalog:"
 	}
 }

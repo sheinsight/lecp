@@ -18,8 +18,8 @@
 		"build": "node --experimental-strip-types ./src/cli.ts"
 	},
 	"dependencies": {
-		"@microsoft/api-extractor": "^7.48.1",
-		"@rspack/core": "^1.1.6",
+		"@microsoft/api-extractor": "^7.49.1",
+		"@rspack/core": "^1.1.8",
 		"@shined/swc-plugin-transform-extensions": "workspace:*",
 		"@shined/swc-plugin-transform-shims": "workspace:*",
 		"@shined/swc-plugin-transform-ts2js": "workspace:*",
@@ -28,13 +28,13 @@
 		"chokidar": "^4.0.3",
 		"deepmerge": "^4.3.1",
 		"jiti": "^2.4.2",
-		"less": "^4.2.1",
-		"lightningcss": "^1.28.2",
+		"less": "^4.2.2",
+		"lightningcss": "^1.29.1",
 		"picocolors": "^1.1.1",
 		"read-pkg": "^9.0.1",
 		"swc-plugin-css-modules": "1.0.0",
 		"tinyglobby": "^0.2.10",
-		"typescript-transform-paths": "^3.5.2",
+		"typescript-transform-paths": "^3.5.3",
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
