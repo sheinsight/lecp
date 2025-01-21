@@ -1,11 +1,15 @@
-import path from "node:path";
+import fs from "node:fs/promises";
+import path from "path";
+import colors from "picocolors";
 import { type NormalizedPackageJson, readPackage } from "read-pkg";
 import type { CompilerOptions } from "typescript";
+import { bundleDts } from "./bundle/dts.ts";
 import { bundleFiles } from "./bundle/index.ts";
-import { getTsConfigFileContent } from "./bundless/dts.ts";
+import { bundlessDts, getTsConfigFileContent } from "./bundless/dts.ts";
 import { bundlessFiles } from "./bundless/index.ts";
 import { getConfig, getFinalUserOptions } from "./config.ts";
 import type { UserConfig } from "./define-config.ts";
+import { pathExists } from "./util/index.ts";
 import { type LogLevel, logger } from "./util/logger.ts";
 
 export interface InputSystemConfig {
@@ -27,7 +31,7 @@ export interface Watcher {
 }
 
 export const build = async (
-	config: UserConfig,
+	userConfig: UserConfig,
 	inputSystemConfig: InputSystemConfig,
 ): Promise<Watcher[]> => {
 	logger.info("start build");
@@ -45,23 +49,47 @@ export const build = async (
 		}).options,
 	} as SystemConfig;
 
-	const userConfig = getFinalUserOptions(config, systemConfig);
-	const { format, ...others } = userConfig;
+	const options = getFinalUserOptions(userConfig, systemConfig);
+	const { format, ...others } = options;
+	const { cwd } = systemConfig;
 
 	for (const task of format) {
-		if (task.mode === "bundless") {
-			const watcher = await bundlessFiles({ ...task, ...others }, systemConfig);
+		const { mode, outDir, dts } = task;
+
+		if (mode === "bundless") {
+			const watcher = await bundlessFiles({ ...others, ...task }, systemConfig);
 			watchers = watchers.concat(watcher ?? []);
 		}
 
-		// TODO: bundleDts 依赖 bundless的 dts
-		if (userConfig.dts?.mode === "bundle") {
-			//
+		if (mode === "bundle") {
+			const watcher = await bundleFiles({ ...others, ...task }, systemConfig);
+			watchers = watchers.concat(watcher ?? []);
 		}
 
-		if (task.mode === "bundle") {
-			const watcher = await bundleFiles({ ...task, ...others }, systemConfig);
-			watchers = watchers.concat(watcher ?? []);
+		if (dts) {
+			logger.info(colors.white(`编译dts(${dts.mode})`));
+
+			if (dts.mode === "bundless") {
+				const watcher = await bundlessDts({ ...others, ...task }, systemConfig);
+				if (watcher) watchers.push(watcher);
+			}
+
+			if (dts.mode === "bundle") {
+				// 能否复用 bundlessDts ??
+				const tempDir = path.join(cwd, ".lecp"); // api-extractor 在 node_module 下 合并 dts 失败
+				if (!(await pathExists(tempDir))) {
+					await fs.mkdir(tempDir);
+					await fs.writeFile(path.resolve(tempDir, ".gitignore"), "**/*");
+				}
+
+				const tempOutDir = path.join(tempDir, path.relative(cwd, outDir));
+				const watcher = await bundlessDts(
+					{ ...others, ...task, outDir: tempOutDir },
+					systemConfig,
+					() => bundleDts({ srcDir: tempOutDir, outDir, cwd }),
+				);
+				if (watcher) watchers.push(watcher);
+			}
 		}
 	}
 
@@ -69,7 +97,6 @@ export const build = async (
 };
 
 const CONFIG_FILE = "lecp.config.ts";
-// const CONFIG_FILE = "lecp2.config.ts";
 
 // cwd -> configFiles, config
 export const init = async (

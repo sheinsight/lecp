@@ -10,15 +10,16 @@ import { glob } from "tinyglobby";
 import type { SystemConfig, Watcher } from "../build.ts";
 import type { FinalUserConfig } from "../config.ts";
 import { testPattern } from "../constant.ts";
-import type { BundlessFormat, DtsBuilderType } from "../define-config.ts";
-import { getOutJsExt } from "../util/index.ts";
-import { logger } from "../util/logger.ts";
+import type { BundlessFormat } from "../define-config.ts";
 import {
-	bundlessDts,
-	swcTransformDeclaration,
-	transformDts,
-	tsTransformDeclaration,
-} from "./dts.ts";
+	getOutJsExt,
+	isCss,
+	isDts,
+	isJsx,
+	isLess,
+	isScript,
+} from "../util/index.ts";
+import { logger } from "../util/logger.ts";
 import {
 	type TransformLessOptions,
 	transformCSS,
@@ -138,12 +139,6 @@ const copyAsset = async (
 	await fs.copyFile(file, outFilePath);
 };
 
-const isLess = /\.less$/;
-const isCss = /\.css$/;
-const isScript = /\.(c|m)?(t|j)sx?$/;
-const isDts = /\.d\.(c|m)?tsx?$/;
-const isJsx = /\.(t|j)sx$/;
-
 type BundlessOptions = Omit<FinalUserConfig, "format"> &
 	Required<BundlessFormat>;
 
@@ -152,18 +147,12 @@ export const bundlessFiles = async (
 	config: SystemConfig,
 ): Promise<Watcher[] | undefined> => {
 	const { cwd, watch } = config;
-	const { exclude, entry, outDir: _outDir, css, type: format, dts } = options;
+	const { exclude, entry: srcDir, outDir, css, type: format } = options;
 	const { sourcemap, targets, minify } = options;
-
-	const srcDir = path.join(cwd, entry);
-	const outDir = path.join(cwd, _outDir);
 
 	// 清除文件
 	logger.info(`🧹 清除${format}目录: ${outDir.replace(cwd, "")}`);
 	await fs.rm(outDir, { recursive: true, force: true });
-
-	const excludePatterns = testPattern.concat(exclude);
-	const files = await glob("**/*", { cwd: srcDir, ignore: excludePatterns });
 
 	const outJsExt = getOutJsExt(
 		!!targets.node,
@@ -248,44 +237,6 @@ export const bundlessFiles = async (
 				outFilePath: getOutFilePath(filePath, "script"),
 			});
 
-			// dts + isolatedDeclarations
-			if (dts?.mode === "bundless" && config.tsconfig?.isolatedDeclarations) {
-				logger.info(colors.white(`编译dts:`), colors.yellow(fileRelPath));
-
-				const dtsBuilders: Record<
-					DtsBuilderType,
-					() => Promise<TransformResult | undefined>
-				> = {
-					swc: () => {
-						// baseUrl + paths
-						const swcOptions = getSwcOptions(
-							{
-								...options,
-								outJsExt: isJsx.test(file) ? ".js" : outJsExt,
-								swcOptions: {
-									// ...options.swcOptions,
-									jsc: { experimental: { emitIsolatedDts: true } },
-								},
-							},
-							config,
-						);
-
-						return swcTransformDeclaration(file, swcOptions);
-					},
-					ts: () =>
-						tsTransformDeclaration(file, {
-							...config.tsconfig,
-							outDir,
-							declarationDir: outDir,
-						}),
-				};
-
-				await transformDts(file, {
-					transform: dtsBuilders[dts.builder],
-					outFilePath: getOutFilePath(filePath, "dts"),
-				});
-			}
-
 			return;
 		}
 
@@ -293,7 +244,13 @@ export const bundlessFiles = async (
 		await copyAsset(file, { srcDir, outDir });
 	};
 
-	files.map(file => path.join(srcDir, file)).forEach(compileFile);
+	const excludePatterns = testPattern.concat(exclude);
+	const files = await glob("**/*", {
+		cwd: srcDir,
+		ignore: excludePatterns,
+		absolute: true,
+	});
+	files.forEach(compileFile);
 
 	const watchers: Watcher[] = [];
 
@@ -308,10 +265,7 @@ export const bundlessFiles = async (
 			if (event === "add" || event === "change")
 				return compileFile(path.join(srcDir, file));
 			if (event === "unlinkDir")
-				return fs.rm(path.join(outDir, file), {
-					recursive: true,
-					force: true,
-				});
+				return fs.rm(path.join(outDir, file), { recursive: true, force: true });
 			if (event === "unlink") {
 				// style
 				if (isLess.test(file) || isCss.test(file)) {
@@ -324,21 +278,8 @@ export const bundlessFiles = async (
 				// script
 				if (isScript.test(file) && !isDts.test(file)) {
 					const outFilePath = getOutFilePath(file, "script");
-
-					// .js
 					if (sourcemap) fs.rm(outFilePath + ".map");
 					fs.rm(outFilePath);
-
-					if (
-						dts?.mode === "bundless" &&
-						config.tsconfig?.isolatedDeclarations
-					) {
-						// d.ts
-						const outDtsFilePath = getOutFilePath(file, "script");
-						if (config.tsconfig?.declarationMap) fs.rm(outDtsFilePath + ".map");
-						fs.rm(outDtsFilePath);
-					}
-
 					return;
 				}
 
@@ -356,13 +297,6 @@ export const bundlessFiles = async (
 		});
 
 		watchers.push(watcher);
-	}
-
-	// dts + !isolatedDeclarations
-	if (dts && !config.tsconfig?.isolatedDeclarations) {
-		logger.info(colors.white(`编译dts`));
-		const watch = await bundlessDts(config, srcDir, outDir);
-		if (watch) watchers.push(watch);
 	}
 
 	if (watch) return watchers;

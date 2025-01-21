@@ -124,7 +124,14 @@ export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 export interface FinalUserConfig
 	extends Required<Omit<UserConfig, "extend" | "dts" | "css" | "shims">> {
-	format: Required<BundlessFormat | BundleFormat>[];
+	format: Required<
+		| (Omit<BundlessFormat, "dts"> & {
+				dts?: Required<Exclude<UserConfig["dts"], boolean>>;
+		  })
+		| (Omit<BundleFormat, "dts"> & {
+				dts?: Required<Exclude<UserConfig["dts"], boolean>>;
+		  })
+	>[];
 	name: string;
 	dts?: Required<Exclude<UserConfig["dts"], boolean>>;
 	css?: Prettify<UserConfig["css"] & { cssModules?: string }>;
@@ -144,13 +151,6 @@ export const getFinalUserOptions = (
 			: { chrome: DEFAULT_WEB_TARGET };
 	}
 
-	buildOptions.format = userConfig.format.map(item => {
-		return {
-			...defaultFormatConfig[item.type],
-			...item,
-		} as BundlessFormat | BundleFormat;
-	});
-
 	if (buildOptions.dts) {
 		buildOptions.dts = {
 			mode: "bundless",
@@ -159,6 +159,22 @@ export const getFinalUserOptions = (
 			...buildOptions.dts,
 		};
 	}
+
+	buildOptions.format = userConfig.format.map(item => {
+		const data = {
+			...defaultFormatConfig[item.type],
+			...item,
+		} as FinalUserConfig["format"][0];
+
+		data.dts = {
+			// @ts-expect-error ...true ok
+			...buildOptions.dts,
+			...data.dts,
+		};
+		if (data.outDir) data.outDir = path.resolve(systemConfig.cwd, data.outDir);
+		if (data.entry) data.entry = path.resolve(systemConfig.cwd, data.entry);
+		return data;
+	});
 
 	if (buildOptions.shims === true) {
 		buildOptions.shims = { legacy: false };

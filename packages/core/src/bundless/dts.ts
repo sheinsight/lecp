@@ -3,13 +3,20 @@ import {
 	type Options as SwcOptions,
 	transformFile as swcTransformFile,
 } from "@swc/core";
+import chokidar from "chokidar";
 import fs from "fs/promises";
+import colors from "picocolors";
+import { glob } from "tinyglobby";
 import ts, { type CompilerOptions } from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
 import type { SystemConfig, Watcher } from "../build.ts";
-import { testPatternForTs } from "../constant.ts";
+import type { FinalUserConfig } from "../config.ts";
+import { testPattern, testPatternForTs } from "../constant.ts";
+import type { BundleFormat, BundlessFormat } from "../define-config.ts";
+import { getOutJsExt, isJsx, pathExists } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
-import type { TransformResult } from "./index.ts";
+import type { SourceMap, TransformResult } from "./index.ts";
+import { getSwcOptions } from "./swc.ts";
 
 /**
  * 参考配置 @see https://github.com/Swatinem/rollup-plugin-dts/blob/master/src/program.ts
@@ -83,17 +90,64 @@ export const getTsConfigFileContent = (options: {
 	return ts.parseJsonConfigFileContent(config, ts.sys, cwd);
 };
 
+export const copyDts = async (
+	typesDir: string,
+	tasks: { outDir: string }[],
+	srcDir: string,
+) => {
+	const dtsFiles = await glob("**/*.d.ts", { cwd: typesDir });
+	for (const { outDir } of tasks) {
+		if (outDir === typesDir) continue;
+		for (const file of dtsFiles) {
+			// d.ts
+			await fs.cp(path.join(typesDir, file), path.join(outDir, file));
+
+			// d.ts.map
+			await generateDtsMapFile({ srcDir, typesDir, outDir, file });
+		}
+	}
+};
+
+export async function generateDtsMapFile(params: {
+	srcDir: string;
+	typesDir: string;
+	outDir: string;
+	file: string;
+}) {
+	const { typesDir, outDir, file, srcDir } = params;
+
+	const mapFile = path.join(typesDir, `${file}.map`);
+	const outMapFile = path.join(outDir, `${file}.map`);
+
+	if (!(await pathExists(mapFile))) return;
+
+	const sourceRelativePath = path.relative(typesDir, srcDir); // es: "../src"
+	const destRelativePath = path.relative(outDir, srcDir); //  lib: "../src", dist/lib: "../../src",
+
+	if (sourceRelativePath === destRelativePath) {
+		await fs.cp(mapFile, outMapFile);
+	} else {
+		const content: SourceMap = JSON.parse(await fs.readFile(mapFile, "utf8"));
+
+		content.sources = content.sources?.map(source =>
+			source.replace(sourceRelativePath, destRelativePath),
+		);
+
+		await fs.writeFile(outMapFile, JSON.stringify(content));
+	}
+}
+
 /**
  * 编译 ts 到 dts
  */
-export const bundlessDts = async (
+export const bundlessEmitDts = async (
 	config: SystemConfig,
-	srcDir: string,
 	typesDir: string,
+	onSuccess?: () => void,
 ): Promise<Watcher | void> => {
 	const { cwd, watch } = config;
 
-	logger.verbose("dts编译目录:", srcDir);
+	// logger.verbose("dts编译目录:", srcDir);
 
 	const { fileNames, options } = getTsConfigFileContent({ cwd, exclude: [] });
 	logger.verbose("dts编译文件: ", fileNames);
@@ -119,10 +173,10 @@ export const bundlessDts = async (
 	logger.verbose("最终tsconfig配置: ", compilerOptions);
 
 	if (watch) {
-		return watchDeclaration(fileNames, compilerOptions);
+		return watchDeclaration(fileNames, compilerOptions, onSuccess);
 	}
 
-	emitDeclaration(fileNames, compilerOptions);
+	emitDeclaration(fileNames, compilerOptions, onSuccess);
 };
 
 /**
@@ -131,6 +185,7 @@ export const bundlessDts = async (
 export const emitDeclaration = (
 	files: string[],
 	compilerOptions: CompilerOptions,
+	onSuccess?: () => void,
 ): void => {
 	const program = ts.createProgram({
 		rootNames: files,
@@ -148,6 +203,8 @@ export const emitDeclaration = (
 		ts.getPreEmitDiagnostics(program).concat(diagnostics),
 	);
 	log && logger.error(log);
+
+	onSuccess?.();
 };
 
 /**
@@ -156,6 +213,7 @@ export const emitDeclaration = (
 export const watchDeclaration = (
 	files: string[],
 	compilerOptions: CompilerOptions,
+	onSuccess?: () => void,
 ): ts.WatchOfConfigFile<ts.BuilderProgram> => {
 	logger.verbose("watching dts...");
 	const host = ts.createWatchCompilerHost(
@@ -167,7 +225,11 @@ export const watchDeclaration = (
 			logger.error(getDiagnosticsLog([diagnostic]));
 		},
 		function reportWatchStatusChanged(diagnostic) {
-			logger.info(getDiagnosticsLog([diagnostic]));
+			// TS6031, TS6032  Starting compilation
+			if (![6031, 6032].includes(diagnostic.code)) {
+				// logger.info(getDiagnosticsLog([diagnostic]));
+				onSuccess?.();
+			}
 		},
 	);
 
@@ -282,7 +344,7 @@ export const swcTransformDeclaration = async (
 			swcOptions ?? defaultSwcOptions,
 		);
 
-		// @ts-expect-error
+		// @ts-expect-error output exists
 		const output = JSON.parse(result.output);
 		return {
 			code: output.__swc_isolated_declarations__,
@@ -292,25 +354,125 @@ export const swcTransformDeclaration = async (
 	}
 };
 
-interface TransformDtsOption {
-	transform: () => Promise<TransformResult | undefined>;
-	outFilePath: string;
+type BundlessOptions = Omit<FinalUserConfig, "format"> &
+	Required<BundlessFormat | BundleFormat>;
+
+export async function bundlessTransformDts(
+	options: BundlessOptions,
+	config: SystemConfig,
+	onSuccess?: () => void,
+) {
+	const { entry: srcDir, outDir, targets, type: format, dts } = options;
+	const { pkg, cwd, tsconfig, watch } = config;
+
+	const excludePatterns = testPattern.concat(options.exclude ?? []);
+
+	const files = await glob("**/*.ts", {
+		cwd: srcDir,
+		absolute: true,
+		ignore: excludePatterns,
+	});
+
+	const dtsBuilders = {
+		swc: (file: string) => {
+			const outJsExt = getOutJsExt(
+				!!targets.node,
+				pkg.type === "module",
+				format,
+			);
+
+			// baseUrl + paths
+			const swcOptions = getSwcOptions(
+				{
+					...options,
+					outJsExt: isJsx.test(file) ? ".js" : outJsExt,
+					swcOptions: {
+						// ...options.swcOptions,
+						jsc: { experimental: { emitIsolatedDts: true } },
+					},
+				},
+				config,
+			);
+
+			return swcTransformDeclaration(file, swcOptions);
+		},
+		ts: (file: string) =>
+			tsTransformDeclaration(file, {
+				...tsconfig,
+				outDir,
+				declarationDir: outDir,
+			}),
+	};
+
+	const compileFile = async (file: string) => {
+		const fileRelPath = file.replace(cwd, "");
+		const filePath = file.replace(srcDir, "");
+		logger.info(colors.white(`编译dts:`), colors.yellow(fileRelPath));
+
+		const result = await dtsBuilders[dts.builder](file);
+		if (!result) return;
+		const { code, map } = result;
+
+		const outFilePath = path.join(
+			outDir,
+			filePath.replace(/\.(t|j)sx?$/, ".d.ts").replace(/\.(c|m)ts$/, ".d.$1ts"),
+		);
+		await fs.mkdir(path.dirname(outFilePath), { recursive: true });
+
+		// .d.ts
+		fs.writeFile(outFilePath, code);
+
+		// d.ts.map
+		map && fs.writeFile(outFilePath + ".map", map);
+
+		onSuccess?.();
+	};
+
+	files.forEach(compileFile);
+
+	if (watch) {
+		const watcher = chokidar.watch(".", {
+			cwd: srcDir,
+			ignoreInitial: true,
+			ignored: await glob(excludePatterns, { cwd: srcDir }),
+		});
+
+		watcher.on("all", async (event, file) => {
+			try {
+				if (event === "add" || event === "change") {
+					return compileFile(path.join(srcDir, file));
+				}
+
+				if (event === "unlink") {
+					// if (
+					// 	dts?.mode === "bundless" &&
+					// 	tsconfig?.isolatedDeclarations
+					// ) {
+					// 	// d.ts
+					// 	const outDtsFilePath = getOutFilePath(file, "script");
+					// 	if (tsconfig?.declarationMap)
+					// 		fs.rm(outDtsFilePath + ".map");
+					// 	fs.rm(outDtsFilePath);
+					// }
+				}
+			} catch (error) {
+				logger.verbose(error);
+			}
+		});
+
+		return watcher;
+	}
 }
 
-export const transformDts = async (
-	file: string,
-	{ transform, outFilePath }: TransformDtsOption,
-): Promise<void> => {
-	const result = await transform();
-	if (!result) return;
-
-	const { code, map } = result;
-
-	await fs.mkdir(path.dirname(outFilePath), { recursive: true });
-
-	// .d.ts
-	fs.writeFile(outFilePath, code);
-
-	// d.ts.map
-	map && fs.writeFile(outFilePath + ".map", map);
-};
+export async function bundlessDts(
+	options: BundlessOptions,
+	config: SystemConfig,
+	onSuccess?: () => void,
+) {
+	const { tsconfig } = config;
+	if (tsconfig?.isolatedDeclarations) {
+		return bundlessTransformDts(options, config, onSuccess);
+	} else {
+		return bundlessEmitDts(config, options.outDir, onSuccess);
+	}
+}

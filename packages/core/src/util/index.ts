@@ -43,6 +43,12 @@ export const merge = <T extends object>(...args: Partial<T>[]): T => {
 	return args.reduce((prev, next) => Object.assign(prev, next), {}) as T;
 };
 
+export const isLess = /\.less$/;
+export const isCss = /\.css$/;
+export const isScript = /\.(c|m)?(t|j)sx?$/;
+export const isDts = /\.d\.(c|m)?tsx?$/;
+export const isJsx = /\.(t|j)sx$/;
+
 /**
  * |     | module | commonjs |
  * | --- | ------ | -------- |

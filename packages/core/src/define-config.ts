@@ -60,6 +60,12 @@ export interface Format {
 	 * 是否开启压缩
 	 */
 	minify?: boolean;
+
+	/**
+	 * 是否生成声明文件
+	 * @default true (mode:"bundless" + builder: "ts")
+	 */
+	dts?: UserConfig["dts"];
 }
 
 export interface BundlessFormat extends Format {
