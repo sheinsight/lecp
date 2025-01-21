@@ -181,15 +181,19 @@ fn create_expr(value: Value) -> Option<Expr> {
 
 test_inline!(
     Default::default(),
-    |_| transform_define(serde_json::json!({
-        "STR": "string",
-        "NUM": 0,
-        "BOOL": false,
-        "ARR": [],
-        "OBJ": {},
-        // "NULL": null, // serde_json 未设置也会返回 null, js 会是 undefined
-        // "UN_DEF": undefined, // 无法设置 undefined, Value 没有这个类型
-    })),
+    |_| transform_define(
+        serde_json::from_str(
+            r#"
+            {
+                "STR": "string",
+                "NUM": 0,
+                "BOOL": false,
+                "ARR": [],
+                "OBJ": {}
+            }"#
+        )
+        .unwrap()
+    ),
     fn_ident,
     r#"
         STR;
@@ -213,9 +217,15 @@ test_inline!(
 
 test_inline!(
     Default::default(),
-    |_| transform_define(serde_json::json!({
-        "STR": "string",
-    })),
+    |_| transform_define(
+        serde_json::from_str(
+            r#"
+            {
+                "STR": "string"
+            }"#
+        )
+        .unwrap()
+    ),
     fn_import,
     r#"
         import { STR } from "pkg1";
@@ -233,9 +243,15 @@ test_inline!(
 
 test_inline!(
     Default::default(),
-    |_| transform_define(serde_json::json!({
-        "typeof window":  "object"
-    })),
+    |_| transform_define(
+        serde_json::from_str(
+            r#"
+            {
+                "typeof window":  "object"
+            }"#
+        )
+        .unwrap()
+    ),
     fn_typeof,
     r#"
         typeof window;
@@ -250,13 +266,19 @@ test_inline!(
 // 'process.env.NODE_ENV 被正确转化-字符串参数
 test_inline!(
     Default::default(),
-    |_| transform_define(serde_json::json!({
-        "process.env.NODE_ENV": "production",
-        "process.env.BOOL": true,
-        "process.env.NUM": 1,
-        "process.env.ARR": [],
-        "process.env.OBJ": {},
-    })),
+    |_| transform_define(
+        serde_json::from_str(
+            r#"
+            {
+                "process.env.NODE_ENV": "production",
+                "process.env.BOOL": true,
+                "process.env.NUM": 1,
+                "process.env.ARR": [],
+                "process.env.OBJ": {}
+            }"#
+        )
+        .unwrap()
+    ),
     fn_member_expr,
     r#"
         if (process.env.NODE_ENV === "production") console.log(true);
@@ -295,17 +317,23 @@ test_inline!(
 // 'process.env.NODE_ENV 被正确转化-对象参数
 test_inline!(
     Default::default(),
-    |_| transform_define(serde_json::json!({
-       "process": {
-            "env": {
-                "NODE_ENV": "production",
-                "BOOL": true,
-                "NUM": 1,
-                "ARR": [],
-                "OBJ": {},
-            },
-        },
-    })),
+    |_| transform_define(
+        serde_json::from_str(
+            r#"
+            {
+                "process": {
+                    "env": {
+                        "NODE_ENV": "production",
+                        "BOOL": true,
+                        "NUM": 1,
+                        "ARR": [],
+                        "OBJ": {}
+                    }
+                }
+            }"#,
+        )
+        .unwrap()
+    ),
     fn_member_expr2,
     r#"
         if (process.env.NODE_ENV === "production") console.log(true);
