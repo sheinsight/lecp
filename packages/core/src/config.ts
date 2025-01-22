@@ -164,16 +164,22 @@ export const getFinalUserOptions = (
 		const data = {
 			...defaultFormatConfig[item.type],
 			...item,
-		} as FinalUserConfig["format"][0];
-
-		data.dts = {
-			// @ts-expect-error ...true ok
-			...buildOptions.dts,
-			...data.dts,
 		};
+
+		if (data.dts === undefined) {
+			data.dts = buildOptions.dts;
+		} else if (data.dts) {
+			data.dts = {
+				// @ts-expect-error ...true ok
+				...buildOptions.dts,
+				// @ts-expect-error ...true ok
+				...data.dts,
+			};
+		}
+
 		if (data.outDir) data.outDir = path.resolve(systemConfig.cwd, data.outDir);
 		if (data.entry) data.entry = path.resolve(systemConfig.cwd, data.entry);
-		return data;
+		return data as FinalUserConfig["format"][0];
 	});
 
 	if (buildOptions.shims === true) {
