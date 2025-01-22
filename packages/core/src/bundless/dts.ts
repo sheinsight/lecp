@@ -94,7 +94,7 @@ export const copyDts = async (
 	typesDir: string,
 	tasks: { outDir: string }[],
 	srcDir: string,
-) => {
+): Promise<void> => {
 	const dtsFiles = await glob("**/*.d.ts", { cwd: typesDir });
 	for (const { outDir } of tasks) {
 		if (outDir === typesDir) continue;
@@ -113,7 +113,7 @@ export async function generateDtsMapFile(params: {
 	typesDir: string;
 	outDir: string;
 	file: string;
-}) {
+}): Promise<void> {
 	const { typesDir, outDir, file, srcDir } = params;
 
 	const mapFile = path.join(typesDir, `${file}.map`);
@@ -140,7 +140,7 @@ export async function generateDtsMapFile(params: {
 /**
  * 编译 ts 到 dts
  */
-export const bundlessEmitDts = async (
+const bundlessEmitDts = async (
 	config: SystemConfig,
 	typesDir: string,
 	onSuccess?: () => void,
@@ -361,7 +361,7 @@ export async function bundlessTransformDts(
 	options: BundlessOptions,
 	config: SystemConfig,
 	onSuccess?: () => void,
-) {
+): Promise<void | Watcher> {
 	const { entry: srcDir, outDir, targets, type: format, dts } = options;
 	const { pkg, cwd, tsconfig, watch } = config;
 
@@ -468,7 +468,7 @@ export async function bundlessDts(
 	options: BundlessOptions,
 	config: SystemConfig,
 	onSuccess?: () => void,
-) {
+): Promise<void | Watcher> {
 	const { tsconfig } = config;
 	if (tsconfig?.isolatedDeclarations) {
 		return bundlessTransformDts(options, config, onSuccess);

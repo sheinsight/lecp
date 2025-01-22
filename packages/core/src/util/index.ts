@@ -43,11 +43,11 @@ export const merge = <T extends object>(...args: Partial<T>[]): T => {
 	return args.reduce((prev, next) => Object.assign(prev, next), {}) as T;
 };
 
-export const isLess = /\.less$/;
-export const isCss = /\.css$/;
-export const isScript = /\.(c|m)?(t|j)sx?$/;
-export const isDts = /\.d\.(c|m)?tsx?$/;
-export const isJsx = /\.(t|j)sx$/;
+export const isLess: RegExp = /\.less$/;
+export const isCss: RegExp = /\.css$/;
+export const isScript: RegExp = /\.(c|m)?(t|j)sx?$/;
+export const isDts: RegExp = /\.d\.(c|m)?tsx?$/;
+export const isJsx: RegExp = /\.(t|j)sx$/;
 
 /**
  * |     | module | commonjs |
