@@ -90,53 +90,6 @@ export const getTsConfigFileContent = (options: {
 	return ts.parseJsonConfigFileContent(config, ts.sys, cwd);
 };
 
-export const copyDts = async (
-	typesDir: string,
-	tasks: { outDir: string }[],
-	srcDir: string,
-): Promise<void> => {
-	const dtsFiles = await glob("**/*.d.ts", { cwd: typesDir });
-	for (const { outDir } of tasks) {
-		if (outDir === typesDir) continue;
-		for (const file of dtsFiles) {
-			// d.ts
-			await fs.cp(path.join(typesDir, file), path.join(outDir, file));
-
-			// d.ts.map
-			await generateDtsMapFile({ srcDir, typesDir, outDir, file });
-		}
-	}
-};
-
-export async function generateDtsMapFile(params: {
-	srcDir: string;
-	typesDir: string;
-	outDir: string;
-	file: string;
-}): Promise<void> {
-	const { typesDir, outDir, file, srcDir } = params;
-
-	const mapFile = path.join(typesDir, `${file}.map`);
-	const outMapFile = path.join(outDir, `${file}.map`);
-
-	if (!(await pathExists(mapFile))) return;
-
-	const sourceRelativePath = path.relative(typesDir, srcDir); // es: "../src"
-	const destRelativePath = path.relative(outDir, srcDir); //  lib: "../src", dist/lib: "../../src",
-
-	if (sourceRelativePath === destRelativePath) {
-		await fs.cp(mapFile, outMapFile);
-	} else {
-		const content: SourceMap = JSON.parse(await fs.readFile(mapFile, "utf8"));
-
-		content.sources = content.sources?.map(source =>
-			source.replace(sourceRelativePath, destRelativePath),
-		);
-
-		await fs.writeFile(outMapFile, JSON.stringify(content));
-	}
-}
-
 /**
  * 编译 ts 到 dts
  */
@@ -420,12 +373,11 @@ export async function bundlessTransformDts(
 		await fs.mkdir(path.dirname(outFilePath), { recursive: true });
 
 		// .d.ts
-		fs.writeFile(outFilePath, code);
+		await fs.writeFile(outFilePath, code);
+		onSuccess?.();
 
 		// d.ts.map
-		map && fs.writeFile(outFilePath + ".map", map);
-
-		onSuccess?.();
+		map && (await fs.writeFile(outFilePath + ".map", map));
 	};
 
 	files.forEach(compileFile);

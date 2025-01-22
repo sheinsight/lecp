@@ -100,20 +100,20 @@ const compileScript = async (
 ): Promise<void> => {
 	let { code, map } = await compile(file);
 
-	await fs.mkdir(path.dirname(outFilePath), { recursive: true });
+	const outDir = path.dirname(outFilePath);
+	await fs.mkdir(outDir, { recursive: true });
 
 	if (map) {
 		const mapFilePath = outFilePath + ".map";
 		code += `\n//# sourceMappingURL=${path.basename(mapFilePath)}`;
 
 		const mapJson: SourceMap = typeof map === "string" ? JSON.parse(map) : map;
-
 		mapJson.file = path.basename(outFilePath);
 
 		// 绝对路径 -> 相对路径
 		if (mapJson.sources) {
 			mapJson.sources = mapJson.sources.map(filePath =>
-				path.relative(path.dirname(outFilePath), filePath),
+				path.relative(outDir, filePath),
 			);
 		}
 
