@@ -6,7 +6,7 @@ packages:
 catalog:
   typescript: ^5.7.3
 
-  '@types/node': ^22.10.7
+  '@types/node': ^22.10.8
 
   # react
   react: &react ^19.0.0
