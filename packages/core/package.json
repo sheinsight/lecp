@@ -43,5 +43,5 @@
 		"@types/yargs": "^17.0.33",
 		"typescript": "catalog:"
 	},
-	"packageManager": "pnpm@9.15.0"
+	"packageManager": "pnpm@10.2.0"
 }
