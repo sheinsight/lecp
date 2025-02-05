@@ -1,6 +1,5 @@
 import path from "node:path";
 import { createJiti } from "jiti";
-import { glob } from "tinyglobby";
 import type { SystemConfig } from "./build.ts";
 import { DEFAULT_NODE_TARGET, DEFAULT_WEB_TARGET } from "./constant.ts";
 import type {
@@ -112,14 +111,6 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 	} as BundleFormat,
 };
 
-const getDefaultEntry = async (cwd: string) => {
-	const files = await glob(["./src/index.{tsx,ts,jsx,js}"], {
-		cwd,
-		absolute: true,
-	});
-	return files.sort().reverse().at(0);
-};
-
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 export interface FinalUserConfig
@@ -141,7 +132,9 @@ export interface FinalUserConfig
 export const getFinalUserOptions = (
 	userConfig: UserConfig,
 	systemConfig: SystemConfig,
-) => {
+): FinalUserConfig => {
+	const { cwd, pkg } = systemConfig;
+
 	const buildOptions = merge<UserConfig>(defaultConfig, userConfig);
 
 	if (!userConfig.targets) {
@@ -166,6 +159,10 @@ export const getFinalUserOptions = (
 			...item,
 		};
 
+		if (data.mode === "bundle") {
+			data.name ??= pkg.name;
+		}
+
 		if (data.dts === undefined) {
 			data.dts = buildOptions.dts;
 		} else if (data.dts) {
@@ -177,8 +174,8 @@ export const getFinalUserOptions = (
 			};
 		}
 
-		if (data.outDir) data.outDir = path.resolve(systemConfig.cwd, data.outDir);
-		if (data.entry) data.entry = path.resolve(systemConfig.cwd, data.entry);
+		if (data.outDir) data.outDir = path.resolve(cwd, data.outDir);
+		if (data.entry) data.entry = path.resolve(cwd, data.entry);
 		return data as FinalUserConfig["format"][0];
 	});
 

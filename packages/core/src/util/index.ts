@@ -71,3 +71,9 @@ export function getOutJsExt(
 
 	return ".js";
 }
+
+export function getBrowsersList({ targets }: { targets: Record<string, any> }) {
+	return Object.keys(targets).map(key => {
+		return `${key} >= ${targets[key] === true ? "0" : targets[key]}`;
+	});
+}

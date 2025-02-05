@@ -55,6 +55,7 @@ export const build = async (
 
 	for (const task of format) {
 		const { mode, outDir, dts } = task;
+		logger.info(colors.white(`编译 script(${mode}-${task.type})`));
 
 		if (mode === "bundless") {
 			const watcher = await bundlessFiles({ ...others, ...task }, systemConfig);
@@ -67,7 +68,7 @@ export const build = async (
 		}
 
 		if (dts) {
-			logger.info(colors.white(`编译dts(${dts.mode})`));
+			logger.info(colors.white(`编译 dts(${dts.mode})`));
 
 			if (dts.mode === "bundless") {
 				const watcher = await bundlessDts({ ...others, ...task }, systemConfig);
@@ -75,7 +76,6 @@ export const build = async (
 			}
 
 			if (dts.mode === "bundle") {
-				// 能否复用 bundlessDts ??
 				const tempDir = path.join(cwd, ".lecp"); // api-extractor 在 node_module 下 合并 dts 失败
 				if (!(await pathExists(tempDir))) {
 					await fs.mkdir(tempDir);

@@ -13,9 +13,9 @@ import type { SystemConfig, Watcher } from "../build.ts";
 import type { FinalUserConfig } from "../config.ts";
 import { testPattern, testPatternForTs } from "../constant.ts";
 import type { BundleFormat, BundlessFormat } from "../define-config.ts";
-import { getOutJsExt, isJsx, pathExists } from "../util/index.ts";
+import { getOutJsExt, isJsx } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
-import type { SourceMap, TransformResult } from "./index.ts";
+import type { TransformResult } from "./index.ts";
 import { getSwcOptions } from "./swc.ts";
 
 /**
