@@ -83,7 +83,7 @@ const compileStyle = async (
 		code += `\n/*# sourceMappingURL=${path.basename(mapFilePath)}*/`;
 
 		// .css.map
-		await fs.writeFile(outFilePath + ".map", JSON.stringify(map));
+		await fs.writeFile(outFilePath + ".map", map);
 	}
 
 	// .css
