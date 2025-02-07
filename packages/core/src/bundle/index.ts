@@ -31,14 +31,6 @@ const rspackModuleMap = {
 	umd: "umd",
 } as const;
 
-const getDefaultEntry = (cwd: string) => {
-	const files = globSync(["./src/index.{tsx,ts,jsx,js}"], {
-		cwd,
-		absolute: true,
-	});
-	return files.sort().reverse().at(0);
-};
-
 // '@': './src'  -> '@': path.join(cwd, 'src'),
 const aliasToWebpackAlias = (
 	alias: Record<string, string> = {},
@@ -86,7 +78,7 @@ function getRspackConfig(
 		target: `browserslist: ${getBrowsersList({ targets })}`,
 		context: cwd,
 		entry: {
-			[fileName]: entry ?? getDefaultEntry(cwd),
+			[fileName]: entry,
 		},
 		output: {
 			path: options.outDir,
@@ -256,7 +248,7 @@ function getRspackConfig(
 		resolve: {
 			tsConfig: ts.findConfigFile(cwd, ts.sys.fileExists),
 			alias: aliasToWebpackAlias(options.alias, cwd),
-			extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs"],
+			extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
 			extensionAlias: {
 				".js": [".js", ".ts", ".tsx"],
 				".mjs": [".mjs", ".mts"],

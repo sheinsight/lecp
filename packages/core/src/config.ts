@@ -106,8 +106,8 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 		builder: "rspack",
 		outDir: "umd",
 		fileName: "index",
-		// entry:
-		// name:
+		entry: "src",
+		// name: pkg.name,
 	} as BundleFormat,
 };
 
