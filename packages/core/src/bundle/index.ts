@@ -73,6 +73,7 @@ function getRspackConfig(
 	const cssModulesOptions = css?.cssModules
 		? {
 				modules: {
+					namedExport: false, // 兼容 css-loader@6
 					auto: (resourcePath: string) => resourcePath.includes(srcDir),
 					localIdentName: css?.cssModules,
 				},
@@ -89,7 +90,7 @@ function getRspackConfig(
 		},
 		output: {
 			path: options.outDir,
-			filename: "[name].js", // [name].cjs, [name].mjs
+			filename: minify ? "[name].min.js" : "[name].js", // [name].cjs, [name].mjs
 			library: {
 				name: toUmdName(options.name),
 				type: rspackModuleMap[format],
@@ -198,10 +199,7 @@ function getRspackConfig(
 							options: {
 								importLoaders: 1, // lightningcss-loader
 								sourceMap: sourcemap,
-								modules: {
-									namedExport: false, // 兼容 css-loader@6
-									...cssModulesOptions,
-								},
+								...cssModulesOptions,
 							},
 						},
 						{
@@ -294,16 +292,13 @@ function getRspackConfig(
 
 type CallbackFunction = Parameters<Compiler["run"]>[0];
 const compilerHandler: CallbackFunction = (err, stats) => {
-	if (err) {
-		logger.error(err?.message);
-	}
-	if (stats?.hasErrors()) {
-		logger.error(stats.toString());
+	if (err || stats?.hasErrors()) {
+		logger.error(err?.message || stats?.toString());
+		return;
 	}
 
 	if (stats?.startTime && stats?.endTime) {
 		console.log(`${(stats.endTime - stats.startTime) / 1000}s`);
-		console.log(stats?.toString());
 	}
 };
 
@@ -322,5 +317,12 @@ export const bundleFiles = async (
 		return watcher;
 	}
 
-	compiler.run(compilerHandler);
+	// node@22.0.0
+	// const { promise, resolve } = Promise.withResolvers<undefined>();
+	return new Promise(resolve => {
+		compiler.run((err, stats) => {
+			compilerHandler(err, stats);
+			compiler.close(() => resolve(undefined));
+		});
+	});
 };

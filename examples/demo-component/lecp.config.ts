@@ -4,6 +4,9 @@ export default defineConfig({
 	format: [
 		// swc 自动补后缀 .js
 		{
+			type: "umd",
+		},
+		{
 			type: "esm",
 		},
 	],
@@ -14,7 +17,7 @@ export default defineConfig({
 	},
 	css: {
 		// [name]__[local]___[hash:base64:5]
-		cssModules: true,
+		cssModules: true, // pkgName__[local]
 		lessCompile: true,
 	},
 	// react: {
