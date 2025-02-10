@@ -1,5 +1,6 @@
 import type { TransformOptions as LightningCssTransformOptions } from "lightningcss";
 
+import type { Configuration } from "@rspack/core";
 import type Less from "less";
 
 /** 编译类型 */
@@ -105,7 +106,7 @@ export interface BundleFormat extends Format {
 	 * @description 'auto' 自动排除 peerDependencies
 	 * - esm,cjs: 排除 dependencies,devDependencies
 	 */
-	externals?: unknown; // Configuration['externals'];
+	externals?: Configuration["externals"];
 }
 
 export interface UserConfig {

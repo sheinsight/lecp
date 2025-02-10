@@ -6,7 +6,6 @@ import rspack, {
 	type SwcLoaderOptions,
 	type RspackOptions,
 } from "@rspack/core";
-import { globSync } from "tinyglobby";
 import ts from "typescript";
 import type { SystemConfig, Watcher } from "../build.ts";
 import { getSwcOptions } from "../bundless/swc.ts";
@@ -66,6 +65,7 @@ function getRspackConfig(
 		? {
 				modules: {
 					namedExport: false, // 兼容 css-loader@6
+					// *.module.css or src/**/*.css
 					auto: (resourcePath: string) => resourcePath.includes(srcDir),
 					localIdentName: css?.cssModules,
 				},
@@ -255,17 +255,17 @@ function getRspackConfig(
 				".cjs": [".cjs", ".cts"],
 			},
 		},
-		node: {},
-		externals: {},
+		externals: options.externals,
 		devtool: sourcemap ? "source-map" : false,
 		optimization: {
 			minimize: !!minify,
 			minimizer: [
 				new rspack.SwcJsMinimizerRspackPlugin({
-					minimizerOptions: {}, // TODO:
+					extractComments: true,
+					minimizerOptions: {},
 				}),
 				new rspack.LightningCssMinimizerRspackPlugin({
-					minimizerOptions: {}, // TODO:
+					minimizerOptions: {},
 				}),
 			],
 		},
