@@ -107,6 +107,7 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 		outDir: "umd",
 		fileName: "index",
 		entry: "src",
+		minify: true,
 		// name: pkg.name,
 	} as BundleFormat,
 };
