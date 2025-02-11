@@ -1,6 +1,9 @@
+import { produce } from "immer";
 import React from "react";
 import Demo from "./components/Demo";
 import { sleep } from "./utils";
+
+console.log(produce);
 
 export const a = (data: unknown) => console.log(data);
 

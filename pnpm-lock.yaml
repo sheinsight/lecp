@@ -54,6 +54,10 @@ importers:
   crates/transform_ts2js: {}
 
   examples/demo-component:
+    dependencies:
+      immer:
+        specifier: ^10.1.1
+        version: 10.1.1
     devDependencies:
       '@shined/lecp':
         specifier: workspace:*
@@ -1124,6 +1128,9 @@ packages:
     resolution: {integrity: sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==}
     engines: {node: '>=0.10.0'}
     hasBin: true
+
+  immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
   import-lazy@4.0.0:
     resolution: {integrity: sha512-rKtvo6a868b5Hu3heneU+L4yEQ4jYKLtjpnPeUdK7h0yzXGmyBTypknlkCvHFBqfX9YlorEiMM6Dnq/5atfHkw==}
@@ -2581,6 +2588,8 @@ snapshots:
 
   image-size@0.5.5:
     optional: true
+
+  immer@10.1.1: {}
 
   import-lazy@4.0.0: {}
 

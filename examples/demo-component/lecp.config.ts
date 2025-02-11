@@ -5,6 +5,7 @@ export default defineConfig({
 		// swc 自动补后缀 .js
 		{
 			type: "umd",
+			extraCompile: ["immer"],
 		},
 		{
 			type: "esm",
