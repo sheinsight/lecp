@@ -58,6 +58,7 @@ function getRspackConfig(
 		css,
 		modifyRspackConfig,
 		targets,
+		extraCompile,
 	} = options;
 
 	const srcDir = path.join(cwd, "src");
@@ -82,7 +83,7 @@ function getRspackConfig(
 		},
 		output: {
 			path: options.outDir,
-			filename: minify ? "[name].min.js" : "[name].js", // [name].cjs, [name].mjs
+			filename: "[name].js", // TODO: [name].cjs, [name].mjs
 			library: {
 				name: toUmdName(options.name),
 				type: rspackModuleMap[format],
@@ -156,13 +157,24 @@ function getRspackConfig(
 					],
 				},
 				// asset - svg
-				// TODO: svgr-loader
+				// TODO: ?react -> svgr-loader
 
 				// script
 				{
 					test: /\.(js|mjs|cjs|jsx|ts|mts|cts|tsx)$/i,
 					type: "javascript/auto",
-					// include: [],
+					exclude: [
+						{
+							and: [
+								/[\\/]node_modules[\\/]/,
+								{
+									not: extraCompile?.map(
+										pkg => new RegExp(`node_modules[\\\\/]${pkg}[\\\\/]`),
+									),
+								},
+							],
+						},
+					],
 					loader: "builtin:swc-loader",
 					options: getSwcOptions(
 						{
@@ -190,7 +202,6 @@ function getRspackConfig(
 							loader: requireResolve("css-loader"),
 							options: {
 								importLoaders: 1, // lightningcss-loader
-								sourceMap: sourcemap,
 								...cssModulesOptions,
 							},
 						},
@@ -214,11 +225,7 @@ function getRspackConfig(
 							loader: requireResolve("css-loader"),
 							options: {
 								importLoaders: 2, // lightningcss-loader + less-loader
-								sourceMap: sourcemap,
-								modules: {
-									namedExport: false, // 兼容 css-loader@6
-									...cssModulesOptions,
-								},
+								...cssModulesOptions,
 							},
 						},
 						{
@@ -233,7 +240,6 @@ function getRspackConfig(
 							options: {
 								implements: requireResolve("less"),
 								lessOptions: {},
-								sourceMap: sourcemap,
 							},
 						},
 					],
@@ -242,7 +248,7 @@ function getRspackConfig(
 		},
 		plugins: [
 			new rspack.CssExtractRspackPlugin({
-				filename: minify ? "[name].min.css" : "[name].css",
+				filename: "[name].css",
 			}),
 		],
 		resolve: {

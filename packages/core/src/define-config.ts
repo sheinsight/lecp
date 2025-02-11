@@ -107,6 +107,13 @@ export interface BundleFormat extends Format {
 	 * - esm,cjs: 排除 dependencies,devDependencies
 	 */
 	externals?: Configuration["externals"];
+
+	/**
+	 * 默认不编译 node_modules下的文件
+	 * @default: `[]`
+	 * 当包的默认产物不满足当前编译target,可以选择手动加入编译
+	 */
+	extraCompile?: string[];
 }
 
 export interface UserConfig {
