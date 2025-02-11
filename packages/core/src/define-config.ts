@@ -1,7 +1,8 @@
 import type { TransformOptions as LightningCssTransformOptions } from "lightningcss";
 
-import type { Configuration } from "@rspack/core";
+import type { Configuration as RspackConfig } from "@rspack/core";
 import type Less from "less";
+import type RspackChain from "rspack-chain";
 
 /** 编译类型 */
 export type FormatType = "esm" | "cjs" | "umd";
@@ -99,14 +100,19 @@ export interface BundleFormat extends Format {
 	/**
 	 * @private
 	 */
-	modifyRspackConfig?: (config: any) => any;
+	modifyRspackConfig?: (config: RspackConfig) => RspackConfig;
+
+	/**
+	 * @private
+	 */
+	modifyRspackChain?: (chain: RspackChain) => void;
 
 	/**
 	 * 打包排除的 package
 	 * @description 'auto' 自动排除 peerDependencies
 	 * - esm,cjs: 排除 dependencies,devDependencies
 	 */
-	externals?: Configuration["externals"];
+	externals?: RspackConfig["externals"];
 
 	/**
 	 * 默认不编译 node_modules下的文件

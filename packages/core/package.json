@@ -34,6 +34,7 @@
 		"lightningcss": "^1.29.1",
 		"picocolors": "^1.1.1",
 		"read-pkg": "^9.0.1",
+		"rspack-chain": "^1.2.1",
 		"source-map-loader": "^5.0.0",
 		"swc-plugin-css-modules": "2.1.0",
 		"tinyglobby": "^0.2.10",
