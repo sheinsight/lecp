@@ -105,7 +105,6 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 		mode: "bundle",
 		builder: "rspack",
 		outDir: "umd",
-		fileName: "index",
 		entry: "src",
 		minify: true,
 		// name: pkg.name,
@@ -162,6 +161,7 @@ export const getFinalUserOptions = (
 
 		if (data.mode === "bundle") {
 			data.name ??= pkg.name;
+			data.fileName ??= "index";
 		}
 
 		if (data.dts === undefined) {

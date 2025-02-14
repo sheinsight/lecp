@@ -1,3 +1,4 @@
+import { createRequire } from "module";
 import fs from "fs/promises";
 import type { FormatType } from "../define-config.ts";
 
@@ -77,3 +78,11 @@ export function getBrowsersList({ targets }: { targets: Record<string, any> }) {
 		return `${key} >= ${targets[key] === true ? "0" : targets[key]}`;
 	});
 }
+
+export const requireResolve = (id: string) => {
+	try {
+		return require.resolve(id);
+	} catch {
+		return createRequire(import.meta.url).resolve(id);
+	}
+};
