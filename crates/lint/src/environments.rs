@@ -40,6 +40,12 @@ bitflags! {
   }
 }
 
+impl Default for Environments {
+    fn default() -> Self {
+        Environments::Es6 | Environments::Browser
+    }
+}
+
 impl Environments {
     /// 获取所有已设置的环境
     pub fn to_hash_map(&self) -> FxHashMap<String, bool> {

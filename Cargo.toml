@@ -17,20 +17,26 @@ futures    = "0.3"
 log        = "0.4.22"
 regex      = "1.11.0"
 rustc-hash = "2.1.0"
-bitflags = "2.7.0"
+bitflags = "2.8.0"
 
 # serde
-serde      = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde      = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.135"
 
 # swc
 swc_core = { version = "5.0.3", features = ["ecma_plugin_transform"] }
 
 # oxc
-oxc_linter = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.0", package = "oxc_linter" }
+oxc_linter = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_linter" }
+oxc_span = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_span" }
+oxc_allocator = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_allocator" }
+oxc_diagnostics = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_diagnostics" }
+oxc_semantic ={  git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_semantic"}
+oxc_parser = {git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_parser"}
 # .cargo/config defines few alias to build plugin.
 # cargo build-wasi generates wasm-wasi32 binary
 # cargo build-wasm32 generates wasm32-unknown-unknown binary.
+miette = "7.5.0"
 
 [profile.release]
 # This removes more dead code
