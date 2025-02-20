@@ -55,6 +55,11 @@ fn main() {
 
     let filter = LintFilter::allow(LintFilterKind::try_from("no-debugger").unwrap());
 
+    // let config = ConfigStoreBuilder::from_oxlintrc(true, res)
+    //     .with_filters(vec![filter])
+    //     .build()
+    //     .unwrap();
+
     let config = ConfigStoreBuilder::default()
         // .and_plugins(LintPlugins::ESLINT, false)
         .with_filters(vec![filter])
