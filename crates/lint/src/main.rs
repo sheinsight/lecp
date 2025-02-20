@@ -1,3 +1,4 @@
+#![recursion_limit = "256"]
 use std::{path::Path, rc::Rc, sync::Arc};
 
 use oxc_allocator::Allocator;
@@ -21,6 +22,11 @@ fn main() {
                 case 1:
                     break;
             }
+
+            // Check the user's job title
+if (user.name = "John") {  // 这里是赋值操作，而不是比较操作
+    console.log("Hello John!");
+}
         }
     "#;
 
@@ -37,8 +43,77 @@ fn main() {
       },
       "settings": {},
       "rules": {
-        "eqeqeq": "warn",
-        "import/no-cycle": "error"
+        "for-direction": "error",
+        "no-async-promise-executor": "error",
+        "no-caller": "error",
+        "no-class-assign": "error",
+        "no-compare-neg-zero": "error",
+        "no-cond-assign": ["error", "except-parens"],
+        "no-const-assign":["error"],
+        "no-constant-binary-expression":["error"],
+        "no-constant-condition":["error","allExceptWhileTrue"],
+        "no-control-regex":["error"],
+        "no-debugger":["error"],
+        "no-delete-var":["error"],
+        "no-dupe-class-members":["error"],
+        "no-dupe-else-if":["error"],
+        "no-dupe-keys":["error"],
+        "no-duplicate-case":["error"],
+        "no-empty-character-class":["error"],
+        "no-empty-pattern":["error",{"allowObjectPatternsAsParameters":false}],
+        "no-empty-static-block":["error"],
+        "no-ex-assign":["error"],
+        "no-extra-boolean-cast":["error",{"enforceForLogicalOperands":false}],
+        "no-func-assign":["error"],
+        "no-global-assign":["error",{"exceptions":[]}],
+        "no-import-assign":["error"],
+        "no-invalid-regexp":["error",{"allowConstructorFlags":[]}],
+        "no-irregular-whitespace":["error",{
+            "skipStrings": true,     // 允许字符串中的特殊空格
+            "skipComments": false,   // 不允许注释中的特殊空格
+            "skipRegExps": true,     // 允许正则表达式中的特殊空格
+            "skipTemplates": true,   // 允许模板中的特殊空格
+            "skipJSXText": true      // 允许JSX文本中的特殊空格
+        }],
+        "no-loss-of-precision":["error"],
+        "no-new-native-nonconstructor":["error"],
+        "no-nonoctal-decimal-escape":["error"],
+        "no-obj-calls":["error"],
+        "no-self-assign":["error",{"props": true}],
+        "no-setter-return":["error"],
+        "no-shadow-restricted-names":["error"],
+        "no-sparse-arrays":["error"],
+        "no-this-before-super":["error"],
+        "no-unsafe-finally":["error"],
+        "no-unsafe-negation":["error",{"enforceForOrderingRelations":true}],
+        "no-unsafe-optional-chaining":["error",{"disallowArithmeticOperators":true}],
+        "no-unused-labels":["error"],
+        "no-unused-private-class-members":["warn"],
+        "no-unused-vars":["error",{
+            "argsIgnorePattern":"^_",
+            "varsIgnorePattern":"^_",
+            "caughtErrorsIgnorePattern":"^_",
+            "destructuredArrayIgnorePattern":"^_",
+            "varsIgnorePattern":"^_",
+            "caughtErrorsIgnorePattern":"^_",
+            "destructuredArrayIgnorePattern":"^_"
+        }],
+        "no-useless-catch":["error"],
+        "no-useless-escape":["error"],
+        "no-useless-rename":["error",{
+            "ignoreImport":false,
+            "ignoreDestructuring":false,
+            "ignoreExport":false
+        }],
+        "no-with":["error"],
+        "require-yield":["error"],
+        "use-isnan":["error",{
+            "enforceForSwitchCase":true,
+            "enforceForIndexOf":true,
+        }],
+        "valid-typeof":["error",{
+            "requireStringLiterals":true
+        }],
       },
       "overrides": [
         {
@@ -53,18 +128,17 @@ fn main() {
 
     // let filter = LintFilter::deny(LintFilterKind::try_from("no-debugger").unwrap());
 
-    let filter = LintFilter::allow(LintFilterKind::try_from("no-debugger").unwrap());
+    let filter = setup().unwrap();
 
-    // let config = ConfigStoreBuilder::from_oxlintrc(true, res)
-    //     .with_filters(vec![filter])
-    //     .build()
-    //     .unwrap();
-
-    let config = ConfigStoreBuilder::default()
-        // .and_plugins(LintPlugins::ESLINT, false)
-        .with_filters(vec![filter])
+    let config = ConfigStoreBuilder::from_oxlintrc(true, res)
         .build()
         .unwrap();
+
+    // let config = ConfigStoreBuilder::default()
+    //     // .and_plugins(LintPlugins::ESLINT, false)
+    //     .with_filters(filter)
+    //     .build()
+    //     .unwrap();
 
     let lint = Linter::new(
         LintOptions {
@@ -115,11 +189,13 @@ fn main() {
         let spans = r.error.labels.clone().unwrap();
 
         let mut labels = vec![];
-
+        println!("{:?}", r.error);
         let message = r.error.message.to_string();
 
         for span in spans {
-            labels.push(LabeledSpan::at_offset(span.offset(), message.clone()));
+            // let lp = LabeledSpan::at_offset(span.offset(), message.clone());
+            let lp = LabeledSpan::at(span.offset()..span.offset() + span.len(), message.clone());
+            labels.push(lp);
         }
 
         let h = r.error.help.as_ref().unwrap().to_string();
@@ -146,4 +222,30 @@ fn main() {
 
         eprintln!("{:?}", report);
     }
+}
+
+fn setup() -> anyhow::Result<Vec<LintFilter>> {
+    let x = vec![
+        "for-direction",
+        "no-async-promise-executor",
+        "no-caller",
+        "no-class-assign",
+        "no-compare-neg-zero",
+        "no-cond-assign",
+        "no-const-assign",
+        "no-constant-binary-expression",
+    ];
+
+    let res = x
+        .iter()
+        .filter_map(|s| {
+            if let Ok(kind) = LintFilterKind::try_from(*s) {
+                Some(LintFilter::deny(kind))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    Ok(res)
 }

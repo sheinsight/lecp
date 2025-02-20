@@ -38,6 +38,8 @@ oxc_parser = {git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.1
 # cargo build-wasm32 generates wasm32-unknown-unknown binary.
 miette = "7.5.0"
 
+anyhow = "1.0.96"
+
 [profile.release]
 # This removes more dead code
 codegen-units = 1
