@@ -15,5 +15,5 @@ catalog:
   '@types/react-dom': ^19.0.3
 
   # vitest
-  vitest: &vitest "^3.0.5"
+  vitest: &vitest "^3.0.6"
   '@vitest/coverage-v8': *vitest

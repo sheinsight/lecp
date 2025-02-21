@@ -17,9 +17,9 @@ repository   = ""
 rust-version = "1.82"
 
 [workspace.dependencies]
-serde = { version = "1.0.217", features = ["derive"] }
-serde_json = "1.0.138"
-swc_core = { version = "13.0.2", features = ["ecma_plugin_transform"] }
+serde = { version = "1.0.218", features = ["derive"] }
+serde_json = "1.0.139"
+swc_core = { version = "14.1.0", features = ["ecma_plugin_transform"] }
 
 # .cargo/config defines few alias to build plugin.
 # cargo build-wasi generates wasm-wasi32 binary
