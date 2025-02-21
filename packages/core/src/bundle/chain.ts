@@ -4,6 +4,7 @@ import type { SystemConfig } from "../build.ts";
 import { getBrowsersList } from "../util/index.ts";
 import type { BundleOptions } from "./index.ts";
 import { pluginAsset } from "./plugins/asset.ts";
+import { pluginCjs } from "./plugins/cjs.ts";
 import { pluginCss } from "./plugins/css.ts";
 import { pluginEsm } from "./plugins/esm.ts";
 import { pluginMinimize } from "./plugins/minimize.ts";
@@ -42,6 +43,7 @@ export function getRspackConfig(
 		pluginMinimize,
 		pluginResolve,
 		format === "esm" && pluginEsm,
+		format === "cjs" && pluginCjs,
 	]
 		.filter(Boolean)
 		.forEach(
