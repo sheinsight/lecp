@@ -1,0 +1,19 @@
+{
+  "plugins": ["import", "typescript", "unicorn"],
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "foo": "readonly"
+  },
+  "settings": {},
+  "rules": {
+    "no-console": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.test.ts", "*.spec.ts"],
+      "rules": {}
+    }
+  ]
+}

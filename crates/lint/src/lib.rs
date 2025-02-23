@@ -4,12 +4,17 @@ use rustc_hash::FxHashMap;
 use serde::Deserialize;
 
 pub mod environments;
+pub mod rule_builder;
 pub mod rules;
 
 pub struct Linter {
     envs: Environments,
     plugins: LintPlugins,
 }
+
+// react-component
+// react-component-esm
+// react-component-commonjs
 
 impl Linter {
     pub fn new(envs: Environments, plugins: LintPlugins) -> Self {
