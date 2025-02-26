@@ -44,6 +44,7 @@ oxc_parser = {git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.1
 miette = "7.5.0"
 
 anyhow = "1.0.96"
+ptree = "0.5.2"
 
 [profile.release]
 # This removes more dead code
