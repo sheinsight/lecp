@@ -7,7 +7,11 @@ use oxc_linter::{ConfigStoreBuilder, FixKind, FrameworkFlags, LintOptions, LintP
 use oxc_parser::Parser;
 use oxc_semantic::SemanticBuilder;
 use rayon::prelude::*;
-use rules::{eslint::EslintRuleGetter, rule_getter::RuleGetter};
+use rules::{
+    eslint::EslintRuleGetter, oxc::OxcRuleGetter, promise::PromiseRuleGetter,
+    react::ReactRuleGetter, rule_getter::RuleGetter, typescript::TypescriptRuleGetter,
+    unicorn::UnicornRuleGetter,
+};
 use rustc_hash::FxHashMap;
 use serde_json::json;
 use std::borrow::Cow;
@@ -36,6 +40,7 @@ pub struct MietteReport {
     pub labels: Vec<miette::LabeledSpan>,
     pub help: Option<Cow<'static, str>>,
     pub source_code: String,
+    pub path: PathBuf,
 }
 
 impl Linter {
@@ -89,6 +94,39 @@ impl Linter {
             json!([]) // 生产环境下使用空数组
         };
 
+        let mut eslint = EslintRuleGetter::get_def_rules()
+            .as_object()
+            .unwrap()
+            .to_owned();
+        let oxc = OxcRuleGetter::get_def_rules()
+            .as_object()
+            .unwrap()
+            .to_owned();
+        let promise = PromiseRuleGetter::get_def_rules()
+            .as_object()
+            .unwrap()
+            .to_owned();
+        let react = ReactRuleGetter::get_def_rules()
+            .as_object()
+            .unwrap()
+            .to_owned();
+        let typescript = TypescriptRuleGetter::get_def_rules()
+            .as_object()
+            .unwrap()
+            .to_owned();
+        let unicorn = UnicornRuleGetter::get_def_rules()
+            .as_object()
+            .unwrap()
+            .to_owned();
+
+        eslint.extend(oxc);
+        eslint.extend(promise);
+        eslint.extend(react);
+        eslint.extend(typescript);
+        eslint.extend(unicorn);
+
+        let merged = serde_json::to_value(eslint).unwrap();
+
         let rc = serde_json::from_value::<Oxlintrc>(json!({
             "plugins": ["import", "typescript", "unicorn","oxc","promise","react","react-perf"],
             "env": {
@@ -98,7 +136,7 @@ impl Linter {
               "foo": "readonly"
             },
             "settings": {},
-            "rules": EslintRuleGetter::get_def_rules(),
+            "rules": merged,
             "overrides":overrides
         }))?;
 
@@ -184,6 +222,7 @@ impl Linter {
                                 source_code: source_code.to_owned(),
                                 scope,
                                 number,
+                                path: path.to_owned(),
                             }
                         })
                         .collect::<Vec<_>>()

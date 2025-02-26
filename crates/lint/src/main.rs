@@ -109,14 +109,18 @@ fn lint() {
 
     let start = Instant::now();
 
-    let cwd = current_dir().unwrap();
+    let cwd = current_dir().unwrap().join("demo");
+
+    println!("{:?}", cwd);
 
     let linter = Linter::new(cwd, Environments::default(), LintPlugins::default());
 
     let res = linter.build().unwrap();
 
+    println!("{:?}", res);
+
     for report in res {
-        let report = miette!(
+        let mut miette_report = miette!(
             severity = report.severity,
             url = report.url.as_ref().unwrap().to_string(),
             labels = report.labels,
@@ -127,10 +131,16 @@ fn lint() {
             "{}/{}",
             report.scope.as_ref().unwrap(),
             report.number.as_ref().unwrap()
-        )
-        .with_source_code(report.source_code);
+        );
+        // .with_source_code(report.source_code);
+        if !report.source_code.is_empty() {
+            miette_report = miette_report.with_source_code(report.source_code);
+        } else {
+            miette_report =
+                miette_report.with_source_code(report.path.to_string_lossy().to_string());
+        }
 
-        eprintln!("{:?}", report);
+        eprintln!("{:?}", miette_report);
     }
 
     let end = Instant::now();
@@ -139,9 +149,9 @@ fn lint() {
 }
 
 fn main() {
-    test_tree().unwrap();
+    // test_tree().unwrap();
 
-    // lint();
+    lint();
 
     //     let report = miette!(
     //         severity = miette::Severity::Error,
