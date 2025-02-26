@@ -10,6 +10,7 @@
 		"lightningcss",
 		"miette",
 		"nashorn",
+		"nonconstructor",
 		"Oxlint",
 		"Oxlintrc",
 		"phantomjs",
@@ -20,7 +21,8 @@
 		"serde",
 		"serviceworker",
 		"shelljs",
-		"taplo"
+		"taplo",
+		"trunc"
 	],
 	"editor.codeActionsOnSave": {
 		"quickfix.biome": "explicit",

@@ -21,3 +21,5 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 miette = {workspace = true,features = ["fancy"]}
 anyhow = { workspace = true }
+wax = { workspace = true }
+rayon = { workspace = true }
