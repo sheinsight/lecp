@@ -24,3 +24,4 @@ anyhow = { workspace = true }
 ptree = { workspace = true }
 wax = { workspace = true }
 rayon = { workspace = true }
+walk_parallel = { path = "../walk_parallel" }

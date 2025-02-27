@@ -15,6 +15,7 @@ use rules::{
 use rustc_hash::FxHashMap;
 use serde_json::json;
 use std::borrow::Cow;
+use walk_parallel::WalkParallel;
 use wax::Glob;
 
 pub mod environments;
@@ -152,85 +153,77 @@ impl Linter {
             config,
         );
 
-        let glob = Glob::new("**/*.{js,jsx,ts,tsx,cjs,mjs,cts,mts}")?;
+        let walk = WalkParallel::new(&self.cwd);
 
-        let entries = glob.walk(self.cwd.as_path()).not(vec![
-            "**/node_modules/**",
-            "node_modules",
-            "**/dist/**",
-            "**/*.d.ts",
-        ])?;
+        let res = walk
+            .walk(|path| {
+                let Ok(source_code) = std::fs::read_to_string(&path) else {
+                    return None;
+                };
 
-        let res = entries
-            .par_bridge()
-            .filter_map(Result::ok)
-            .map(|walk_entry| walk_entry.path().to_owned())
-            .filter(|path| path.is_file())
-            .map(|path| {
-                if let Ok(source_code) = std::fs::read_to_string(&path) {
-                    let allocator = Allocator::default();
-                    let source_type = Self::source_type_from_path(&path);
-                    let parser = Parser::new(&allocator, &source_code, source_type);
-                    let parser_return = parser.parse();
-                    let program = allocator.alloc(&parser_return.program);
-                    let semantic_builder_return = SemanticBuilder::new()
-                        .with_check_syntax_error(false)
-                        .with_cfg(true)
-                        .build(program);
-                    let semantic = semantic_builder_return.semantic;
-                    let module_record = Arc::new(oxc_linter::ModuleRecord::new(
-                        &path,
-                        &parser_return.module_record,
-                        &semantic,
-                    ));
-                    let semantic = Rc::new(semantic);
-                    let res = lint.run(&path, semantic, module_record);
-                    res.into_iter()
-                        .map(|message| {
-                            let labels = message.error.labels.as_ref().map_or(vec![], |labels| {
-                                labels
-                                    .iter()
-                                    .map(|label| {
-                                        miette::LabeledSpan::at(
-                                            label.offset()..label.offset() + label.len(),
-                                            message.error.message.clone(),
-                                        )
-                                    })
-                                    .collect()
-                            });
+                let allocator = Allocator::default();
+                let source_type = Self::source_type_from_path(&path);
+                let parser = Parser::new(&allocator, &source_code, source_type);
+                let parser_return = parser.parse();
+                let program = allocator.alloc(&parser_return.program);
+                let semantic_builder_return = SemanticBuilder::new()
+                    .with_check_syntax_error(false)
+                    .with_cfg(true)
+                    .build(program);
+                let semantic = semantic_builder_return.semantic;
+                let module_record = Arc::new(oxc_linter::ModuleRecord::new(
+                    &path,
+                    &parser_return.module_record,
+                    &semantic,
+                ));
+                let semantic = Rc::new(semantic);
+                let res = lint.run(&path, semantic, module_record);
+                let res = res
+                    .into_iter()
+                    .map(|message| {
+                        let labels = message.error.labels.as_ref().map_or(vec![], |labels| {
+                            labels
+                                .iter()
+                                .map(|label| {
+                                    miette::LabeledSpan::at(
+                                        label.offset()..label.offset() + label.len(),
+                                        message.error.message.clone(),
+                                    )
+                                })
+                                .collect()
+                        });
 
-                            let url = message.error.url.as_ref().map(|url| url.to_owned());
-                            let help = message.error.help.as_ref().map(|help| help.to_owned());
-                            let scope = message
-                                .error
-                                .code
-                                .scope
-                                .as_ref()
-                                .map(|scope| scope.to_string());
-                            let number = message
-                                .error
-                                .code
-                                .number
-                                .as_ref()
-                                .map(|number| number.to_string());
+                        let url = message.error.url.as_ref().map(|url| url.to_owned());
+                        let help = message.error.help.as_ref().map(|help| help.to_owned());
+                        let scope = message
+                            .error
+                            .code
+                            .scope
+                            .as_ref()
+                            .map(|scope| scope.to_string());
+                        let number = message
+                            .error
+                            .code
+                            .number
+                            .as_ref()
+                            .map(|number| number.to_string());
 
-                            MietteReport {
-                                severity: Self::convert_severity(message.error.severity),
-                                url,
-                                labels,
-                                help,
-                                source_code: source_code.to_owned(),
-                                scope,
-                                number,
-                                path: path.to_owned(),
-                            }
-                        })
-                        .collect::<Vec<_>>()
-                } else {
-                    println!("read file error {:?}", path);
-                    vec![]
-                }
-            })
+                        MietteReport {
+                            severity: Self::convert_severity(message.error.severity),
+                            url,
+                            labels,
+                            help,
+                            source_code: source_code.to_owned(),
+                            scope,
+                            number,
+                            path: path.to_owned(),
+                        }
+                    })
+                    .collect::<Vec<_>>();
+
+                Some(res)
+            })?
+            .into_iter()
             .flatten()
             .collect::<Vec<_>>();
 
