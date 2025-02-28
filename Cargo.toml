@@ -1,5 +1,13 @@
 [workspace]
-members = ["crates/transform_define", "crates/transform_ts2js", "crates/transform_extensions", "crates/transform_shims", "crates/lint", "crates/walk_parallel"]
+members = [
+  "crates/transform_define", 
+  "crates/transform_ts2js", 
+  "crates/transform_extensions", 
+  "crates/transform_shims", 
+  "crates/lint", 
+  "crates/walk_parallel", 
+  "crates/js_compiler"
+]
 
 resolver = "2"
 

@@ -1,0 +1,13 @@
+[package]
+name = "js_compiler"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+walk_parallel = { path = "../walk_parallel" }
