@@ -8,6 +8,7 @@ pub const DEFAULT_IGNORE_PATTERNS: &[&str] = &[
     "**/build/**",
     "**/coverage/**",
     "**/*.d.ts",
+    "node_modules",
 ];
 
 pub const DEFAULT_TEST_PATTERNS: &[&str] =
