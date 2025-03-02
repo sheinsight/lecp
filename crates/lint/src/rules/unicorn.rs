@@ -1,15 +1,23 @@
-use serde_json::json;
+use serde_json::{json, Map, Value};
 
 use super::rule_getter::RuleGetter;
 
 pub struct UnicornRuleGetter;
 
+impl UnicornRuleGetter {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 impl RuleGetter for UnicornRuleGetter {
-    fn get_dev_override_rules() -> serde_json::Value {
+    fn get_dev_override_rules(&self) -> Map<String, Value> {
         json!({})
+            .as_object()
+            .map_or(Map::new(), |map| map.to_owned())
     }
 
-    fn get_def_rules() -> serde_json::Value {
+    fn get_def_rules(&self) -> Map<String, Value> {
         json!({
           "unicorn/no-await-in-promise-methods": 2,
           "unicorn/no-document-cookie": 2,
@@ -103,5 +111,7 @@ impl RuleGetter for UnicornRuleGetter {
           "unicorn/text-encoding-identifier-case": 1,
           "unicorn/throw-new-error": 2
         })
+        .as_object()
+        .map_or(Map::new(), |map| map.to_owned())
     }
 }

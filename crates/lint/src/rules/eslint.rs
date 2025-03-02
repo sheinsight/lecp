@@ -1,11 +1,17 @@
-use serde_json::json;
+use serde_json::{json, Map, Value};
 
 use super::rule_getter::RuleGetter;
 
-pub struct EslintRuleGetter {}
+pub struct EslintRuleGetter;
+
+impl EslintRuleGetter {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
 
 impl RuleGetter for EslintRuleGetter {
-    fn get_dev_override_rules() -> serde_json::Value {
+    fn get_dev_override_rules(&self) -> Map<String, Value> {
         json!({
             "eslint/no-console":[1,{"allow":["error","warn","info"]}],
             "eslint/no-debugger":1,
@@ -14,9 +20,11 @@ impl RuleGetter for EslintRuleGetter {
             "eslint/no-empty-function":1,
             "eslint/no-empty-static-block":1
         })
+        .as_object()
+        .map_or(Map::new(), |map| map.to_owned())
     }
 
-    fn get_def_rules() -> serde_json::Value {
+    fn get_def_rules(&self) -> Map<String, Value> {
         json!({
             "eslint/for-direction": 2,
             "eslint/no-empty-pattern":2,
@@ -140,7 +148,8 @@ impl RuleGetter for EslintRuleGetter {
             "eslint/no-nested-ternary":0,
             "eslint/prefer-exponentiation-operator": 1,
             "eslint/radix":[1,"as-needed"],
-            "eslint/no-magic-numbers":[1,{
+            // TODO 异常太多，先关闭
+            "eslint/no-magic-numbers":[0,{
                 "ignore": [-1, 0, 1, 2],
                 "ignoreArrayIndexes": true,
                 "enforceConst": true,
@@ -199,5 +208,7 @@ impl RuleGetter for EslintRuleGetter {
             "eslint/sort-keys":0,
             "eslint/vars-on-top": 0
         })
+        .as_object()
+        .map_or(Map::new(), |map| map.to_owned())
     }
 }

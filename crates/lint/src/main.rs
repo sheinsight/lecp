@@ -11,12 +11,13 @@ use std::{
 
 use lint::{
     environments::Environments,
+    lint_mode::LintMode,
     rules::{eslint::EslintRuleGetter, rule_getter::RuleGetter},
     Linter,
 };
 use oxc_allocator::Allocator;
 
-use miette::{miette, LabeledSpan};
+use miette::{miette, LabeledSpan, NamedSource};
 
 use oxc_linter::LintPlugins;
 use oxc_parser::Parser;
@@ -26,7 +27,9 @@ use ptree::{
     print_config::{ASCII_CHARS_TICK, UTF_CHARS, UTF_CHARS_BOLD},
     print_tree_with, write_tree_with, Color, PrintConfig, Style, TreeBuilder,
 };
-use serde_json::json;
+use serde::Serialize;
+use serde_json::{json, Map};
+use walk_parallel::WalkParallel;
 
 fn build_tree(path: &Path, tree: &mut TreeBuilder) -> std::io::Result<()> {
     if path.is_dir() {
@@ -47,6 +50,22 @@ fn build_tree(path: &Path, tree: &mut TreeBuilder) -> std::io::Result<()> {
     }
 
     Ok(())
+}
+
+fn init_miette() {
+    miette::set_hook(Box::new(|_| {
+        Box::new(
+            miette::MietteHandlerOpts::new()
+                // .tab_width(14)
+                .terminal_links(true)
+                .unicode(true)
+                .color(true)
+                .wrap_lines(true)
+                .with_cause_chain()
+                .build(),
+        )
+    }))
+    .unwrap();
 }
 
 fn test_tree() -> std::io::Result<()> {
@@ -104,20 +123,87 @@ fn test_tree() -> std::io::Result<()> {
     Ok(())
 }
 
-fn lint() {
-    // 统计执行耗时
+fn walk_lint() {
+    init_miette();
 
+    let start = Instant::now();
+
+    let cwd = current_dir().unwrap().join("examples/demo-component/src");
+
+    let walker = WalkParallel::new(&cwd);
+
+    let mut define = Map::new();
+    define.insert("process".to_string(), "readonly".into());
+
+    let linter = Linter::new(
+        LintMode::Development,
+        Environments::default(),
+        LintPlugins::default(),
+    )
+    .with_define(define);
+
+    walker
+        .walk(|path| {
+            // Some(lint(path))
+            let res = linter.lint(path).unwrap();
+            Some(res)
+        })
+        .into_iter()
+        .flatten()
+        .flatten()
+        .collect::<Vec<_>>();
+
+    // for report in res {
+    //     let mut miette_report = miette!(
+    //         severity = report.severity,
+    //         url = report.url.as_ref().unwrap().to_string(),
+    //         labels = report.labels,
+    //         help = report
+    //             .help
+    //             .as_ref()
+    //             .map_or_else(|| "".to_string(), |help| help.to_string()),
+    //         "{}/{}",
+    //         report.scope.as_ref().unwrap(),
+    //         report.number.as_ref().unwrap()
+    //     );
+    //     // .with_source_code(report.source_code);
+    //     if !report.source_code.is_empty() {
+    //         let source = NamedSource::new(
+    //             report.path.clone().display().to_string(),
+    //             report.source_code.clone(),
+    //         );
+    //         miette_report = miette_report.with_source_code(source);
+    //     } else {
+    //         miette_report =
+    //             miette_report.with_source_code(report.path.to_string_lossy().to_string());
+    //     }
+
+    //     eprintln!("{:?}", miette_report);
+    // }
+
+    let end = Instant::now();
+
+    println!("执行耗时: {:?}", end - start);
+}
+
+fn lint<P: AsRef<Path>>(path: P) {
+    // 统计执行耗时
+    init_miette();
     let start = Instant::now();
 
     let cwd = current_dir().unwrap().join("demo");
 
     println!("{:?}", cwd);
 
-    let linter = Linter::new(cwd, Environments::default(), LintPlugins::default());
+    let linter = Linter::new(
+        LintMode::Development,
+        Environments::default(),
+        LintPlugins::default(),
+    );
 
-    let res = linter.build().unwrap();
+    let res = linter.lint(path).unwrap();
 
-    println!("{:?}", res);
+    // println!("{:?}", res);
 
     for report in res {
         let mut miette_report = miette!(
@@ -134,7 +220,11 @@ fn lint() {
         );
         // .with_source_code(report.source_code);
         if !report.source_code.is_empty() {
-            miette_report = miette_report.with_source_code(report.source_code);
+            let source = NamedSource::new(
+                report.path.clone().display().to_string(),
+                report.source_code.clone(),
+            );
+            miette_report = miette_report.with_source_code(source);
         } else {
             miette_report =
                 miette_report.with_source_code(report.path.to_string_lossy().to_string());
@@ -151,7 +241,9 @@ fn lint() {
 fn main() {
     // test_tree().unwrap();
 
-    lint();
+    // lint();
+
+    walk_lint();
 
     //     let report = miette!(
     //         severity = miette::Severity::Error,

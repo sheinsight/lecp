@@ -2,12 +2,13 @@ use bitflags::bitflags;
 use rustc_hash::FxHashMap;
 
 bitflags! {
-  pub struct Environments : u64 {
-      const Browser = 1 << 0;
-      const Node = 1 << 1;
-      const CommonJS = 1 << 2;
-      const SharedNodeBrowser = 1 << 3;
-      const Es6 = 1 << 4;
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct Environments: u64 {
+        const Browser = 1 << 0;
+        const Node = 1 << 1;
+        const CommonJS = 1 << 2;
+        const SharedNodeBrowser = 1 << 3;
+        const Es6 = 1 << 4;
       const Es2016 = 1 << 5;
       const Es2017 = 1 << 6;
       const Es2018 = 1 << 7;
@@ -37,12 +38,12 @@ bitflags! {
       const EmberTest = 1 << 31;
       const WebExtensions = 1 << 32;
       const GreaseMonkey = 1 << 33;
-  }
+    }
 }
 
 impl Default for Environments {
     fn default() -> Self {
-        Environments::Es6 | Environments::Browser
+        Environments::Es2024 | Environments::Browser
     }
 }
 

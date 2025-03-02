@@ -1,15 +1,26 @@
-use serde_json::json;
+use serde_json::{Map, Value, json};
 
 use super::rule_getter::RuleGetter;
 
-pub struct TypescriptRuleGetter;
+#[derive(Default, Clone)]
+pub struct TypescriptConfig {}
+
+pub struct TypescriptRuleGetter {
+    config: TypescriptConfig,
+}
+
+impl TypescriptRuleGetter {
+    pub fn new(config: TypescriptConfig) -> Self {
+        Self { config }
+    }
+}
 
 impl RuleGetter for TypescriptRuleGetter {
-    fn get_dev_override_rules() -> serde_json::Value {
-        json!({})
+    fn get_dev_override_rules(&self) -> Map<String, Value> {
+        json!({}).as_object().map_or(Map::new(), |map| map.to_owned())
     }
 
-    fn get_def_rules() -> serde_json::Value {
+    fn get_def_rules(&self) -> Map<String, Value> {
         json!({
           "typescript/no-duplicate-enum-values":2,
           "typescript/no-extra-non-null-assertion": 2,
@@ -84,8 +95,6 @@ impl RuleGetter for TypescriptRuleGetter {
           "typescript/prefer-ts-expect-error":1,
           "typescript/adjacent-overload-signatures":1,
           "typescript/no-empty-interface":1,
-
-
           "typescript/no-import-type-side-effects":0,
           "typescript/no-require-imports":0,
           "typescript/no-var-requires":0,
@@ -101,5 +110,7 @@ impl RuleGetter for TypescriptRuleGetter {
           "typescript/prefer-function-type":0,
           "typescript/prefer-namespace-keyword":0
         })
+        .as_object()
+        .map_or(Map::new(), |map| map.to_owned())
     }
 }
