@@ -1,6 +1,6 @@
 use serde_json::{json, Map, Value};
 
-use super::rule_getter::RuleGetter;
+use crate::rules::rule_getter::RuleGetter;
 
 pub struct OxcRuleGetter;
 
@@ -11,7 +11,7 @@ impl Default for OxcRuleGetter {
 }
 
 impl RuleGetter for OxcRuleGetter {
-    fn get_def_rules(&self) -> Map<String, Value> {
+    fn get_def(&self) -> Map<String, Value> {
         json!({
           "oxc/bad-array-method-on-arguments":2,
           "oxc/bad-char-at-comparison":2,

@@ -1,6 +1,6 @@
 use serde_json::{json, Map, Value};
 
-use super::rule_getter::RuleGetter;
+use crate::rules::rule_getter::RuleGetter;
 
 pub struct EslintRuleGetter;
 
@@ -11,7 +11,7 @@ impl Default for EslintRuleGetter {
 }
 
 impl RuleGetter for EslintRuleGetter {
-    fn get_def_rules(&self) -> Map<String, Value> {
+    fn get_def(&self) -> Map<String, Value> {
         json!({
             "eslint/for-direction": 2,
             "eslint/no-empty-pattern": 2,

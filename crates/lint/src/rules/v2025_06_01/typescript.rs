@@ -1,10 +1,7 @@
 use serde_json::{json, Map, Value};
 
-use super::rule_getter::RuleGetter;
-
-#[derive(Default, Clone, Debug)]
-pub struct TypescriptConfig {}
-
+use crate::rules::rule_getter::RuleGetter;
+use crate::rules::typescript_config::TypescriptConfig;
 pub struct TypescriptRuleGetter {
     config: TypescriptConfig,
 }
@@ -25,7 +22,7 @@ impl TypescriptRuleGetter {
 }
 
 impl RuleGetter for TypescriptRuleGetter {
-    fn get_def_rules(&self) -> Map<String, Value> {
+    fn get_def(&self) -> Map<String, Value> {
         json!({
           "typescript/no-duplicate-enum-values":2,
           "typescript/no-extra-non-null-assertion": 2,

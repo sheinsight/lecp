@@ -1,6 +1,6 @@
 use serde_json::{json, Map, Value};
 
-use super::rule_getter::RuleGetter;
+use crate::rules::rule_getter::RuleGetter;
 
 pub struct PromiseRuleGetter;
 
@@ -11,7 +11,7 @@ impl Default for PromiseRuleGetter {
 }
 
 impl RuleGetter for PromiseRuleGetter {
-    fn get_def_rules(&self) -> Map<String, Value> {
+    fn get_def(&self) -> Map<String, Value> {
         json!({
           "no-promise-in-callback":0,
           "promise/prefer-await-to-callbacks":0,

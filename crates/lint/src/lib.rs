@@ -5,6 +5,7 @@ use std::{
     sync::Arc,
 };
 
+use config_builder::ConfigBuilder;
 use environments::Environments;
 use lint_mode::LintMode;
 use miette::{miette, NamedSource};
@@ -14,13 +15,13 @@ use oxc_linter::{ConfigStoreBuilder, FixKind, FrameworkFlags, LintOptions, LintP
 use oxc_parser::Parser;
 use oxc_semantic::SemanticBuilder;
 use rules::{
-    eslint::EslintRuleGetter,
-    oxc::OxcRuleGetter,
-    promise::PromiseRuleGetter,
-    react::{ReactConfig, ReactRuleGetter},
+    react_config::ReactConfig,
     rule_getter::RuleGetter,
-    typescript::{TypescriptConfig, TypescriptRuleGetter},
-    unicorn::UnicornRuleGetter,
+    typescript_config::TypescriptConfig,
+    v2025_06_01::{
+        eslint::EslintRuleGetter, oxc::OxcRuleGetter, promise::PromiseRuleGetter,
+        react::ReactRuleGetter, typescript::TypescriptRuleGetter, unicorn::UnicornRuleGetter,
+    },
 };
 
 use serde_json::{json, Map, Value};
@@ -89,37 +90,6 @@ impl Linter {
 }
 
 impl Linter {
-    fn get_def_plugins(&self) -> LintPlugins {
-        let mut plugins = LintPlugins::ESLINT
-            | LintPlugins::UNICORN
-            | LintPlugins::IMPORT
-            | LintPlugins::PROMISE
-            | LintPlugins::OXC;
-
-        if self.ts.is_some() {
-            plugins |= LintPlugins::TYPESCRIPT
-        }
-
-        if self.react.is_some() {
-            plugins |= LintPlugins::REACT | LintPlugins::REACT_PERF
-        }
-
-        plugins
-    }
-
-    fn get_def_rules(&self) -> Map<String, Value> {
-        let eslint = EslintRuleGetter::default().get_def_rules();
-        let oxc = OxcRuleGetter::default().get_def_rules();
-        let promise = PromiseRuleGetter::default().get_def_rules();
-        let unicorn = UnicornRuleGetter::default().get_def_rules();
-        let mut merged = Map::new();
-        merged.extend(eslint);
-        merged.extend(oxc);
-        merged.extend(promise);
-        merged.extend(unicorn);
-        merged
-    }
-
     fn source_type_from_path<P: AsRef<Path>>(&self, path: P) -> oxc_span::SourceType {
         match path.as_ref().extension().and_then(|ext| ext.to_str()) {
             Some("ts") | Some("cts") | Some("mts") => oxc_span::SourceType::ts(),
@@ -131,36 +101,6 @@ impl Linter {
         }
     }
 
-    fn get_overrides(&self) -> Vec<Value> {
-        let mut overrides = json!([])
-            .as_array()
-            .map_or(vec![], |overrides| overrides.to_owned());
-
-        if let Some(ts) = &self.ts {
-            let ts_rules = TypescriptRuleGetter::default()
-                .with_config(ts.clone())
-                .get_def_rules();
-
-            overrides.push(json!({
-                "files": ["*.{ts,tsx,cts,mts}"],
-                "rules": ts_rules,
-            }));
-        }
-
-        if let Some(react) = &self.react {
-            let react_rules = ReactRuleGetter::default()
-                .with_runtime(react.runtime.clone())
-                .get_def_rules();
-
-            overrides.push(json!({
-                "files": ["*.{jsx,tsx}"],
-                "rules": react_rules,
-            }));
-        }
-
-        overrides
-    }
-
     fn convert_severity(severity: oxc_diagnostics::Severity) -> miette::Severity {
         match severity {
             oxc_diagnostics::Severity::Error => miette::Severity::Error,
@@ -170,19 +110,13 @@ impl Linter {
     }
 
     fn get_linter_config(&self) -> Oxlintrc {
-        let def_plugin = self.get_def_plugins();
-        let def_rules = self.get_def_rules();
-        let overrides = self.get_overrides();
-
-        serde_json::from_value::<Oxlintrc>(json!({
-            "plugins": def_plugin,
-            "env": self.envs,
-            "globals": self.define,
-            "settings": {},
-            "rules": def_rules,
-            "overrides":overrides
-        }))
-        .unwrap()
+        ConfigBuilder::default()
+            .with_envs(self.envs)
+            .with_define(self.define.clone())
+            .with_react(self.react.clone().unwrap_or_default())
+            .with_typescript(self.ts.clone().unwrap_or_default())
+            .build()
+            .unwrap()
     }
 
     pub fn render_report(&self, source_code: NamedSource<String>, diagnostic: &OxcDiagnostic) {

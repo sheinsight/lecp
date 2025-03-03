@@ -4,16 +4,10 @@ use serde_json::{json, Map, Value};
 
 use crate::environments::Environments;
 use crate::lint_mode::LintMode;
-use crate::rules::eslint::EslintRuleGetter;
-use crate::rules::oxc::OxcRuleGetter;
-use crate::rules::promise::PromiseRuleGetter;
-use crate::rules::rule_getter::RuleGetter;
-use crate::rules::unicorn::UnicornRuleGetter;
-use crate::rules::{
-    react::{ReactConfig, ReactRuleGetter},
-    typescript::{TypescriptConfig, TypescriptRuleGetter},
-};
-
+use crate::rules::category_getter::CategoryGetter;
+use crate::rules::react_config::ReactConfig;
+use crate::rules::typescript_config::TypescriptConfig;
+use crate::rules::v2025_06_01::category::Category20250601;
 pub struct ConfigBuilder {
     envs: Environments,
     mode: LintMode,
@@ -60,72 +54,25 @@ impl ConfigBuilder {
         self
     }
 
-    fn get_def_plugins(&self) -> LintPlugins {
-        let mut plugins = LintPlugins::ESLINT
-            | LintPlugins::UNICORN
-            | LintPlugins::IMPORT
-            | LintPlugins::PROMISE
-            | LintPlugins::OXC;
-
-        if self.ts.is_some() {
-            plugins |= LintPlugins::TYPESCRIPT
-        }
-
-        if self.react.is_some() {
-            plugins |= LintPlugins::REACT | LintPlugins::REACT_PERF
-        }
-
-        plugins
-    }
-
-    fn get_def_rules(&self) -> Map<String, Value> {
-        let eslint = EslintRuleGetter::default().get_def_rules();
-        let oxc = OxcRuleGetter::default().get_def_rules();
-        let promise = PromiseRuleGetter::default().get_def_rules();
-        let unicorn = UnicornRuleGetter::default().get_def_rules();
-        let mut merged = Map::new();
-        merged.extend(eslint);
-        merged.extend(oxc);
-        merged.extend(promise);
-        merged.extend(unicorn);
-        merged
-    }
-
     pub fn build(self) -> anyhow::Result<Oxlintrc> {
-        let def_plugin = self.get_def_plugins();
-        let def_rules = self.get_def_rules();
+        let mut category = Category20250601::default();
+        if let Some(react) = &self.react {
+            category = category.with_react(react.clone());
+        }
 
-        let react_rules = if let Some(react) = self.react {
-            ReactRuleGetter::default()
-                .with_runtime(react.runtime)
-                .get_def_rules()
-        } else {
-            Map::new()
-        };
-
-        let ts_rules = if let Some(ts) = self.ts {
-            TypescriptRuleGetter::default()
-                .with_config(ts)
-                .get_def_rules()
-        } else {
-            Map::new()
-        };
+        if let Some(ts) = &self.ts {
+            category = category.with_typescript(ts.clone());
+        }
 
         let res = serde_json::from_value::<Oxlintrc>(json!({
-            "plugins": def_plugin,
+            "plugins": category.get_def_plugins(),
             "env": self.envs,
             "globals": self.define,
             "settings": {},
-            "rules": def_rules,
+            "rules": category.get_def(),
             "overrides":[
-              {
-                "files":["*.{ts,tsx,cts,mts}"],
-                "rules": ts_rules
-              },
-              {
-                "files":["*.{jsx,tsx}"],
-                "rules": react_rules
-              }
+              category.get_ts_override(),
+              category.get_react_override()
             ]
         }));
 

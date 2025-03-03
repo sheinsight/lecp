@@ -13,10 +13,9 @@ use lint::{
     environments::Environments,
     lint_mode::LintMode,
     rules::{
-        eslint::EslintRuleGetter,
-        react::{ReactConfig, ReactRuntime},
-        rule_getter::RuleGetter,
-        typescript::TypescriptConfig,
+        react_config::{ReactConfig, ReactRuntime},
+        typescript_config::TypescriptConfig,
+        v2025_06_01::eslint::EslintRuleGetter,
     },
     Linter,
 };

@@ -1,17 +1,7 @@
 use serde_json::{json, Map, Value};
 
-use super::rule_getter::RuleGetter;
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum ReactRuntime {
-    Classic,
-    Automatic,
-}
-
-#[derive(Debug, Clone)]
-pub struct ReactConfig {
-    pub runtime: ReactRuntime,
-}
+use crate::rules::react_config::{ReactConfig, ReactRuntime};
+use crate::rules::rule_getter::RuleGetter;
 
 impl ReactConfig {
     pub fn with_runtime(mut self, runtime: ReactRuntime) -> Self {
@@ -48,7 +38,7 @@ impl Default for ReactRuleGetter {
 }
 
 impl RuleGetter for ReactRuleGetter {
-    fn get_def_rules(&self) -> Map<String, Value> {
+    fn get_def(&self) -> Map<String, Value> {
         json!({
            // react
           "react/jsx-key":2,

@@ -1,6 +1,6 @@
 use serde_json::{json, Map, Value};
 
-use super::rule_getter::RuleGetter;
+use crate::rules::rule_getter::RuleGetter;
 
 pub struct UnicornRuleGetter;
 
@@ -11,7 +11,7 @@ impl Default for UnicornRuleGetter {
 }
 
 impl RuleGetter for UnicornRuleGetter {
-    fn get_def_rules(&self) -> Map<String, Value> {
+    fn get_def(&self) -> Map<String, Value> {
         json!({
           "unicorn/no-await-in-promise-methods": 2,
           "unicorn/no-document-cookie": 2,
