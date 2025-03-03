@@ -12,7 +12,12 @@ use std::{
 use lint::{
     environments::Environments,
     lint_mode::LintMode,
-    rules::{eslint::EslintRuleGetter, rule_getter::RuleGetter},
+    rules::{
+        eslint::EslintRuleGetter,
+        react::{ReactConfig, ReactRuntime},
+        rule_getter::RuleGetter,
+        typescript::TypescriptConfig,
+    },
     Linter,
 };
 use oxc_allocator::Allocator;
@@ -135,23 +140,16 @@ fn walk_lint() {
     let mut define = Map::new();
     define.insert("process".to_string(), "readonly".into());
 
-    let linter = Linter::new(
-        LintMode::Development,
-        Environments::default(),
-        LintPlugins::default(),
-    )
-    .with_define(define);
+    let linter = Linter::new(LintMode::Development, Environments::default())
+        .with_define(define)
+        .with_typescript(TypescriptConfig::default())
+        .with_react(ReactConfig::default().with_runtime(ReactRuntime::Classic));
 
-    walker
-        .walk(|path| {
-            // Some(lint(path))
-            let res = linter.lint(path).unwrap();
-            Some(res)
-        })
-        .into_iter()
-        .flatten()
-        .flatten()
-        .collect::<Vec<_>>();
+    let _ = walker.walk(|path| {
+        // Some(lint(path))
+        let res = linter.lint(path).unwrap();
+        Some(res)
+    });
 
     // for report in res {
     //     let mut miette_report = miette!(
@@ -195,43 +193,11 @@ fn lint<P: AsRef<Path>>(path: P) {
 
     println!("{:?}", cwd);
 
-    let linter = Linter::new(
-        LintMode::Development,
-        Environments::default(),
-        LintPlugins::default(),
-    );
+    let linter = Linter::new(LintMode::Development, Environments::default());
 
     let res = linter.lint(path).unwrap();
 
     // println!("{:?}", res);
-
-    for report in res {
-        let mut miette_report = miette!(
-            severity = report.severity,
-            url = report.url.as_ref().unwrap().to_string(),
-            labels = report.labels,
-            help = report
-                .help
-                .as_ref()
-                .map_or_else(|| "".to_string(), |help| help.to_string()),
-            "{}/{}",
-            report.scope.as_ref().unwrap(),
-            report.number.as_ref().unwrap()
-        );
-        // .with_source_code(report.source_code);
-        if !report.source_code.is_empty() {
-            let source = NamedSource::new(
-                report.path.clone().display().to_string(),
-                report.source_code.clone(),
-            );
-            miette_report = miette_report.with_source_code(source);
-        } else {
-            miette_report =
-                miette_report.with_source_code(report.path.to_string_lossy().to_string());
-        }
-
-        eprintln!("{:?}", miette_report);
-    }
 
     let end = Instant::now();
 

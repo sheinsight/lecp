@@ -4,19 +4,13 @@ use super::rule_getter::RuleGetter;
 
 pub struct PromiseRuleGetter;
 
-impl PromiseRuleGetter {
-    pub fn new() -> Self {
+impl Default for PromiseRuleGetter {
+    fn default() -> Self {
         Self {}
     }
 }
 
 impl RuleGetter for PromiseRuleGetter {
-    fn get_dev_override_rules(&self) -> Map<String, Value> {
-        json!({})
-            .as_object()
-            .map_or(Map::new(), |map| map.to_owned())
-    }
-
     fn get_def_rules(&self) -> Map<String, Value> {
         json!({
           "no-promise-in-callback":0,

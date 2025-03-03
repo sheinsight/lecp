@@ -1,25 +1,30 @@
-use serde_json::{Map, Value, json};
+use serde_json::{json, Map, Value};
 
 use super::rule_getter::RuleGetter;
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct TypescriptConfig {}
 
 pub struct TypescriptRuleGetter {
     config: TypescriptConfig,
 }
 
+impl Default for TypescriptRuleGetter {
+    fn default() -> Self {
+        Self {
+            config: TypescriptConfig::default(),
+        }
+    }
+}
+
 impl TypescriptRuleGetter {
-    pub fn new(config: TypescriptConfig) -> Self {
-        Self { config }
+    pub fn with_config(mut self, config: TypescriptConfig) -> Self {
+        self.config = config;
+        self
     }
 }
 
 impl RuleGetter for TypescriptRuleGetter {
-    fn get_dev_override_rules(&self) -> Map<String, Value> {
-        json!({}).as_object().map_or(Map::new(), |map| map.to_owned())
-    }
-
     fn get_def_rules(&self) -> Map<String, Value> {
         json!({
           "typescript/no-duplicate-enum-values":2,
@@ -100,7 +105,7 @@ impl RuleGetter for TypescriptRuleGetter {
           "typescript/no-var-requires":0,
           "typescript/no-unnecessary-type-constraint":0,
           "typescript/ban-ts-comment":0,
-          "typescript/no-unsafe-function-type":0,
+          "typescript/no-unsafe-function-type":2,
           "typescript/array-type":0,
           "typescript/consistent-generic-constructors":0,
           "typescript/consistent-indexed-object-style":0,
@@ -108,7 +113,7 @@ impl RuleGetter for TypescriptRuleGetter {
           "typescript/no-inferrable-types":0,
           "typescript/prefer-for-of":0,
           "typescript/prefer-function-type":0,
-          "typescript/prefer-namespace-keyword":0
+          "typescript/prefer-namespace-keyword":2
         })
         .as_object()
         .map_or(Map::new(), |map| map.to_owned())

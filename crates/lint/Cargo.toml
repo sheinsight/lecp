@@ -1,27 +1,27 @@
 [package]
-name = "lint"
-version = "0.1.0"
-authors.workspace = true
-edition.workspace = true
-homepage.workspace = true
-license.workspace = true
-repository.workspace = true
+authors.workspace      = true
+edition.workspace      = true
+homepage.workspace     = true
+license.workspace      = true
+name                   = "lint"
+repository.workspace   = true
 rust-version.workspace = true
+version                = "0.1.0"
 
 [dependencies]
-oxc_linter = { workspace = true }
-oxc_span = { workspace = true }
-oxc_allocator = { workspace = true }
+anyhow          = { workspace = true }
+bitflags        = { workspace = true }
+miette          = { workspace = true, features = ["fancy"] }
+oxc_allocator   = { workspace = true }
 oxc_diagnostics = { workspace = true }
-oxc_parser = {workspace = true}
-oxc_semantic = {workspace = true}
-rustc-hash = { workspace = true }
-bitflags = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
-miette = {workspace = true,features = ["fancy"]}
-anyhow = { workspace = true }
-ptree = { workspace = true }
-wax = { workspace = true }
-rayon = { workspace = true }
-walk_parallel = { path = "../walk_parallel" }
+oxc_linter      = { workspace = true }
+oxc_parser      = { workspace = true }
+oxc_semantic    = { workspace = true }
+oxc_span        = { workspace = true }
+ptree           = { workspace = true }
+rayon           = { workspace = true }
+rustc-hash      = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+walk_parallel   = { path = "../walk_parallel" }
+wax             = { workspace = true }

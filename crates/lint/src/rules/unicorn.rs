@@ -4,19 +4,13 @@ use super::rule_getter::RuleGetter;
 
 pub struct UnicornRuleGetter;
 
-impl UnicornRuleGetter {
-    pub fn new() -> Self {
+impl Default for UnicornRuleGetter {
+    fn default() -> Self {
         Self {}
     }
 }
 
 impl RuleGetter for UnicornRuleGetter {
-    fn get_dev_override_rules(&self) -> Map<String, Value> {
-        json!({})
-            .as_object()
-            .map_or(Map::new(), |map| map.to_owned())
-    }
-
     fn get_def_rules(&self) -> Map<String, Value> {
         json!({
           "unicorn/no-await-in-promise-methods": 2,
@@ -90,7 +84,7 @@ impl RuleGetter for UnicornRuleGetter {
           "unicorn/no-await-expression-member": 1,
           "unicorn/no-console-spaces": 0,
           "unicorn/no-null": 0,
-          "unicorn/no-unreadable-array-destructuring": 0,
+          "unicorn/no-unreadable-array-destructuring": 1,
           "unicorn/no-zero-fractions": 1,
           "unicorn/number-literal-case": 1,
           "unicorn/numeric-separators-style": 2,

@@ -11,8 +11,19 @@ pub const DEFAULT_IGNORE_PATTERNS: &[&str] = &[
     "node_modules",
 ];
 
-pub const DEFAULT_TEST_PATTERNS: &[&str] =
-    &["**/test/**", "**/tests/**", "**/spec/**", "**/specs/**"];
+pub const DEFAULT_TEST_PATTERNS: &[&str] = &[
+    "**/test/**",
+    "**/tests/**",
+    "**/spec/**",
+    "**/specs/**",
+    "*.spec.ts",
+    "*.spec.tsx",
+    "*.test.ts",
+    "*.test.tsx",
+    "*.min.js",
+    "*.min.css",
+    "*.d.ts",
+];
 
 pub const DEFAULT_DTS_PATTERNS: &[&str] = &["**/*.d.ts"];
 

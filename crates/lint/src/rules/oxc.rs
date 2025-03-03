@@ -1,20 +1,16 @@
-use serde_json::{Map, Value, json};
+use serde_json::{json, Map, Value};
 
 use super::rule_getter::RuleGetter;
 
 pub struct OxcRuleGetter;
 
-impl OxcRuleGetter {
-    pub fn new() -> Self {
+impl Default for OxcRuleGetter {
+    fn default() -> Self {
         Self {}
     }
 }
 
 impl RuleGetter for OxcRuleGetter {
-    fn get_dev_override_rules(&self) -> Map<String, Value> {
-        json!({}).as_object().map_or(Map::new(), |map| map.to_owned())
-    }
-
     fn get_def_rules(&self) -> Map<String, Value> {
         json!({
           "oxc/bad-array-method-on-arguments":2,

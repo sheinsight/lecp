@@ -13,6 +13,13 @@ pub struct ReactConfig {
     pub runtime: ReactRuntime,
 }
 
+impl ReactConfig {
+    pub fn with_runtime(mut self, runtime: ReactRuntime) -> Self {
+        self.runtime = runtime;
+        self
+    }
+}
+
 impl Default for ReactConfig {
     fn default() -> Self {
         Self {
@@ -26,26 +33,24 @@ pub struct ReactRuleGetter {
 }
 
 impl ReactRuleGetter {
-    pub fn new(config: ReactConfig) -> Self {
-        Self { config }
+    pub fn with_runtime(mut self, runtime: ReactRuntime) -> Self {
+        self.config.runtime = runtime;
+        self
     }
 }
 
 impl Default for ReactRuleGetter {
     fn default() -> Self {
-        Self::new(ReactConfig::default())
+        Self {
+            config: ReactConfig::default(),
+        }
     }
 }
 
 impl RuleGetter for ReactRuleGetter {
-    fn get_dev_override_rules(&self) -> Map<String, Value> {
-        json!({})
-            .as_object()
-            .map_or(Map::new(), |map| map.to_owned())
-    }
-
     fn get_def_rules(&self) -> Map<String, Value> {
         json!({
+           // react
           "react/jsx-key":2,
           "react/jsx-no-duplicate-props":2,
           "react/jsx-no-target-blank":[2,{
@@ -67,7 +72,7 @@ impl RuleGetter for ReactRuleGetter {
           "react/iframe-missing-sandbox":2,
           "react/jsx-no-comment-textnodes":2,
           "react/no-array-index-key":1,
-          "react/no-render-return-value":1,
+          "react/no-render-return-value":2,
           "react/jsx-boolean-value":1,
           "react/no-find-dom-node":1,
           "react/no-unknown-property":1,
@@ -77,6 +82,7 @@ impl RuleGetter for ReactRuleGetter {
           "react/jsx-no-useless-fragment":0,
           "react/prefer-es6-class":0,
           "react/style-prop-object":2,
+          "react/require-render-return": 2,
           "react/checked-requires-onchange-or-readonly":2,
           "react/no-unescaped-entities":2,
           "react/rules-of-hooks":2,
@@ -86,7 +92,12 @@ impl RuleGetter for ReactRuleGetter {
             "propElementValues": "always"
           }],
           "react/no-set-state":0,
-          "react/react-in-jsx-scope": if self.config.runtime == ReactRuntime::Automatic { 0 } else { 2 }
+          "react/react-in-jsx-scope": if self.config.runtime == ReactRuntime::Automatic { 0 } else { 2 },
+          // react_perf
+          "react_perf/jsx-no-jsx-as-prop":1,
+          "react_perf/jsx-no-new-array-as-prop":1,
+          "react_perf/jsx-no-new-function-as-prop":1,
+          "react_perf/jsx-no-new-object-as-prop":1,
         })
         .as_object()
         .map_or(Map::new(), |map| map.to_owned())

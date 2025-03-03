@@ -18,7 +18,6 @@ use rules::{
     oxc::OxcRuleGetter,
     promise::PromiseRuleGetter,
     react::{ReactConfig, ReactRuleGetter},
-    react_perf::ReactPerfRuleGetter,
     rule_getter::RuleGetter,
     typescript::{TypescriptConfig, TypescriptRuleGetter},
     unicorn::UnicornRuleGetter,
@@ -27,14 +26,15 @@ use rules::{
 use serde_json::{json, Map, Value};
 use std::borrow::Cow;
 
+pub mod config_builder;
 pub mod environments;
 pub mod lint_mode;
-pub mod rule_builder;
+pub mod oxc_conf;
 pub mod rules;
 
 pub struct Linter {
     envs: Environments,
-    plugins: LintPlugins,
+    // plugins: LintPlugins,
     mode: LintMode,
     define: Map<String, Value>,
     react: Option<ReactConfig>,
@@ -58,10 +58,13 @@ pub struct MietteReport {
 }
 
 impl Linter {
-    pub fn new(mode: LintMode, envs: Environments, plugins: LintPlugins) -> Self {
+    pub fn new(
+        mode: LintMode,
+        envs: Environments, //, plugins: LintPlugins
+    ) -> Self {
         Self {
             envs,
-            plugins,
+            // plugins,
             mode,
             define: Map::new(),
             react: None,
@@ -74,24 +77,41 @@ impl Linter {
         self
     }
 
-    fn get_def_plugins(&self) -> Vec<Value> {
-        serde_json::to_value(
-            LintPlugins::ESLINT
-                | LintPlugins::UNICORN
-                | LintPlugins::IMPORT
-                | LintPlugins::PROMISE
-                | LintPlugins::OXC,
-        )
-        .unwrap_or(Value::Array(vec![]))
-        .as_array()
-        .map_or(vec![], |v| v.to_owned())
+    pub fn with_react(mut self, react: ReactConfig) -> Self {
+        self.react = Some(react);
+        self
+    }
+
+    pub fn with_typescript(mut self, ts: TypescriptConfig) -> Self {
+        self.ts = Some(ts);
+        self
+    }
+}
+
+impl Linter {
+    fn get_def_plugins(&self) -> LintPlugins {
+        let mut plugins = LintPlugins::ESLINT
+            | LintPlugins::UNICORN
+            | LintPlugins::IMPORT
+            | LintPlugins::PROMISE
+            | LintPlugins::OXC;
+
+        if self.ts.is_some() {
+            plugins |= LintPlugins::TYPESCRIPT
+        }
+
+        if self.react.is_some() {
+            plugins |= LintPlugins::REACT | LintPlugins::REACT_PERF
+        }
+
+        plugins
     }
 
     fn get_def_rules(&self) -> Map<String, Value> {
-        let eslint = EslintRuleGetter::new().get_def_rules();
-        let oxc = OxcRuleGetter::new().get_def_rules();
-        let promise = PromiseRuleGetter::new().get_def_rules();
-        let unicorn = UnicornRuleGetter::new().get_def_rules();
+        let eslint = EslintRuleGetter::default().get_def_rules();
+        let oxc = OxcRuleGetter::default().get_def_rules();
+        let promise = PromiseRuleGetter::default().get_def_rules();
+        let unicorn = UnicornRuleGetter::default().get_def_rules();
         let mut merged = Map::new();
         merged.extend(eslint);
         merged.extend(oxc);
@@ -117,32 +137,23 @@ impl Linter {
             .map_or(vec![], |overrides| overrides.to_owned());
 
         if let Some(ts) = &self.ts {
-            let ts_rules = TypescriptRuleGetter::new(ts.clone()).get_def_rules();
-
-            let ts_plugins = serde_json::to_value(LintPlugins::TYPESCRIPT)
-                .unwrap_or(Value::Array(vec![]))
-                .as_array()
-                .map_or(vec![], |plugins| plugins.to_owned());
+            let ts_rules = TypescriptRuleGetter::default()
+                .with_config(ts.clone())
+                .get_def_rules();
 
             overrides.push(json!({
-                "files": ["*.ts", "*.tsx", "*.cts", "*.mts"],
-                "plugins": ts_plugins,
+                "files": ["*.{ts,tsx,cts,mts}"],
                 "rules": ts_rules,
             }));
         }
 
         if let Some(react) = &self.react {
-            let mut react_rules = ReactRuleGetter::new(react.clone()).get_def_rules();
-            react_rules.extend(ReactPerfRuleGetter::new().get_def_rules());
-
-            let react_plugins = serde_json::to_value(LintPlugins::REACT | LintPlugins::REACT_PERF)
-                .unwrap_or(Value::Array(vec![]))
-                .as_array()
-                .map_or(vec![], |plugins| plugins.to_owned());
+            let react_rules = ReactRuleGetter::default()
+                .with_runtime(react.runtime.clone())
+                .get_def_rules();
 
             overrides.push(json!({
-                "files": ["*.jsx", "*.tsx"],
-                "plugins": react_plugins,
+                "files": ["*.{jsx,tsx}"],
                 "rules": react_rules,
             }));
         }
@@ -165,7 +176,7 @@ impl Linter {
 
         serde_json::from_value::<Oxlintrc>(json!({
             "plugins": def_plugin,
-            "env": self.envs.to_hash_map(),
+            "env": self.envs,
             "globals": self.define,
             "settings": {},
             "rules": def_rules,
@@ -228,7 +239,7 @@ impl Linter {
         eprintln!("{:?}", report);
     }
 
-    pub fn lint<P: AsRef<Path>>(&self, path: P) -> anyhow::Result<Vec<MietteReport>> {
+    pub fn lint<P: AsRef<Path>>(&self, path: P) -> anyhow::Result<()> {
         let path = path.as_ref();
 
         let Ok(source_code) = std::fs::read_to_string(&path) else {
@@ -236,6 +247,8 @@ impl Linter {
         };
 
         let rc = self.get_linter_config();
+
+        // println!("-->rc: {}", serde_json::to_string(&rc).unwrap());
 
         let config = ConfigStoreBuilder::from_oxlintrc(true, rc).build().unwrap();
 
@@ -269,18 +282,8 @@ impl Linter {
             let source = NamedSource::new(path.to_string_lossy().to_string(), source_code.clone());
 
             self.render_report(source, &message.error);
-
-            // let error = message.error.with_source_code(source);
-
-            // let handler =
-            //     GraphicalReportHandler::new_themed(GraphicalTheme::ascii()).with_cause_chain();
-            // let mut output = String::new();
-
-            // handler.render_report(&mut output, error.as_ref()).unwrap();
-
-            // println!("{}", output);
         }
 
-        Ok(vec![])
+        Ok(())
     }
 }

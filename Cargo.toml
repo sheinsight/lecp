@@ -1,12 +1,12 @@
 [workspace]
 members = [
-  "crates/transform_define", 
-  "crates/transform_ts2js", 
-  "crates/transform_extensions", 
-  "crates/transform_shims", 
-  "crates/lint", 
-  "crates/walk_parallel", 
-  "crates/js_compiler"
+  "crates/transform_define",
+  "crates/transform_ts2js",
+  "crates/transform_extensions",
+  "crates/transform_shims",
+  "crates/lint",
+  "crates/walk_parallel",
+  "crates/js_compiler",
 ]
 
 resolver = "2"
@@ -20,39 +20,38 @@ repository   = ""
 rust-version = "1.82"
 
 [workspace.dependencies]
+bitflags   = "2.8.0"
 env_logger = "0.11.5"
 futures    = "0.3"
 log        = "0.4.22"
 regex      = "1.11.0"
 rustc-hash = "2.1.0"
-bitflags = "2.8.0"
 
 # serde
 serde      = { version = "1.0.217", features = ["derive"] }
-serde_json = "1.0.135"  
+serde_json = "1.0.135"
 
 
-
-wax = "0.6.0"
 rayon = "1.10.0"
+wax   = "0.6.0"
 
 # swc
 swc_core = { version = "5.0.3", features = ["ecma_plugin_transform"] }
 
 # oxc
-oxc_linter = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_linter" }
-oxc_span = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_span" }
-oxc_allocator = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_allocator" }
+oxc_allocator   = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_allocator" }
 oxc_diagnostics = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_diagnostics" }
-oxc_semantic ={  git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_semantic"}
-oxc_parser = {git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_parser"}
+oxc_linter      = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_linter" }
+oxc_parser      = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_parser" }
+oxc_semantic    = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_semantic" }
+oxc_span        = { git = "https://github.com/oxc-project/oxc.git", tag = "oxlint_v0.15.11", package = "oxc_span" }
 # .cargo/config defines few alias to build plugin.
 # cargo build-wasi generates wasm-wasi32 binary
 # cargo build-wasm32 generates wasm32-unknown-unknown binary.
 miette = "7.5.0"
 
 anyhow = "1.0.96"
-ptree = "0.5.2"
+ptree  = "0.5.2"
 
 [profile.release]
 # This removes more dead code

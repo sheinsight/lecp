@@ -4,30 +4,18 @@ use super::rule_getter::RuleGetter;
 
 pub struct EslintRuleGetter;
 
-impl EslintRuleGetter {
-    pub fn new() -> Self {
+impl Default for EslintRuleGetter {
+    fn default() -> Self {
         Self {}
     }
 }
 
 impl RuleGetter for EslintRuleGetter {
-    fn get_dev_override_rules(&self) -> Map<String, Value> {
-        json!({
-            "eslint/no-console":[1,{"allow":["error","warn","info"]}],
-            "eslint/no-debugger":1,
-            "eslint/no-alert":1,
-            "eslint/no-empty":1,
-            "eslint/no-empty-function":1,
-            "eslint/no-empty-static-block":1
-        })
-        .as_object()
-        .map_or(Map::new(), |map| map.to_owned())
-    }
-
     fn get_def_rules(&self) -> Map<String, Value> {
         json!({
             "eslint/for-direction": 2,
-            "eslint/no-empty-pattern":2,
+            "eslint/no-empty-pattern": 2,
+            "eslint/getter-return": [2, { "allowImplicit": false }],
             "eslint/no-async-promise-executor": 2,
             "eslint/no-caller": 2,
             "eslint/no-class-assign": 2,
@@ -59,6 +47,7 @@ impl RuleGetter for EslintRuleGetter {
             "eslint/no-useless-call":2,
             "eslint/no-eq-null":2,
             "eslint/no-iterator":2,
+            "eslint/no-unreachable": 2,
             "eslint/no-proto":2,
             "eslint/no-regex-spaces":2,
             "eslint/no-array-constructor":2,
