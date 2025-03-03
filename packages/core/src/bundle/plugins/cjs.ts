@@ -1,6 +1,6 @@
 import type { PluginFn } from "../chain.ts";
 
-export const pluginCjs: PluginFn = (chain, { options: { externals } }) => {
+export const pluginCjs: PluginFn = chain => {
 	// node:
 	// chunkFormat: commonjs
 	// chunkLoading: 'require',

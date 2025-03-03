@@ -1,6 +1,6 @@
 import type { PluginFn } from "../chain.ts";
 
-export const pluginEsm: PluginFn = (chain, { options: { externals } }) => {
+export const pluginEsm: PluginFn = chain => {
 	chain.experiments({ outputModule: true });
 	chain.output.module(true);
 

@@ -1,3 +1,4 @@
+// eslint-disable no-await-in-loop
 import fs from "node:fs/promises";
 import path from "path";
 import colors from "picocolors";
