@@ -156,13 +156,22 @@ impl Linter {
         let semantic = Rc::new(semantic);
         let res = lint.run(&path, semantic, module_record);
 
+        let mut errors = 0;
+        let mut warnings = 0;
+
         for message in res {
+            if message.error.severity == oxc_diagnostics::Severity::Error {
+                errors += 1;
+            } else {
+                warnings += 1;
+            }
+
             let source = NamedSource::new(path.to_string_lossy().to_string(), source_code.clone());
             self.render_report(source, &message.error);
-            if message.error.severity == oxc_diagnostics::Severity::Error {
-                return Err(anyhow::anyhow!("Failed to lint file: {}", path.display()));
-            }
         }
+
+        println!("errors count: {}", errors);
+        println!("warnings count: {}", warnings);
 
         Ok(())
     }
