@@ -14,7 +14,6 @@ use oxc_diagnostics::OxcDiagnostic;
 use oxc_linter::{ConfigStoreBuilder, FixKind, FrameworkFlags, LintOptions, Oxlintrc};
 use oxc_parser::Parser;
 use oxc_semantic::SemanticBuilder;
-use rules::{react_config::ReactConfig, typescript_config::TypescriptConfig};
 
 use serde_json::{Map, Value};
 use std::borrow::Cow;

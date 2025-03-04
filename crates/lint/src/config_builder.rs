@@ -1,9 +1,9 @@
-use crate::environments::EnvironmentFlags;
 use crate::lint_mode::LintMode;
 use crate::rules::category_getter::CategoryGetter;
 use crate::rules::react_config::ReactConfig;
 use crate::rules::typescript_config::TypescriptConfig;
 use crate::rules::v2025_06_01::category::Category20250601;
+use crate::{environments::EnvironmentFlags, rules::category_getter::Category};
 use anyhow::Context;
 use oxc_linter::Oxlintrc;
 use serde_json::{json, Map, Value};
@@ -17,6 +17,7 @@ pub struct ConfigBuilder {
     react: Option<ReactConfig>,
     ts: Option<TypescriptConfig>,
     package_json: Option<PathBuf>,
+    category: Category,
 }
 
 impl Default for ConfigBuilder {
@@ -25,6 +26,7 @@ impl Default for ConfigBuilder {
             envs: EnvironmentFlags::default(),
             mode: LintMode::Development,
             define: Map::new(),
+            category: Category::V20250601(Category20250601::default()),
             react: None,
             ts: None,
             package_json: None,
@@ -63,8 +65,16 @@ impl ConfigBuilder {
         self
     }
 
+    pub fn with_category(mut self, category: Category) -> Self {
+        self.category = category;
+        self
+    }
+
     pub fn build(&self) -> anyhow::Result<Oxlintrc> {
-        let mut category = Category20250601::default();
+        let mut category = match &self.category {
+            Category::V20250601(category) => category.to_owned(),
+        };
+
         if let Some(react) = &self.react {
             category = category.with_react(react.clone());
         }

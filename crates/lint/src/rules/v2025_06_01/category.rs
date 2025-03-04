@@ -14,6 +14,7 @@ use crate::rules::v2025_06_01::react::ReactRuleGetter;
 use crate::rules::v2025_06_01::typescript::TypescriptRuleGetter;
 use crate::rules::v2025_06_01::unicorn::UnicornRuleGetter;
 
+#[derive(Debug, Clone)]
 pub struct Category20250601 {
     pub react: Option<ReactConfig>,
     pub typescript: Option<TypescriptConfig>,
