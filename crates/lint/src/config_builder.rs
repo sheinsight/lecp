@@ -1,21 +1,22 @@
-use anyhow::Context;
-use oxc_linter::Oxlintrc;
-use serde_json::{json, Map, Value};
-
 use crate::environments::EnvironmentFlags;
 use crate::lint_mode::LintMode;
 use crate::rules::category_getter::CategoryGetter;
 use crate::rules::react_config::ReactConfig;
 use crate::rules::typescript_config::TypescriptConfig;
 use crate::rules::v2025_06_01::category::Category20250601;
+use anyhow::Context;
+use oxc_linter::Oxlintrc;
+use serde_json::{json, Map, Value};
+use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
 pub struct ConfigBuilder {
-    envs: EnvironmentFlags,
     mode: LintMode,
+    envs: EnvironmentFlags,
     define: Map<String, Value>,
     react: Option<ReactConfig>,
     ts: Option<TypescriptConfig>,
+    package_json: Option<PathBuf>,
 }
 
 impl Default for ConfigBuilder {
@@ -26,6 +27,7 @@ impl Default for ConfigBuilder {
             define: Map::new(),
             react: None,
             ts: None,
+            package_json: None,
         }
     }
 }
@@ -56,6 +58,11 @@ impl ConfigBuilder {
         self
     }
 
+    pub fn with_package_json(mut self, package_json: PathBuf) -> Self {
+        self.package_json = Some(package_json);
+        self
+    }
+
     pub fn build(&self) -> anyhow::Result<Oxlintrc> {
         let mut category = Category20250601::default();
         if let Some(react) = &self.react {
@@ -74,7 +81,8 @@ impl ConfigBuilder {
             "rules": category.get_def(),
             "overrides":[
               category.get_ts_override(),
-              category.get_react_override()
+              category.get_react_override(),
+              category.get_jest_override(),
             ]
         }));
 

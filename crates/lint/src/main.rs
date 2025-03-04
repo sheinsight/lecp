@@ -1,38 +1,24 @@
 #![recursion_limit = "512"]
-use std::{
-    env::current_dir,
-    fs,
-    ops::Index,
-    path::{Path, PathBuf},
-    rc::Rc,
-    sync::Arc,
-    time::Instant,
-};
+use std::{env::current_dir, fs, path::Path, time::Instant};
 
 use lint::{
+    config_builder::ConfigBuilder,
     environments::{Environment, EnvironmentFlags},
-    lint_mode::LintMode,
     rules::{
         react_config::{ReactConfig, ReactRuntime},
         typescript_config::TypescriptConfig,
-        v2025_06_01::eslint::EslintRuleGetter,
     },
     Linter,
 };
-use oxc_allocator::Allocator;
 
-use miette::{miette, LabeledSpan, NamedSource};
-
-use oxc_linter::LintPlugins;
-use oxc_parser::Parser;
-use oxc_semantic::SemanticBuilder;
+use miette::{miette, LabeledSpan};
 
 use ptree::{
     print_config::{ASCII_CHARS_TICK, UTF_CHARS, UTF_CHARS_BOLD},
     print_tree_with, write_tree_with, Color, PrintConfig, Style, TreeBuilder,
 };
-use serde::Serialize;
-use serde_json::{json, Map};
+
+use serde_json::Map;
 use walk_parallel::WalkParallel;
 
 fn build_tree(path: &Path, tree: &mut TreeBuilder) -> std::io::Result<()> {
@@ -132,54 +118,27 @@ fn walk_lint() {
 
     let start = Instant::now();
 
-    let cwd = current_dir().unwrap().join("examples/demo-component/src");
+    let cwd = current_dir().unwrap().join("examples/demo-test");
 
     let walker = WalkParallel::new(&cwd);
 
     let mut define = Map::new();
     define.insert("process".to_string(), "readonly".into());
 
-    let linter = Linter::default()
+    let config_builder = ConfigBuilder::default()
         .with_define(define)
-        .with_typescript(TypescriptConfig::default())
         .with_envs(Environment::WebApp.into())
+        .with_typescript(TypescriptConfig::default())
         .with_react(ReactConfig::default().with_runtime(ReactRuntime::Classic));
+
+    let linter = Linter::from(config_builder);
 
     let res = walker
         .walk(|path| {
-            // Some(lint(path))
             let res = linter.lint(path);
             Some(res)
         })
         .unwrap();
-
-    // for report in res {
-    //     let mut miette_report = miette!(
-    //         severity = report.severity,
-    //         url = report.url.as_ref().unwrap().to_string(),
-    //         labels = report.labels,
-    //         help = report
-    //             .help
-    //             .as_ref()
-    //             .map_or_else(|| "".to_string(), |help| help.to_string()),
-    //         "{}/{}",
-    //         report.scope.as_ref().unwrap(),
-    //         report.number.as_ref().unwrap()
-    //     );
-    //     // .with_source_code(report.source_code);
-    //     if !report.source_code.is_empty() {
-    //         let source = NamedSource::new(
-    //             report.path.clone().display().to_string(),
-    //             report.source_code.clone(),
-    //         );
-    //         miette_report = miette_report.with_source_code(source);
-    //     } else {
-    //         miette_report =
-    //             miette_report.with_source_code(report.path.to_string_lossy().to_string());
-    //     }
-
-    //     eprintln!("{:?}", miette_report);
-    // }
 
     let end = Instant::now();
 

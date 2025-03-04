@@ -1,5 +1,6 @@
 #![recursion_limit = "512"]
 use std::{
+    fs,
     path::{Path, PathBuf},
     rc::Rc,
     sync::Arc,
@@ -51,25 +52,9 @@ impl Default for Linter {
     }
 }
 
-impl Linter {
-    pub fn with_define(mut self, define: Map<String, Value>) -> Self {
-        self.config_builder = self.config_builder.with_define(define);
-        self
-    }
-
-    pub fn with_react(mut self, react: ReactConfig) -> Self {
-        self.config_builder = self.config_builder.with_react(react);
-        self
-    }
-
-    pub fn with_typescript(mut self, ts: TypescriptConfig) -> Self {
-        self.config_builder = self.config_builder.with_typescript(ts);
-        self
-    }
-
-    pub fn with_envs(mut self, envs: EnvironmentFlags) -> Self {
-        self.config_builder = self.config_builder.with_envs(envs);
-        self
+impl From<ConfigBuilder> for Linter {
+    fn from(config_builder: ConfigBuilder) -> Self {
+        Self { config_builder }
     }
 }
 
@@ -156,7 +141,9 @@ impl Linter {
 
         let rc = self.config_builder.build()?;
 
-        // println!("-->rc: {}", serde_json::to_string(&rc).unwrap());
+        let rc_str = serde_json::to_string_pretty(&rc).unwrap();
+
+        fs::write(".oxlintrc.json", rc_str).unwrap();
 
         let config = ConfigStoreBuilder::from_oxlintrc(true, rc).build().unwrap();
 

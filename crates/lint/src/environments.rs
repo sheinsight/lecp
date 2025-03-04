@@ -1,3 +1,5 @@
+use std::path::{Path, PathBuf};
+
 use bitflags::bitflags;
 use oxc_linter::FrameworkFlags;
 use rustc_hash::FxHashMap;
@@ -64,6 +66,36 @@ impl Default for EnvironmentFlags {
     }
 }
 
+// impl From<PathBuf> for EnvironmentFlags {
+//     fn from(value: PathBuf) -> Self {
+//         let mut env = EnvironmentFlags::Es2024;
+
+//         let p = value.display().to_string();
+
+//         const CJS_MODULE_EXTS: [&str; 2] = ["cjs", "cts"];
+//         const TEST_EXTS: [&str; 8] = [
+//             ".test.ts",
+//             ".test.tsx",
+//             ".spec.ts",
+//             ".spec.tsx",
+//             ".test.js",
+//             ".test.jsx",
+//             ".spec.js",
+//             ".spec.jsx",
+//         ];
+
+//         if CJS_MODULE_EXTS.iter().any(|ext| p.ends_with(ext)) {
+//             env |= EnvironmentFlags::CommonJS;
+//         }
+
+//         if TEST_EXTS.iter().any(|ext| p.ends_with(ext)) {
+//             env |= EnvironmentFlags::Jest;
+//         }
+
+//         env
+//     }
+// }
+
 impl Into<FrameworkFlags> for EnvironmentFlags {
     fn into(self) -> FrameworkFlags {
         let mut framework_hints = FrameworkFlags::empty();
@@ -80,16 +112,14 @@ pub enum Environment {
     DesktopApp,
     WebExtensionsApp,
     GreaseMonkeyApp,
-    PhantomJSApp,
+    // PhantomJSApp,
 }
 
 impl Into<EnvironmentFlags> for Environment {
     fn into(self) -> EnvironmentFlags {
         match self {
             Environment::WebApp => EnvironmentFlags::Es2024 | EnvironmentFlags::Browser,
-            Environment::NodeApp => {
-                EnvironmentFlags::Es2024 | EnvironmentFlags::Node | EnvironmentFlags::CommonJS
-            }
+            Environment::NodeApp => EnvironmentFlags::Es2024 | EnvironmentFlags::Node,
             Environment::DesktopApp => {
                 EnvironmentFlags::Es2024 | EnvironmentFlags::Node | EnvironmentFlags::Browser
             }
@@ -98,8 +128,7 @@ impl Into<EnvironmentFlags> for Environment {
             }
             Environment::GreaseMonkeyApp => {
                 EnvironmentFlags::Es2024 | EnvironmentFlags::GreaseMonkey
-            }
-            Environment::PhantomJSApp => EnvironmentFlags::Es2024 | EnvironmentFlags::PhantomJS,
+            } // Environment::PhantomJSApp => EnvironmentFlags::Es2024 | EnvironmentFlags::PhantomJS,
         }
     }
 }
@@ -188,10 +217,12 @@ impl Serialize for EnvironmentFlags {
 
         // 检查每个环境是否被设置，并添加到 map 中
         for (name, bits) in all_environments {
-            map.insert(
-                name.to_string(),
-                self.contains(Self::from_bits_truncate(bits)),
-            );
+            if self.contains(Self::from_bits_truncate(bits)) {
+                map.insert(
+                    name.to_string(),
+                    self.contains(Self::from_bits_truncate(bits)),
+                );
+            }
         }
 
         map.serialize(serializer)

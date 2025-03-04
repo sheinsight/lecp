@@ -1,11 +1,13 @@
 use oxc_linter::LintPlugins;
 use serde_json::{json, Map, Value};
 
+use crate::environments::EnvironmentFlags;
 use crate::rules::category_getter::CategoryGetter;
 use crate::rules::react_config::ReactConfig;
 use crate::rules::rule_getter::RuleGetter;
 use crate::rules::typescript_config::TypescriptConfig;
 use crate::rules::v2025_06_01::eslint::EslintRuleGetter;
+use crate::rules::v2025_06_01::jest::JestRuleGetter;
 use crate::rules::v2025_06_01::oxc::OxcRuleGetter;
 use crate::rules::v2025_06_01::promise::PromiseRuleGetter;
 use crate::rules::v2025_06_01::react::ReactRuleGetter;
@@ -79,12 +81,25 @@ impl CategoryGetter for Category20250601 {
         }
     }
 
+    fn get_jest_override(&self) -> Value {
+        json!({
+            "files": [
+                "*.{test,spec}.{js,jsx,ts,tsx}",
+                "**/{test,tests,spec,specs}/**",
+            ],
+            "plugins": LintPlugins::JEST,
+            "env": EnvironmentFlags::Jest | EnvironmentFlags::Es2024,
+            "rules": JestRuleGetter::default().get_def()
+        })
+    }
+
     fn get_def_plugins(&self) -> oxc_linter::LintPlugins {
         let mut plugins = LintPlugins::ESLINT
             | LintPlugins::UNICORN
             | LintPlugins::IMPORT
             | LintPlugins::PROMISE
-            | LintPlugins::OXC;
+            | LintPlugins::OXC
+            | LintPlugins::JEST;
 
         if self.typescript.is_some() {
             plugins |= LintPlugins::TYPESCRIPT
