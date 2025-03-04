@@ -27,22 +27,6 @@ pub struct Linter {
     config_builder: ConfigBuilder,
 }
 
-// react-component
-// react-component-esm
-// react-component-commonjs
-
-#[derive(Debug)]
-pub struct MietteReport {
-    pub scope: Option<String>,
-    pub number: Option<String>,
-    pub severity: miette::Severity,
-    pub url: Option<Cow<'static, str>>,
-    pub labels: Vec<miette::LabeledSpan>,
-    pub help: Option<Cow<'static, str>>,
-    pub source_code: String,
-    pub path: PathBuf,
-}
-
 impl Default for Linter {
     fn default() -> Self {
         Self {
