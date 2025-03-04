@@ -6,40 +6,25 @@ use std::{
 };
 
 use config_builder::ConfigBuilder;
-use environments::Environments;
-use lint_mode::LintMode;
+use environments::EnvironmentFlags;
 use miette::{miette, NamedSource};
 use oxc_allocator::Allocator;
 use oxc_diagnostics::OxcDiagnostic;
-use oxc_linter::{ConfigStoreBuilder, FixKind, FrameworkFlags, LintOptions, LintPlugins, Oxlintrc};
+use oxc_linter::{ConfigStoreBuilder, FixKind, FrameworkFlags, LintOptions, Oxlintrc};
 use oxc_parser::Parser;
 use oxc_semantic::SemanticBuilder;
-use rules::{
-    react_config::ReactConfig,
-    rule_getter::RuleGetter,
-    typescript_config::TypescriptConfig,
-    v2025_06_01::{
-        eslint::EslintRuleGetter, oxc::OxcRuleGetter, promise::PromiseRuleGetter,
-        react::ReactRuleGetter, typescript::TypescriptRuleGetter, unicorn::UnicornRuleGetter,
-    },
-};
+use rules::{react_config::ReactConfig, typescript_config::TypescriptConfig};
 
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value};
 use std::borrow::Cow;
 
 pub mod config_builder;
 pub mod environments;
 pub mod lint_mode;
-pub mod oxc_conf;
 pub mod rules;
 
 pub struct Linter {
-    envs: Environments,
-    // plugins: LintPlugins,
-    mode: LintMode,
-    define: Map<String, Value>,
-    react: Option<ReactConfig>,
-    ts: Option<TypescriptConfig>,
+    config_builder: ConfigBuilder,
 }
 
 // react-component
@@ -58,33 +43,32 @@ pub struct MietteReport {
     pub path: PathBuf,
 }
 
-impl Linter {
-    pub fn new(
-        mode: LintMode,
-        envs: Environments, //, plugins: LintPlugins
-    ) -> Self {
+impl Default for Linter {
+    fn default() -> Self {
         Self {
-            envs,
-            // plugins,
-            mode,
-            define: Map::new(),
-            react: None,
-            ts: None,
+            config_builder: ConfigBuilder::default(),
         }
     }
+}
 
+impl Linter {
     pub fn with_define(mut self, define: Map<String, Value>) -> Self {
-        self.define = define;
+        self.config_builder = self.config_builder.with_define(define);
         self
     }
 
     pub fn with_react(mut self, react: ReactConfig) -> Self {
-        self.react = Some(react);
+        self.config_builder = self.config_builder.with_react(react);
         self
     }
 
     pub fn with_typescript(mut self, ts: TypescriptConfig) -> Self {
-        self.ts = Some(ts);
+        self.config_builder = self.config_builder.with_typescript(ts);
+        self
+    }
+
+    pub fn with_envs(mut self, envs: EnvironmentFlags) -> Self {
+        self.config_builder = self.config_builder.with_envs(envs);
         self
     }
 }
@@ -107,16 +91,6 @@ impl Linter {
             oxc_diagnostics::Severity::Warning => miette::Severity::Warning,
             oxc_diagnostics::Severity::Advice => miette::Severity::Advice,
         }
-    }
-
-    fn get_linter_config(&self) -> Oxlintrc {
-        ConfigBuilder::default()
-            .with_envs(self.envs)
-            .with_define(self.define.clone())
-            .with_react(self.react.clone().unwrap_or_default())
-            .with_typescript(self.ts.clone().unwrap_or_default())
-            .build()
-            .unwrap()
     }
 
     pub fn render_report(&self, source_code: NamedSource<String>, diagnostic: &OxcDiagnostic) {
@@ -180,7 +154,7 @@ impl Linter {
             return Err(anyhow::anyhow!("Failed to read file: {}", path.display()));
         };
 
-        let rc = self.get_linter_config();
+        let rc = self.config_builder.build()?;
 
         // println!("-->rc: {}", serde_json::to_string(&rc).unwrap());
 
@@ -188,8 +162,8 @@ impl Linter {
 
         let lint = oxc_linter::Linter::new(
             LintOptions {
-                fix: FixKind::Fix,
-                framework_hints: FrameworkFlags::React,
+                fix: FixKind::None,
+                framework_hints: FrameworkFlags::empty(),
             },
             config,
         );
@@ -214,8 +188,10 @@ impl Linter {
 
         for message in res {
             let source = NamedSource::new(path.to_string_lossy().to_string(), source_code.clone());
-
             self.render_report(source, &message.error);
+            if message.error.severity == oxc_diagnostics::Severity::Error {
+                return Err(anyhow::anyhow!("Failed to lint file: {}", path.display()));
+            }
         }
 
         Ok(())

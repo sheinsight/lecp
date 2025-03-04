@@ -10,7 +10,7 @@ use std::{
 };
 
 use lint::{
-    environments::Environments,
+    environments::{Environment, EnvironmentFlags},
     lint_mode::LintMode,
     rules::{
         react_config::{ReactConfig, ReactRuntime},
@@ -139,16 +139,19 @@ fn walk_lint() {
     let mut define = Map::new();
     define.insert("process".to_string(), "readonly".into());
 
-    let linter = Linter::new(LintMode::Development, Environments::default())
+    let linter = Linter::default()
         .with_define(define)
         .with_typescript(TypescriptConfig::default())
+        .with_envs(Environment::WebApp.into())
         .with_react(ReactConfig::default().with_runtime(ReactRuntime::Classic));
 
-    let _ = walker.walk(|path| {
-        // Some(lint(path))
-        let res = linter.lint(path).unwrap();
-        Some(res)
-    });
+    let res = walker
+        .walk(|path| {
+            // Some(lint(path))
+            let res = linter.lint(path);
+            Some(res)
+        })
+        .unwrap();
 
     // for report in res {
     //     let mut miette_report = miette!(
@@ -177,26 +180,6 @@ fn walk_lint() {
 
     //     eprintln!("{:?}", miette_report);
     // }
-
-    let end = Instant::now();
-
-    println!("执行耗时: {:?}", end - start);
-}
-
-fn lint<P: AsRef<Path>>(path: P) {
-    // 统计执行耗时
-    init_miette();
-    let start = Instant::now();
-
-    let cwd = current_dir().unwrap().join("demo");
-
-    println!("{:?}", cwd);
-
-    let linter = Linter::new(LintMode::Development, Environments::default());
-
-    let res = linter.lint(path).unwrap();
-
-    // println!("{:?}", res);
 
     let end = Instant::now();
 

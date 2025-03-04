@@ -1,14 +1,12 @@
 use bitflags::bitflags;
+use oxc_linter::FrameworkFlags;
 use rustc_hash::FxHashMap;
 use serde::{Serialize, Serializer};
 
 bitflags! {
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-    pub struct Environments: u64 {
-        const Browser = 1 << 0;
-        const Node = 1 << 1;
-        const CommonJS = 1 << 2;
-        const SharedNodeBrowser = 1 << 3;
+    pub struct EnvironmentFlags: u64 {
+        // 语言标准 (ECMAScript 版本) LanguageFlags
         const Es6 = 1 << 4;
         const Es2016 = 1 << 5;
         const Es2017 = 1 << 6;
@@ -19,36 +17,94 @@ bitflags! {
         const Es2022 = 1 << 11;
         const Es2023 = 1 << 12;
         const Es2024 = 1 << 13;
+
+        // 核心运行时环境 RuntimeFlags
+        const Browser = 1 << 0;
+        const Node = 1 << 1;
+        const SharedNodeBrowser = 1 << 3;
         const Worker = 1 << 14;
+        const ServiceWorker = 1 << 29;
+
+        // 模块系统
+        const CommonJS = 1 << 2;
         const Amd = 1 << 15;
+
+        // 测试框架 TestingFlags
         const Mocha = 1 << 16;
         const Jasmine = 1 << 17;
         const Jest = 1 << 18;
-        const PhantomJS = 1 << 19;
-        const Protractor = 1 << 20;
         const Qunit = 1 << 21;
+        const AtomTest = 1 << 30;
+        const EmberTest = 1 << 31;
+        const Protractor = 1 << 20;
+
+        // 库和框架  FrameworkFlags
         const JQuery = 1 << 22;
         const PrototypeJS = 1 << 23;
         const ShellJS = 1 << 24;
         const Meteor = 1 << 25;
         const Mongo = 1 << 26;
-        const AppleScript = 1 << 27;
-        const NaShorn = 1 << 28;
-        const ServiceWorker = 1 << 29;
-        const AtomTest = 1 << 30;
-        const EmberTest = 1 << 31;
+
+        // 浏览器扩展和特殊环境
         const WebExtensions = 1 << 32;
         const GreaseMonkey = 1 << 33;
+        const PhantomJS = 1 << 19;
+
+        // 特殊/遗留环境
+        const AppleScript = 1 << 27;
+        const NaShorn = 1 << 28;
+
+
     }
 }
 
-impl Default for Environments {
+impl Default for EnvironmentFlags {
     fn default() -> Self {
-        Environments::Es2024 | Environments::Browser
+        EnvironmentFlags::Es2024
     }
 }
 
-impl Into<&'static str> for Environments {
+impl Into<FrameworkFlags> for EnvironmentFlags {
+    fn into(self) -> FrameworkFlags {
+        let mut framework_hints = FrameworkFlags::empty();
+        if self.contains(EnvironmentFlags::Jest) {
+            framework_hints |= FrameworkFlags::Jest;
+        }
+        framework_hints
+    }
+}
+
+pub enum Environment {
+    WebApp,
+    NodeApp,
+    DesktopApp,
+    WebExtensionsApp,
+    GreaseMonkeyApp,
+    PhantomJSApp,
+}
+
+impl Into<EnvironmentFlags> for Environment {
+    fn into(self) -> EnvironmentFlags {
+        match self {
+            Environment::WebApp => EnvironmentFlags::Es2024 | EnvironmentFlags::Browser,
+            Environment::NodeApp => {
+                EnvironmentFlags::Es2024 | EnvironmentFlags::Node | EnvironmentFlags::CommonJS
+            }
+            Environment::DesktopApp => {
+                EnvironmentFlags::Es2024 | EnvironmentFlags::Node | EnvironmentFlags::Browser
+            }
+            Environment::WebExtensionsApp => {
+                EnvironmentFlags::Es2024 | EnvironmentFlags::WebExtensions
+            }
+            Environment::GreaseMonkeyApp => {
+                EnvironmentFlags::Es2024 | EnvironmentFlags::GreaseMonkey
+            }
+            Environment::PhantomJSApp => EnvironmentFlags::Es2024 | EnvironmentFlags::PhantomJS,
+        }
+    }
+}
+
+impl Into<&'static str> for EnvironmentFlags {
     fn into(self) -> &'static str {
         match self {
             Self::Browser => "browser",
@@ -90,7 +146,7 @@ impl Into<&'static str> for Environments {
     }
 }
 
-impl Serialize for Environments {
+impl Serialize for EnvironmentFlags {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut map = FxHashMap::default();
         let all_environments = [
@@ -142,7 +198,7 @@ impl Serialize for Environments {
     }
 }
 
-impl Environments {
+impl EnvironmentFlags {
     /// 获取所有已设置的环境
     pub fn to_hash_map(&self) -> FxHashMap<String, bool> {
         let mut map = FxHashMap::default();
@@ -203,17 +259,17 @@ mod tests {
 
     #[test]
     fn test_environments() {
-        let env = Environments::Es2016 | Environments::Es2017;
+        let env = EnvironmentFlags::Es2016 | EnvironmentFlags::Es2017;
 
-        assert!(env.contains(Environments::Es2016));
-        assert!(env.contains(Environments::Es2017));
-        assert!(!env.contains(Environments::Es2018));
-        assert!(!env.contains(Environments::Es2019));
-        assert!(!env.contains(Environments::Es2020));
-        assert!(!env.contains(Environments::Es2021));
-        assert!(!env.contains(Environments::Es2022));
-        assert!(!env.contains(Environments::Es2023));
-        assert!(!env.contains(Environments::Es2024));
+        assert!(env.contains(EnvironmentFlags::Es2016));
+        assert!(env.contains(EnvironmentFlags::Es2017));
+        assert!(!env.contains(EnvironmentFlags::Es2018));
+        assert!(!env.contains(EnvironmentFlags::Es2019));
+        assert!(!env.contains(EnvironmentFlags::Es2020));
+        assert!(!env.contains(EnvironmentFlags::Es2021));
+        assert!(!env.contains(EnvironmentFlags::Es2022));
+        assert!(!env.contains(EnvironmentFlags::Es2023));
+        assert!(!env.contains(EnvironmentFlags::Es2024));
 
         let map = env.to_hash_map();
 

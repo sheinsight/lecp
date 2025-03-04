@@ -1,15 +1,17 @@
 use anyhow::Context;
-use oxc_linter::{LintPlugins, Oxlintrc};
+use oxc_linter::Oxlintrc;
 use serde_json::{json, Map, Value};
 
-use crate::environments::Environments;
+use crate::environments::EnvironmentFlags;
 use crate::lint_mode::LintMode;
 use crate::rules::category_getter::CategoryGetter;
 use crate::rules::react_config::ReactConfig;
 use crate::rules::typescript_config::TypescriptConfig;
 use crate::rules::v2025_06_01::category::Category20250601;
+
+#[derive(Debug, Clone)]
 pub struct ConfigBuilder {
-    envs: Environments,
+    envs: EnvironmentFlags,
     mode: LintMode,
     define: Map<String, Value>,
     react: Option<ReactConfig>,
@@ -19,7 +21,7 @@ pub struct ConfigBuilder {
 impl Default for ConfigBuilder {
     fn default() -> Self {
         Self {
-            envs: Environments::default(),
+            envs: EnvironmentFlags::default(),
             mode: LintMode::Development,
             define: Map::new(),
             react: None,
@@ -49,12 +51,12 @@ impl ConfigBuilder {
         self
     }
 
-    pub fn with_envs(mut self, envs: Environments) -> Self {
+    pub fn with_envs(mut self, envs: EnvironmentFlags) -> Self {
         self.envs = envs;
         self
     }
 
-    pub fn build(self) -> anyhow::Result<Oxlintrc> {
+    pub fn build(&self) -> anyhow::Result<Oxlintrc> {
         let mut category = Category20250601::default();
         if let Some(react) = &self.react {
             category = category.with_react(react.clone());
