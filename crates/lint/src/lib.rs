@@ -1,43 +1,42 @@
 #![recursion_limit = "512"]
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    rc::Rc,
-    sync::Arc,
-};
+use std::{fs, path::Path, rc::Rc, sync::Arc};
 
 use config_builder::ConfigBuilder;
-use environments::EnvironmentFlags;
-use miette::{miette, NamedSource};
+use file_diagnostic::FileDiagnostic;
+use miette::miette;
 use oxc_allocator::Allocator;
 use oxc_diagnostics::OxcDiagnostic;
-use oxc_linter::{ConfigStoreBuilder, FixKind, FrameworkFlags, LintOptions, Oxlintrc};
+use oxc_linter::{ConfigStoreBuilder, FixKind, FrameworkFlags, LintOptions};
 use oxc_parser::Parser;
 use oxc_semantic::SemanticBuilder;
 
-use serde_json::{Map, Value};
-use std::borrow::Cow;
-
 pub mod config_builder;
 pub mod environments;
+pub mod file_diagnostic;
 pub mod lint_mode;
+pub mod named_source;
 pub mod rules;
 
 pub struct Linter {
     config_builder: ConfigBuilder,
+    file_diagnostics: Vec<FileDiagnostic>,
 }
 
 impl Default for Linter {
     fn default() -> Self {
         Self {
             config_builder: ConfigBuilder::default(),
+            file_diagnostics: Vec::new(),
         }
     }
 }
 
 impl From<ConfigBuilder> for Linter {
     fn from(config_builder: ConfigBuilder) -> Self {
-        Self { config_builder }
+        Self {
+            config_builder,
+            file_diagnostics: Vec::new(),
+        }
     }
 }
 
@@ -61,7 +60,11 @@ impl Linter {
         }
     }
 
-    pub fn render_report(&self, source_code: NamedSource<String>, diagnostic: &OxcDiagnostic) {
+    pub fn render_report(
+        &self,
+        source_code: miette::NamedSource<String>,
+        diagnostic: &OxcDiagnostic,
+    ) -> String {
         let url = diagnostic
             .url
             .as_ref()
@@ -106,21 +109,25 @@ impl Linter {
             labels = labels,
             help = help,
             "{}/{}: {}",
-            scope.unwrap_or_default(),
-            number.unwrap_or_default(),
+            scope.as_ref().unwrap_or(&String::new()),
+            number.as_ref().unwrap_or(&String::new()),
             diagnostic.message
         )
         .with_source_code(source_code);
 
         eprintln!("{:?}", report);
+
+        // println!("{}", diagnostic.message);
+
+        format!(
+            "{}/{}",
+            scope.unwrap_or_default(),
+            number.unwrap_or_default()
+        )
     }
 
-    pub fn lint<P: AsRef<Path>>(&self, path: P) -> anyhow::Result<()> {
-        let path = path.as_ref();
-
-        let Ok(source_code) = std::fs::read_to_string(&path) else {
-            return Err(anyhow::anyhow!("Failed to read file: {}", path.display()));
-        };
+    pub fn lint<P: AsRef<Path>>(&self, path: P) -> anyhow::Result<FileDiagnostic> {
+        let named_source = named_source::PathWithSource::try_from(path)?;
 
         let rc = self.config_builder.build()?;
 
@@ -139,8 +146,8 @@ impl Linter {
         );
 
         let allocator = Allocator::default();
-        let source_type = self.source_type_from_path(&path);
-        let parser = Parser::new(&allocator, &source_code, source_type);
+        let source_type = self.source_type_from_path(&named_source.file_path);
+        let parser = Parser::new(&allocator, &named_source.source_code, source_type);
         let parser_return = parser.parse();
         let program = allocator.alloc(&parser_return.program);
         let semantic_builder_return = SemanticBuilder::new()
@@ -149,30 +156,36 @@ impl Linter {
             .build(program);
         let semantic = semantic_builder_return.semantic;
         let module_record = Arc::new(oxc_linter::ModuleRecord::new(
-            &path,
+            Path::new(&named_source.file_path),
             &parser_return.module_record,
             &semantic,
         ));
         let semantic = Rc::new(semantic);
-        let res = lint.run(&path, semantic, module_record);
+        let res = lint.run(Path::new(&named_source.file_path), semantic, module_record);
 
-        let mut errors = 0;
-        let mut warnings = 0;
+        let diag = FileDiagnostic {
+            path_with_source: named_source.clone(),
+            diagnostics: res.into_iter().map(|msg| msg.error).collect(),
+        };
 
-        for message in res {
-            if message.error.severity == oxc_diagnostics::Severity::Error {
-                errors += 1;
-            } else {
-                warnings += 1;
+        self.custom_render_report(&diag);
+
+        Ok(diag)
+    }
+
+    pub fn custom_render_report(&self, diagnostic: &FileDiagnostic) {
+        if !diagnostic.diagnostics.is_empty() {
+            let handler = oxc_diagnostics::GraphicalReportHandler::new().with_links(true);
+            let mut output = String::with_capacity(1024 * 1024);
+
+            let named_source: oxc_diagnostics::NamedSource<String> =
+                diagnostic.path_with_source.clone().into();
+
+            for diag in &diagnostic.diagnostics {
+                let diag = diag.clone().with_source_code(named_source.clone());
+                handler.render_report(&mut output, diag.as_ref()).unwrap();
             }
-
-            let source = NamedSource::new(path.to_string_lossy().to_string(), source_code.clone());
-            self.render_report(source, &message.error);
+            eprintln!("{}", output);
         }
-
-        println!("errors count: {}", errors);
-        println!("warnings count: {}", warnings);
-
-        Ok(())
     }
 }

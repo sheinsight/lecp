@@ -1,6 +1,7 @@
 #![recursion_limit = "512"]
 use std::{env::current_dir, fs, path::Path, time::Instant};
 
+use anyhow::Result;
 use lint::{
     config_builder::ConfigBuilder,
     environments::{Environment, EnvironmentFlags},
@@ -12,11 +13,11 @@ use lint::{
 };
 
 use miette::{miette, LabeledSpan};
-
 use ptree::{
     print_config::{ASCII_CHARS_TICK, UTF_CHARS, UTF_CHARS_BOLD},
     print_tree_with, write_tree_with, Color, PrintConfig, Style, TreeBuilder,
 };
+use std::fmt::Write;
 
 use serde_json::Map;
 use walk_parallel::WalkParallel;
@@ -114,11 +115,11 @@ fn test_tree() -> std::io::Result<()> {
 }
 
 fn walk_lint() {
-    init_miette();
+    // init_miette();
 
     let start = Instant::now();
 
-    let cwd = current_dir().unwrap().join("examples/demo-test");
+    let cwd = current_dir().unwrap().join("examples/demo-component");
 
     let walker = WalkParallel::new(&cwd);
 
@@ -129,20 +130,49 @@ fn walk_lint() {
         .with_define(define)
         .with_envs(Environment::WebApp.into())
         .with_typescript(TypescriptConfig::default())
-        .with_react(ReactConfig::default().with_runtime(ReactRuntime::Classic));
+        .with_react(ReactConfig::default().with_runtime(ReactRuntime::Automatic));
 
     let linter = Linter::from(config_builder);
 
     let res = walker
         .walk(|path| {
-            let res = linter.lint(path);
+            let res = linter.lint(path).unwrap();
             Some(res)
         })
         .unwrap();
 
+    let mut map = std::collections::HashMap::new();
+
+    for res in res {
+        res.diagnostics.iter().for_each(|m| {
+            let scope = m.code.scope.clone().unwrap_or_default();
+            let number = m.code.number.clone().unwrap_or_default();
+            let x = format!("{}/{}", scope, number);
+            *map.entry(x).or_insert(0) += 1;
+        });
+    }
+
+    for (key, value) in map {
+        println!("{:>4}: {}", value, key);
+    }
+
+    // .with_theme(oxc_diagnostics::GraphicalTheme::unicode_nocolor());
+    // let mut output = String::with_capacity(1024 * 1024);
+
+    // for res in res {
+    //     let res = res.unwrap();
+    //     linter.custom_render_report(&res);
+    // }
+
     let end = Instant::now();
 
     println!("执行耗时: {:?}", end - start);
+
+    // println!("{}", output);
+
+    let end = Instant::now();
+
+    println!("打印耗时: {:?}", end - start);
 }
 
 fn main() {
