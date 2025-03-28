@@ -19,7 +19,7 @@
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.52.2",
-		"@rspack/core": "1.3.0-beta.1",
+		"@rspack/core": "1.3.0",
 		"@shined/swc-plugin-transform-extensions": "workspace:*",
 		"@shined/swc-plugin-transform-shims": "workspace:*",
 		"@shined/swc-plugin-transform-ts2js": "workspace:*",

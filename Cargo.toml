@@ -1,5 +1,11 @@
 [workspace]
-members = ["crates/transform_define", "crates/transform_ts2js", "crates/transform_extensions", "crates/transform_shims"]
+members = [
+    "crates/transform_define",
+    "crates/transform_ts2js",
+    "crates/transform_extensions",
+    "crates/transform_shims",
+    "crates/bundless",
+]
 
 resolver = "2"
 
@@ -12,6 +18,7 @@ repository   = ""
 rust-version = "1.82"
 
 [workspace.dependencies]
+anyhow     = "1.0.97"
 serde      = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 swc_core   = "16.10.0"
