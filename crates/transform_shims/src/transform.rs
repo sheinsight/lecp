@@ -1,18 +1,14 @@
 use serde::Deserialize;
 use std::collections::HashMap;
-use swc_core::common::util::take::Take;
-use swc_core::ecma::ast::{
-    ImportDecl, ImportNamedSpecifier, ImportSpecifier, ModuleDecl, ModuleItem, Stmt, Str,
-};
-
 use swc_core::{
-    common::DUMMY_SP,
+    common::{util::take::Take, DUMMY_SP},
     ecma::{
         ast::{
-            Decl, Expr, Ident, KeyValuePatProp, MemberProp, MetaPropExpr, MetaPropKind, ObjectPat,
-            ObjectPatProp, Pass, Pat, PropName, VarDeclarator,
+            Decl, Expr, Ident, ImportDecl, ImportNamedSpecifier, ImportSpecifier, KeyValuePatProp,
+            MemberProp, MetaPropExpr, MetaPropKind, ModuleDecl, ModuleItem, ObjectPat,
+            ObjectPatProp, Pass, Pat, PropName, Stmt, VarDeclarator,
         },
-        transforms::testing::test_inline,
+        utils::{quote_ident, quote_str},
         visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
     },
 };
@@ -106,7 +102,8 @@ impl VisitMut for TransformShims {
                             "filename" => CJS_FILENAME,
                             _ => return,
                         };
-                        *e = Expr::Ident(Ident::new_no_ctxt(sym.into(), DUMMY_SP));
+                        *e = quote_ident!(sym).into();
+                        // *e = Ident::new_no_ctxt(sym.into(), DUMMY_SP).into();
                     }
                 }
             }
@@ -220,7 +217,7 @@ impl VisitMut for TransformShims {
                     imported: None,
                     is_type_only: false,
                 })],
-                src: Box::new(Str { span: DUMMY_SP, value: "node:url".into(), raw: None }),
+                src: Box::new(quote_str!("node:url")),
                 type_only: false,
                 with: None,
                 phase: Default::default(),
@@ -239,115 +236,121 @@ pub fn init(config: Config) -> impl Pass {
     })
 }
 
-test_inline!(
-    Default::default(),
-    |_| init(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
-    fn_shims_esm,
-    r#"
-        console.log(__dirname);
-        console.log(__filename);
-    "#, // Input codes,
-    r#"
-        console.log(import.meta.dirname);
-        console.log(import.meta.filename);
-    "# // Output codes after transformed with plugin
-);
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use swc_core::ecma::transforms::testing::test_inline;
 
-test_inline!(
-    Default::default(),
-    |_| init(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
-    fn_shims_esm_legacy,
-    r#"
-        console.log(__dirname);
-        console.log(__filename);
-        export {} // 临时加, 解析为 module
-    "#, // Input codes,
-    r#"
-        import { fileURLToPath } from "node:url";
-        console.log(fileURLToPath(new URL('.', import.meta.url)));
-        console.log(fileURLToPath(import.meta.url));
-        export {}
-    "# // Output codes after transformed with plugin
-);
-
-test_inline!(
-    Default::default(),
-    |_| init(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
-    fn_shims_esm_legacy_2,
-    r#"
-        import { fileURLToPath } from "node:url";
-        console.log(__dirname);
-        console.log(__filename);
-        export {} // 临时加, 解析为 module
-    "#, // Input codes,
-    r#"
-        import { fileURLToPath } from "node:url";
-        console.log(fileURLToPath(new URL('.', import.meta.url)));
-        console.log(fileURLToPath(import.meta.url));
-        export {}
-    "# // Output codes after transformed with plugin
-);
-
-test_inline!(
-    Default::default(),
-    |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
-    fn_shims_cjs,
-    r#"
-        console.log(import.meta.dirname);
-        console.log(import.meta.filename);
-        // console.log(import.meta.url); // 无需处理, swc 支持转换
-    "#, // Input codes,
-    r#"
-        console.log(__dirname);
-        console.log(__filename);
-        // console.log(require("url").pathToFileURL(__filename).toString());
-    "# // Output codes after transformed with plugin
-);
-
-test_inline!(
-    Default::default(),
-    |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
-    fn_shims_cjs_2,
-    r#"
-        const { dirname, filename } = {};
-        {
-            const { dirname, filename, url } = import.meta;
-            console.log(dirname);
-            console.log(filename);
-            console.log(url);
-        }
-    "#, // Input codes,
-    r#"
-        const { dirname, filename } = {};
-        {
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
+        fn_shims_esm,
+        r#"
             console.log(__dirname);
             console.log(__filename);
-            console.log(require("url").pathToFileURL(__filename).toString());
-        }
+        "#, // Input codes,
+        r#"
+            console.log(import.meta.dirname);
+            console.log(import.meta.filename);
+        "# // Output codes after transformed with plugin
+    );
 
-    "# // Output codes after transformed with plugin
-);
-
-test_inline!(
-    Default::default(),
-    |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
-    fn_shims_cjs_3,
-    r#"
-        const d1 = "1"; const f1 = "2";
-        {
-            const { dirname: d1, filename: f1, url: u1 } = import.meta;
-            console.log(d1);
-            console.log(f1);
-            console.log(u1);
-        }
-    "#, // Input codes,
-    r#"
-        const d1 = "1"; const f1 = "2";
-        {
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
+        fn_shims_esm_legacy,
+        r#"
             console.log(__dirname);
             console.log(__filename);
-            console.log(require("url").pathToFileURL(__filename).toString());
-        }
+            export {} // 临时加, 解析为 module
+        "#, // Input codes,
+        r#"
+            import { fileURLToPath } from "node:url";
+            console.log(fileURLToPath(new URL('.', import.meta.url)));
+            console.log(fileURLToPath(import.meta.url));
+            export {}
+        "# // Output codes after transformed with plugin
+    );
 
-    "# // Output codes after transformed with plugin
-);
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
+        fn_shims_esm_legacy_2,
+        r#"
+            import { fileURLToPath } from "node:url";
+            console.log(__dirname);
+            console.log(__filename);
+            export {} // 临时加, 解析为 module
+        "#, // Input codes,
+        r#"
+            import { fileURLToPath } from "node:url";
+            console.log(fileURLToPath(new URL('.', import.meta.url)));
+            console.log(fileURLToPath(import.meta.url));
+            export {}
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
+        fn_shims_cjs,
+        r#"
+            console.log(import.meta.dirname);
+            console.log(import.meta.filename);
+            // console.log(import.meta.url); // 无需处理, swc 支持转换
+        "#, // Input codes,
+        r#"
+            console.log(__dirname);
+            console.log(__filename);
+            // console.log(require("url").pathToFileURL(__filename).toString());
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
+        fn_shims_cjs_2,
+        r#"
+            const { dirname, filename } = {};
+            {
+                const { dirname, filename, url } = import.meta;
+                console.log(dirname);
+                console.log(filename);
+                console.log(url);
+            }
+        "#, // Input codes,
+        r#"
+            const { dirname, filename } = {};
+            {
+                console.log(__dirname);
+                console.log(__filename);
+                console.log(require("url").pathToFileURL(__filename).toString());
+            }
+
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
+        fn_shims_cjs_3,
+        r#"
+            const d1 = "1"; const f1 = "2";
+            {
+                const { dirname: d1, filename: f1, url: u1 } = import.meta;
+                console.log(d1);
+                console.log(f1);
+                console.log(u1);
+            }
+        "#, // Input codes,
+        r#"
+            const d1 = "1"; const f1 = "2";
+            {
+                console.log(__dirname);
+                console.log(__filename);
+                console.log(require("url").pathToFileURL(__filename).toString());
+            }
+
+        "# // Output codes after transformed with plugin
+    );
+}

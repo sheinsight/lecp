@@ -1,5 +1,4 @@
 use serde::Deserialize;
-
 use swc_core::ecma::{
     ast::{self, Pass},
     visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
@@ -91,7 +90,7 @@ pub fn init(config: Config) -> impl Pass {
 #[cfg(test)]
 mod tests {
 
-    use super::init;
+    use super::*;
     use swc_core::ecma::transforms::testing::test_inline;
 
     test_inline!(

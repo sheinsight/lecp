@@ -1,6 +1,4 @@
 use serde_json::Value;
-
-use swc_core::ecma::transforms::testing::test_inline;
 use swc_core::{
     common::DUMMY_SP,
     ecma::{
@@ -164,11 +162,16 @@ fn create_expr(value: Value) -> Option<Expr> {
     Some(x)
 }
 
-test_inline!(
-    Default::default(),
-    |_| transform_define(
-        serde_json::from_str(
-            r#"
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use swc_core::ecma::transforms::testing::test_inline;
+
+    test_inline!(
+        Default::default(),
+        |_| transform_define(
+            serde_json::from_str(
+                r#"
             {
                 "STR": "string",
                 "NUM": 0,
@@ -176,11 +179,11 @@ test_inline!(
                 "ARR": [],
                 "OBJ": {}
             }"#
-        )
-        .unwrap()
-    ),
-    fn_ident,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_ident,
+        r#"
         STR;
         NUM;
         BOOL;
@@ -189,7 +192,7 @@ test_inline!(
         NOT_DEF;
         window.aaa = { version: STR };
     "#, // Input codes,
-    r#"
+        r#"
         "string";
         0;
         false;
@@ -198,62 +201,62 @@ test_inline!(
         NOT_DEF;
         window.aaa = { version: "string" };
     "# // Output codes after transformed with plugin
-);
+    );
 
-test_inline!(
-    Default::default(),
-    |_| transform_define(
-        serde_json::from_str(
-            r#"
+    test_inline!(
+        Default::default(),
+        |_| transform_define(
+            serde_json::from_str(
+                r#"
             {
                 "STR": "string"
             }"#
-        )
-        .unwrap()
-    ),
-    fn_import,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_import,
+        r#"
         import { STR } from "pkg1";
         import STR from "pkg1";
         import * as STR from "pkg1";
         STR;
     "#, // Input codes,
-    r#"
+        r#"
         import { STR } from "pkg1";
         import STR from "pkg1";
         import * as STR from "pkg1";
         "string";
     "# // Output codes after transformed with plugin
-);
+    );
 
-test_inline!(
-    Default::default(),
-    |_| transform_define(
-        serde_json::from_str(
-            r#"
+    test_inline!(
+        Default::default(),
+        |_| transform_define(
+            serde_json::from_str(
+                r#"
             {
                 "typeof window":  "object"
             }"#
-        )
-        .unwrap()
-    ),
-    fn_typeof,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_typeof,
+        r#"
         typeof window;
         typeof window === "object";
     "#, // Input codes,
-    r#"
+        r#"
         "object";
         "object" === "object";
     "# // Output codes after transformed with plugin
-);
+    );
 
-// 'process.env.NODE_ENV 被正确转化-字符串参数
-test_inline!(
-    Default::default(),
-    |_| transform_define(
-        serde_json::from_str(
-            r#"
+    // 'process.env.NODE_ENV 被正确转化-字符串参数
+    test_inline!(
+        Default::default(),
+        |_| transform_define(
+            serde_json::from_str(
+                r#"
             {
                 "process.env.NODE_ENV": "production",
                 "process.env.BOOL": true,
@@ -261,11 +264,11 @@ test_inline!(
                 "process.env.ARR": [],
                 "process.env.OBJ": {}
             }"#
-        )
-        .unwrap()
-    ),
-    fn_member_expr,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_member_expr,
+        r#"
         if (process.env.NODE_ENV === "production") console.log(true);
         if (process.env.NODE_ENV) console.log(true);
 
@@ -281,7 +284,7 @@ test_inline!(
         if (process.env.OBJ === "production") console.log(true);
         if (process.env.OBJ) console.log(true);
     "#, // Input codes,
-    r#"
+        r#"
         if ("production" === "production") console.log(true);
         if ("production") console.log(true);
 
@@ -297,14 +300,14 @@ test_inline!(
         if (({}) === "production") console.log(true);
         if ({}) console.log(true);
     "# // Output codes after transformed with plugin
-);
+    );
 
-// 'process.env.NODE_ENV 被正确转化-对象参数
-test_inline!(
-    Default::default(),
-    |_| transform_define(
-        serde_json::from_str(
-            r#"
+    // 'process.env.NODE_ENV 被正确转化-对象参数
+    test_inline!(
+        Default::default(),
+        |_| transform_define(
+            serde_json::from_str(
+                r#"
             {
                 "process": {
                     "env": {
@@ -316,11 +319,11 @@ test_inline!(
                     }
                 }
             }"#,
-        )
-        .unwrap()
-    ),
-    fn_member_expr2,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_member_expr2,
+        r#"
         if (process.env.NODE_ENV === "production") console.log(true);
         if (process.env.NODE_ENV) console.log(true);
 
@@ -336,7 +339,7 @@ test_inline!(
         if (process.env.OBJ === "production") console.log(true);
         if (process.env.OBJ) console.log(true);
     "#, // Input codes,
-    r#"
+        r#"
         if ("production" === "production") console.log(true);
         if ("production") console.log(true);
 
@@ -352,4 +355,5 @@ test_inline!(
         if (({}) === "production") console.log(true);
         if ({}) console.log(true);
     "# // Output codes after transformed with plugin
-);
+    );
+}

@@ -3,7 +3,6 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use swc_core::ecma::{
     ast::{self, Pass},
-    transforms::testing::test_inline,
     visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
 };
 
@@ -95,104 +94,110 @@ pub fn init(config: Config) -> impl Pass {
     visit_mut_pass(RewriteImportingExtensions { config })
 }
 
-test_inline!(
-    Default::default(),
-    |_| init(
-        serde_json::from_str(
-            r#"
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use swc_core::ecma::transforms::testing::test_inline;
+
+    test_inline!(
+        Default::default(),
+        |_| init(
+            serde_json::from_str(
+                r#"
             {
                 "extensions": {
                     ".js": ".cjs",
                     ".mjs": ".cjs"
                 }
             }"#
-        )
-        .unwrap()
-    ),
-    fn_esm2cjs,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_esm2cjs,
+        r#"
         import a from "./a.js";
         import b from "./b.mjs";
     "#, // Input codes,
-    r#"
+        r#"
         import a from "./a.cjs";
         import b from "./b.cjs";
     "# // Output codes after transformed with plugin
-);
+    );
 
-test_inline!(
-    Default::default(),
-    |_| init(
-        serde_json::from_str(
-            r#"
+    test_inline!(
+        Default::default(),
+        |_| init(
+            serde_json::from_str(
+                r#"
             {
                 "extensions": {
                     ".js": ".js",
                     ".mjs": ".js"
                 }
             }"#
-        )
-        .unwrap()
-    ),
-    fn_esm2esm,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_esm2esm,
+        r#"
         import a from "./a.js";
         import b from "./b.mjs";
     "#, // Input codes,
-    r#"
+        r#"
         import a from "./a.js";
         import b from "./b.js";
     "# // Output codes after transformed with plugin
-);
+    );
 
-test_inline!(
-    Default::default(),
-    |_| init(
-        serde_json::from_str(
-            r#"
+    test_inline!(
+        Default::default(),
+        |_| init(
+            serde_json::from_str(
+                r#"
             {
                 "extensions": {
                     ".cjs": ".mjs",
                     ".js": ".mjs"
                 }
             }"#
-        )
-        .unwrap()
-    ),
-    fn_cjs2esm,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_cjs2esm,
+        r#"
         import a from "./a.cjs";
         import b from "./b.js";
     "#, // Input codes,
-    r#"
+        r#"
         import a from "./a.mjs";
         import b from "./b.mjs";
     "# // Output codes after transformed with plugin
-);
+    );
 
-test_inline!(
-    Default::default(),
-    |_| init(
-        serde_json::from_str(
-            r#"
+    test_inline!(
+        Default::default(),
+        |_| init(
+            serde_json::from_str(
+                r#"
             {
                 "extensions": {
                     ".cjs": ".js",
                     ".js": ".js"
                 }
             }"#
-        )
-        .unwrap()
-    ),
-    fn_cjs2cjs,
-    r#"
+            )
+            .unwrap()
+        ),
+        fn_cjs2cjs,
+        r#"
         import a from "./a.cjs";
         import b from "./b.js";
         // import c from "./c";
     "#, // Input codes,
-    r#"
+        r#"
         import a from "./a.js";
         import b from "./b.js";
         // import c from "./c.js";
     "# // Output codes after transformed with plugin
-);
+    );
+}
