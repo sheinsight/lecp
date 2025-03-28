@@ -28,10 +28,7 @@ fn replace_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
     }
 
     // with extension
-    let ext = config
-        .extensions
-        .iter()
-        .find(|(key, _)| src.value.ends_with(*key));
+    let ext = config.extensions.iter().find(|(key, _)| src.value.ends_with(*key));
 
     if let Some((key, ext)) = ext {
         if let Some(name) = src.value.strip_suffix(key) {

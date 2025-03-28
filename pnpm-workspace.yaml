@@ -4,16 +4,21 @@ packages:
 - 'examples/*'
 
 catalog:
-  typescript: ^5.7.3
+  typescript: ^5.8.2
 
-  '@types/node': ^22.13.1
+  '@types/node': ^22.13.13
 
   # react
   react: &react ^19.0.0
   'react-dom': *react
-  '@types/react': ^19.0.8
-  '@types/react-dom': ^19.0.3
+  '@types/react': ^19.0.12
+  '@types/react-dom': ^19.0.4
 
   # vitest
-  vitest: &vitest "^3.0.6"
+  vitest: &vitest "^3.0.9"
   '@vitest/coverage-v8': *vitest
+
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - '@swc/core'
+  - esbuild

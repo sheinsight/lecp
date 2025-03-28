@@ -20,10 +20,7 @@ pub struct TransformDefine {
 
 impl TransformDefine {
     pub fn new(options: Value) -> Self {
-        Self {
-            options,
-            ..Default::default()
-        }
+        Self { options, ..Default::default() }
     }
 }
 
@@ -77,11 +74,7 @@ impl VisitMut for TransformDefine {
             // 从 path 中取值 (like lodash.get)
             if value.is_null() {
                 path.iter().for_each(|p: &String| {
-                    value = if value.is_null() {
-                        &self.options[p]
-                    } else {
-                        &value[p]
-                    };
+                    value = if value.is_null() { &self.options[p] } else { &value[p] };
                 });
             }
 
@@ -148,12 +141,7 @@ fn create_expr(value: Value) -> Option<Expr> {
             span: DUMMY_SP,
             elems: arr
                 .into_iter()
-                .filter_map(|v| {
-                    create_expr(v)
-                        .map(Box::new)
-                        .map(ExprOrSpread::from)
-                        .map(Some)
-                })
+                .filter_map(|v| create_expr(v).map(Box::new).map(ExprOrSpread::from).map(Some))
                 .collect(),
         }
         .into(),
@@ -163,10 +151,7 @@ fn create_expr(value: Value) -> Option<Expr> {
                 .into_iter()
                 .filter_map(|(k, v)| {
                     create_expr(v)
-                        .map(|v| KeyValueProp {
-                            key: PropName::Str(k.into()),
-                            value: Box::new(v),
-                        })
+                        .map(|v| KeyValueProp { key: PropName::Str(k.into()), value: Box::new(v) })
                         .map(Prop::KeyValue)
                         .map(Box::new)
                         .map(PropOrSpread::Prop)

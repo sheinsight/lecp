@@ -134,8 +134,7 @@ impl VisitMut for TransformShims {
                         }
 
                         ObjectPatProp::Assign(assign) => {
-                            self.id_map
-                                .insert(assign.key.to_string(), assign.key.sym.to_string());
+                            self.id_map.insert(assign.key.to_string(), assign.key.sym.to_string());
                         }
                         _ => return,
                     });
@@ -221,11 +220,7 @@ impl VisitMut for TransformShims {
                     imported: None,
                     is_type_only: false,
                 })],
-                src: Box::new(Str {
-                    span: DUMMY_SP,
-                    value: "node:url".into(),
-                    raw: None,
-                }),
+                src: Box::new(Str { span: DUMMY_SP, value: "node:url".into(), raw: None }),
                 type_only: false,
                 with: None,
                 phase: Default::default(),

@@ -5,7 +5,15 @@
 		"source.organizeImports.biome": "explicit"
 		// "source.fixAll.biome": "explicit"
 	},
-	"editor.defaultFormatter": "biomejs.biome",
 	"typescript.tsdk": "node_modules/typescript/lib",
-	"references.preferredLocation": "peek"
+	"references.preferredLocation": "peek",
+	"editor.defaultFormatter": "biomejs.biome",
+	"[rust]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "rust-lang.rust-analyzer"
+	},
+	"[toml]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "tamasfe.even-better-toml"
+	}
 }

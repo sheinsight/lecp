@@ -12,12 +12,8 @@ pub struct Config {
     pub preserve_import_extension: bool,
 }
 
-const TS_EXTENSIONS: [(&str, &str); 4] = [
-    (".ts", ".js"),
-    (".tsx", ".js"),
-    (".mts", ".mjs"),
-    (".cts", ".cjs"),
-];
+const TS_EXTENSIONS: [(&str, &str); 4] =
+    [(".ts", ".js"), (".tsx", ".js"), (".mts", ".mjs"), (".cts", ".cjs")];
 
 fn replace_ts_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
     if !src.value.starts_with('.') {
@@ -27,14 +23,9 @@ fn replace_ts_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
     let path = &src.value;
     TS_EXTENSIONS.iter().find_map(|(ts_ext, js_ext)| {
         if path.ends_with(ts_ext) && !path.ends_with(&format!(".d{}", ts_ext)) {
-            let ext = if config.preserve_import_extension {
-                js_ext
-            } else {
-                ".js"
-            };
+            let ext = if config.preserve_import_extension { js_ext } else { ".js" };
 
-            path.strip_suffix(ts_ext)
-                .map(|file| format!("{}{}", file, ext).into())
+            path.strip_suffix(ts_ext).map(|file| format!("{}{}", file, ext).into())
         } else {
             None
         }
