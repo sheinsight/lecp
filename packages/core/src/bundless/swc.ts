@@ -112,11 +112,11 @@ export const getSwcOptions = (
 			require.resolve("@shined/swc-plugin-transform-extensions"),
 			{
 				extensions: {
-					".js": outJsExt,
-					".mjs": outJsExt,
-					".cjs": outJsExt,
+					"js": outJsExt,
+					"mjs": outJsExt,
+					"cjs": outJsExt,
 					/** lessCompile  */
-					...(css?.lessCompile && { ".less": ".css" }),
+					...(css?.lessCompile && { "less": "css" }),
 				},
 			},
 		]);

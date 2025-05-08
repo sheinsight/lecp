@@ -180,7 +180,7 @@ export const bundlessFiles = async (
 		if (type === "script") {
 			outFile = filePath
 				.replace(/\.(t|j)sx$/, ".js")
-				.replace(/\.(c|m)?(t|j)s$/, outJsExt);
+				.replace(/\.(c|m)?(t|j)s$/, `.${outJsExt}`);
 		}
 
 		if (type === "dts") {
@@ -215,7 +215,7 @@ export const bundlessFiles = async (
 			await compileScript(file, {
 				compile: async file => {
 					const swcOptions = getSwcOptions(
-						{ ...options, outJsExt: isJsx.test(file) ? ".js" : outJsExt },
+						{ ...options, outJsExt: isJsx.test(file) ? "js" : outJsExt },
 						config,
 					);
 
@@ -225,7 +225,7 @@ export const bundlessFiles = async (
 						const { code } = await swcTransformFile(
 							file,
 							getSwcOptions(
-								{ ...options, type: "esm", outJsExt: ".js", resolveDir: true },
+								{ ...options, type: "esm", outJsExt: "js", resolveDir: true },
 								config,
 							),
 						);

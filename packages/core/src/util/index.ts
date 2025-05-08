@@ -65,12 +65,12 @@ export function getOutJsExt(
 	isModule: boolean,
 	format: FormatType,
 ): string {
-	if (!isNode) return ".js";
+	if (!isNode) return "js";
 
-	if (isModule && format === "cjs") return ".cjs";
-	if (!isModule && format === "esm") return ".mjs";
+	if (isModule && format === "cjs") return "cjs";
+	if (!isModule && format === "esm") return "mjs";
 
-	return ".js";
+	return "js";
 }
 
 export function getBrowsersList({ targets }: { targets: Record<string, any> }) {
