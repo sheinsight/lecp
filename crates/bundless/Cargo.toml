@@ -10,6 +10,13 @@ repository.workspace   = true
 rust-version.workspace = true
 
 [dependencies]
-anyhow   = { workspace = true }
-serde    = { workspace = true }
-swc_core = { workspace = true, features = ["base", "ecma_ast", "common"] }
+anyhow     = { workspace = true }
+env_logger = { workspace = true }
+log        = { workspace = true }
+miette     = { workspace = true }
+path-clean = { workspace = true }
+rayon      = { workspace = true }
+serde      = { workspace = true }
+serde_json = { workspace = true }
+swc_core   = { workspace = true, features = ["base", "ecma_ast", "common"] }
+wax        = { workspace = true }

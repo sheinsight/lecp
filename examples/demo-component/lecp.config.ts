@@ -3,10 +3,10 @@ import { defineConfig } from "@shined/lecp";
 export default defineConfig({
 	format: [
 		// swc 自动补后缀 .js
-		{
-			type: "umd",
-			extraCompile: ["immer"],
-		},
+		// {
+		// 	type: "umd",
+		// 	extraCompile: ["immer"],
+		// },
 		{
 			type: "esm",
 		},
