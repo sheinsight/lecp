@@ -5,6 +5,6 @@ export default defineConfig({
 	// dts: true,
 	dts: { mode: "bundless", builder: "ts" },
 	targets: {
-		node: "20.11.0",
+		node: "20.19.0",
 	},
 }) as unknown;

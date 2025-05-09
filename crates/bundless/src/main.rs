@@ -1,4 +1,4 @@
-use anyhow::{Ok, Result};
+use anyhow::Result;
 use log::debug;
 use rayon::prelude::*;
 use serde_json::json;
@@ -8,6 +8,12 @@ use wax::Glob;
 use lecp_bundless::{get_out_file_path, serde_error_to_miette, transform_file, write_file};
 
 fn main() -> Result<()> {
+    miette::set_hook(Box::new(|_| {
+        Box::new(
+            miette::MietteHandlerOpts::new().color(true).unicode(true).terminal_links(true).build(),
+        )
+    }))?;
+
     env_logger::init();
 
     let start_time = std::time::Instant::now();
@@ -75,7 +81,7 @@ fn main() -> Result<()> {
     let config_str = config_json.to_string();
     let options = serde_json::from_str::<Options>(&config_str)
         .map_err(|e| serde_error_to_miette(e, &config_str, "Could not parse swc config"))
-        .unwrap();
+        .map_err(|e| anyhow::anyhow!("{:?}", e))?;
 
     println!("Options: {:#?}", &options);
 

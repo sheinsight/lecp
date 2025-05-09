@@ -125,7 +125,7 @@ mod tests {
     fn test_transform_file() {
         let option_str = r#"{
             "sourceMaps": true,
-            "minify": true
+            "minify": true,
         }"#;
         let options = serde_json::from_str::<Options>(option_str)
             .map_err(|e| serde_error_to_miette(e, option_str, "Could not parse swc options"))
