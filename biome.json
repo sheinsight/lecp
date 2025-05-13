@@ -16,7 +16,8 @@
 		"enabled": true
 	},
 	"formatter": {
-		"enabled": true
+		"enabled": true,
+		"ignore": ["napi/**/npm/**"]
 	},
 	"javascript": {
 		"formatter": {

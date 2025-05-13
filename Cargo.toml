@@ -5,6 +5,7 @@ members = [
     "crates/transform_extensions",
     "crates/transform_shims",
     "crates/bundless",
+    "napi/node_binding",
 ]
 
 resolver = "2"
@@ -18,17 +19,21 @@ repository   = ""
 rust-version = "1.82"
 
 [workspace.dependencies]
-anyhow     = "1.0.98"
-env_logger = "0.11.1"
-log        = "0.4.17"
-miette     = { version = "7.6.0", features = ["fancy"] }
-path-clean = "1.0.1"
-rayon      = "1.10.0"
-serde      = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
-swc_core   = "23.2.0"
-thiserror  = "2.0.12"
-wax        = "0.6.0"
+anyhow        = "1.0.98"
+env_logger    = "0.11.8"
+lecp-bundless = { path = "../lecp-bundless" }
+log           = "0.4.17"
+miette        = { version = "7.6.0", features = ["fancy"] }
+napi          = { version = "3.0.0-alpha", features = ["async"] }
+napi-derive   = { version = "3.0.0-alpha", features = ["type-def"] }
+path-clean    = "1.0.1"
+rayon         = "1.10.0"
+serde         = { version = "1.0.219", features = ["derive"] }
+serde_json    = "1.0.140"
+swc_core      = "24.0.0"
+thiserror     = "2.0.12"
+tokio         = { version = "1.34.0", features = ["fs"] }
+wax           = "0.6.0"
 
 # .cargo/config defines few alias to build plugin.
 # cargo build-wasi ge1.0.219 wasm-wasi32 binary

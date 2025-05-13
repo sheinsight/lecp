@@ -1,0 +1,25 @@
+[package]
+name    = "lecp_node_binding"
+version = "1.0.0"
+
+authors.workspace      = true
+edition.workspace      = true
+homepage.workspace     = true
+license.workspace      = true
+repository.workspace   = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi        = { workspace = true }
+napi-derive = { workspace = true }
+tokio       = { workspace = true, features = ["fs"] }
+
+[build-dependencies]
+napi-build = "2"
+
+# [profile.release]
+# lto   = true
+# strip = "symbols"
