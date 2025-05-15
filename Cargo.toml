@@ -21,7 +21,7 @@ rust-version = "1.82"
 [workspace.dependencies]
 anyhow        = "1.0.98"
 env_logger    = "0.11.8"
-lecp-bundless = { path = "../lecp-bundless" }
+lecp_bundless = { path = "./crates/bundless" }
 log           = "0.4.17"
 miette        = { version = "7.6.0", features = ["fancy"] }
 napi          = { version = "3.0.0-alpha", features = ["async"] }

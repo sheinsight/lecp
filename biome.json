@@ -17,11 +17,19 @@
 	},
 	"formatter": {
 		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
 		"ignore": ["napi/**/npm/**"]
 	},
 	"javascript": {
 		"formatter": {
 			"arrowParentheses": "asNeeded"
+		}
+	},
+	"json": {
+		"formatter": {
+			"trailingCommas": "none",
+			"indentWidth": 4
 		}
 	}
 }

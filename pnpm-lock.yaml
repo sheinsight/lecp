@@ -106,6 +106,15 @@ importers:
         specifier: ^3.0.0-alpha.76
         version: 3.0.0-alpha.78(@emnapi/runtime@1.4.3)(@types/node@22.15.11)
 
+  napi/node_binding:
+    devDependencies:
+      '@napi-rs/cli':
+        specifier: ^3.0.0-alpha.76
+        version: 3.0.0-alpha.78(@emnapi/runtime@1.4.3)(@types/node@22.15.11)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.15.11
+
   packages/core:
     dependencies:
       '@microsoft/api-extractor':

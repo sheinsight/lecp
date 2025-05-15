@@ -43,3 +43,29 @@ pub fn async_task_read_file(path: String) -> AsyncTask<AsyncTaskReadFile> {
 }
 
 // AsyncTask 将同步 api 放到异步中
+
+// bundless_js
+
+pub struct BundlessJsTask {
+    cwd: String,
+}
+
+#[napi]
+impl Task for BundlessJsTask {
+    type Output = ();
+    type JsValue = ();
+
+    fn compute(&mut self) -> Result<Self::Output> {
+        lecp_bundless::bundless_js(&self.cwd)
+            .map_err(|e| Error::new(Status::GenericFailure, format!("{}", e)))
+    }
+
+    fn resolve(&mut self, _: Env, _output: Self::Output) -> Result<Self::JsValue> {
+        Ok(())
+    }
+}
+
+#[napi]
+pub fn bundless_js_async(cwd: String) -> AsyncTask<BundlessJsTask> {
+    AsyncTask::new(BundlessJsTask { cwd })
+}

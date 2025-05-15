@@ -1,5 +1,12 @@
 {
-	"cSpell.words": ["browserlist", "bundless", "lightningcss", "pico", "rspack"],
+	"cSpell.words": [
+		"browserlist",
+		"bundless",
+		"lightningcss",
+		"napi",
+		"pico",
+		"rspack"
+	],
 	"editor.codeActionsOnSave": {
 		"quickfix.biome": "explicit",
 		"source.organizeImports.biome": "explicit"

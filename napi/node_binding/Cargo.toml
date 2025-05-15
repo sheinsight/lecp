@@ -13,9 +13,10 @@ rust-version.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-napi        = { workspace = true }
-napi-derive = { workspace = true }
-tokio       = { workspace = true, features = ["fs"] }
+lecp_bundless = { workspace = true }
+napi          = { workspace = true }
+napi-derive   = { workspace = true }
+tokio         = { workspace = true, features = ["fs"] }
 
 [build-dependencies]
 napi-build = "2"

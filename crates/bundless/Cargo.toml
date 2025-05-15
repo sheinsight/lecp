@@ -1,5 +1,5 @@
 [package]
-name    = "lecp-bundless"
+name    = "lecp_bundless"
 version = "0.1.0"
 
 authors.workspace      = true
