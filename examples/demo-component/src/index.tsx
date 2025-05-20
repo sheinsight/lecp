@@ -1,6 +1,6 @@
 import { produce } from "immer";
 import React from "react";
-import Demo from "./components/Demo";
+import Demo from "@/components/Demo";
 import { sleep } from "./utils";
 
 console.log(produce);
@@ -21,3 +21,37 @@ export const c = async (data: unknown) => {
 export default () => <Demo />;
 
 console.log(React.version);
+
+
+
+
+// "PRODUCTION": "true",
+//  "VERSION": "\"5fa3b9\"",
+//  "BROWSER_SUPPORTS_HTML5": "true",
+//  "TWO": "\"1+1\"",
+//  "typeof window": "\"object\"",
+//  "process.env.NODE_ENV": "\"production\"",
+
+if (process.env.NODE_ENV === "development") {
+	console.log("dev");
+}
+
+if (process.env.NODE_ENV === "production") {
+	console.log("prod");
+}
+
+console.log(VERSION);
+console.log(TWO);
+console.log(BROWSER_SUPPORTS_HTML5);
+
+if (!PRODUCTION) {
+  console.log('Debug info');
+}
+
+if (PRODUCTION) {
+  console.log('Production log');
+}
+
+if (typeof window !== 'undefined')  {
+	  console.log('Browser environment');
+}

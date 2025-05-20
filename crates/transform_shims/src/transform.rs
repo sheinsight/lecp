@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 use swc_core::{
-    common::{util::take::Take, DUMMY_SP},
+    common::{DUMMY_SP, util::take::Take},
     ecma::{
         ast::{
             Decl, Expr, Ident, ImportDecl, ImportNamedSpecifier, ImportSpecifier, KeyValuePatProp,
@@ -9,12 +9,12 @@ use swc_core::{
             ObjectPatProp, Pass, Pat, PropName, Stmt, VarDeclarator,
         },
         utils::{quote_ident, quote_str},
-        visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
+        visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass},
     },
 };
 
 #[derive(Clone, Debug, Deserialize, Default, PartialEq)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "camelCase")]
 pub enum Target {
     #[default]
     UNKNOWN,

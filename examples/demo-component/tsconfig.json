@@ -20,6 +20,13 @@
 		"declaration": true,
 		"declarationMap": true,
 		// react
-		"jsx": "preserve"
+		"jsx": "preserve",
+
+
+		// alias
+		"baseUrl": "./",
+		"paths": {
+			"@/*": ["src/*"]
+		},
 	}
 }

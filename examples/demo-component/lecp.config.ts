@@ -28,4 +28,11 @@ export default defineConfig({
 	targets: {
 		chrome: 55,
 	},
+
+
+	// from tsconfig.json ??
+	alias: {
+		"@": "./src",
+	},
+
 }) as unknown;
