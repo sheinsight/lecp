@@ -474,35 +474,30 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P) -> Result<()> {
         .par_bridge()
         .filter_map(Result::ok)
         .map(|entry| entry.path().to_owned())
-        .map(|path| {
-            let res = transform_file(&path, &swc_options);
+        .try_for_each(|path| -> Result<(), anyhow::Error> {
+            let mut output = transform_file(&path, &swc_options)?;
 
-            res.and_then(|mut output| {
-                // println!("Transforming file: {:?}", output.code);
-                // println!("Transforming file: {:?}", output.map);
-                // println!("Transforming file: {:#?}", output);
+            // write sourcemap
+            let out_path = get_out_file_path(&path, &src_dir, &out_dir, &out_ext)?;
 
-                let out_path = get_out_file_path(&path, &src_dir, &out_dir, &out_ext)?;
+            if let Some(map) = output.map {
+                let map_path = out_path.with_extension(format!("{}.map", out_ext));
+                println!("Writing map file: {:?}", &map_path.strip_prefix(&cwd)?);
 
-                if let Some(map) = output.map {
-                    let map_path = out_path.with_extension(format!("{}.map", out_ext));
-                    println!("Writing map file: {:?}", &map_path.strip_prefix(&cwd)?);
+                output.code.push_str(&format!(
+                    "\n//# sourceMappingURL={}",
+                    &map_path.file_name().unwrap().to_string_lossy()
+                ));
 
-                    output.code.push_str(&format!(
-                        "\n//# sourceMappingURL={}",
-                        &map_path.file_name().unwrap().to_string_lossy()
-                    ));
+                write_file(map_path, map)?;
+            }
 
-                    write_file(map_path, map)?;
-                }
+            // write file
+            println!("Writing     file: {:?}", &out_path.strip_prefix(&cwd)?);
+            write_file(out_path, &output.code)?;
 
-                println!("Writing     file: {:?}", &out_path.strip_prefix(&cwd)?);
-                write_file(out_path, &output.code)?;
-
-                Ok(())
-            })
-        })
-        .collect::<Vec<_>>();
+            Ok(())
+        })?;
 
     Ok(())
 }

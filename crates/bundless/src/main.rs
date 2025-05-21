@@ -12,7 +12,11 @@ fn main() -> Result<()> {
 
     let start_time = std::time::Instant::now();
     let cwd = std::env::current_dir()?.join("./examples/demo-component").canonicalize()?;
-    bundless_js(&cwd)?;
+    let res = bundless_js(&cwd);
+    if let Err(e) = res {
+        eprintln!("\n{:?}", e);
+        std::process::exit(1);
+    }
 
     let end_time = std::time::Instant::now();
     println!("Transforming files took: {} ms", (end_time - start_time).as_millis());
