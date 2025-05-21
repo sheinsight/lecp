@@ -1,53 +1,10 @@
+use lecp_bundless::{BundlessOptions, bundless_js};
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
-use tokio::fs;
-
-#[napi]
-pub fn sum(a: i32, b: i32) -> i32 {
-    a + b
-}
-
-#[napi]
-pub async fn sum_async(a: i32, b: i32) -> Result<i32> {
-    Ok(a + b)
-}
-
-#[napi]
-pub async fn read_file_async(path: String) -> Result<Buffer> {
-    fs::read(&path).await.map(|content| content.into()).map_err(|e| {
-        Error::new(Status::GenericFailure, format!("failed to read file '{}', {}", path, e))
-    })
-}
-
-pub struct AsyncTaskReadFile {
-    path: String,
-}
-
-#[napi]
-impl Task for AsyncTaskReadFile {
-    type Output = Vec<u8>;
-    type JsValue = Buffer;
-
-    fn compute(&mut self) -> Result<Self::Output> {
-        std::fs::read(&self.path).map_err(|e| Error::new(Status::GenericFailure, format!("{}", e)))
-    }
-
-    fn resolve(&mut self, _: Env, output: Self::Output) -> Result<Self::JsValue> {
-        Ok(output.into())
-    }
-}
-
-#[napi]
-pub fn async_task_read_file(path: String) -> AsyncTask<AsyncTaskReadFile> {
-    AsyncTask::new(AsyncTaskReadFile { path })
-}
-
-// AsyncTask 将同步 api 放到异步中
-
-// bundless_js
 
 pub struct BundlessJsTask {
     cwd: String,
+    options: Buffer,
 }
 
 #[napi]
@@ -56,8 +13,12 @@ impl Task for BundlessJsTask {
     type JsValue = ();
 
     fn compute(&mut self) -> Result<Self::Output> {
-        lecp_bundless::bundless_js(&self.cwd)
-            .map_err(|e| Error::new(Status::GenericFailure, format!("{}", e)))
+        let options = match serde_json::from_slice::<BundlessOptions>(self.options.as_ref()) {
+            Ok(opts) => opts,
+            Err(e) => return Err(Error::from_reason(format!("解析选项失败: {}", e))),
+        };
+
+        bundless_js(&self.cwd, &options).map_err(|e| Error::from_reason(format!("构建失败: {}", e)))
     }
 
     fn resolve(&mut self, _: Env, _output: Self::Output) -> Result<Self::JsValue> {
@@ -66,6 +27,6 @@ impl Task for BundlessJsTask {
 }
 
 #[napi]
-pub fn bundless_js_async(cwd: String) -> AsyncTask<BundlessJsTask> {
-    AsyncTask::new(BundlessJsTask { cwd })
+pub fn bundless_js_async(cwd: String, options: Buffer) -> AsyncTask<BundlessJsTask> {
+    AsyncTask::new(BundlessJsTask { cwd, options })
 }

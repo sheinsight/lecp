@@ -16,10 +16,12 @@ crate-type = ["cdylib"]
 lecp_bundless = { workspace = true }
 napi          = { workspace = true }
 napi-derive   = { workspace = true }
+serde         = { workspace = true }
+serde_json    = { workspace = true }
 tokio         = { workspace = true, features = ["fs"] }
 
 [build-dependencies]
-napi-build = "2"
+napi-build = "2.2.0"
 
 # [profile.release]
 # lto   = true

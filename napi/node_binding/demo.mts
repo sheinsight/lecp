@@ -1,33 +1,7 @@
 // ------------------------------------------------------
 import path from "path";
-import { asyncTaskReadFile, readFileAsync, sum, sumAsync,bundlessJsAsync } from "./index.js";
+import { bundlessJsAsync } from "./index.js";
 
-const a = sum(1, 2);
-console.log(a); // 3
-
-sumAsync(1, 2)
-	.then(result => {
-		console.log(result); // 3
-	})
-	.catch(error => {
-		console.error(error);
-	});
-
-readFileAsync("demo.mts")
-	.then(data => {
-		console.log("content", data.toString());
-	})
-	.catch(error => {
-		console.error(error);
-	});
-
-asyncTaskReadFile("demo.mts")
-	.then(data => {
-		console.log("content", data.toString());
-	})
-	.catch(error => {
-		console.error(error);
-	});
 
 (async () => {
 
@@ -36,12 +10,42 @@ asyncTaskReadFile("demo.mts")
 		// 切换 cwd 到 examples/demo-component
 		console.log("cwd", process.cwd());
 		const cwd = path.resolve(process.cwd(),"../../examples/demo-component");
-		await bundlessJsAsync(cwd);
-		performance.mark("end");
+		const options = {
+			"format": "cjs",
+			"cwd": cwd,
+			"targets": {
+				"chrome": "55"
+			},
+			"define": {
+				"PRODUCTION": "\"true\"",
+				"VERSION": "\"5fa3b9\"",
+				"BROWSER_SUPPORTS_HTML5": "\"true\"",
+				"typeof window": "\"object\"",
+				"process.env.NODE_ENV": "\"production\""
+			},
+			"shims": {
+				"legacy": true
+			},
+			"sourceMap": true,
+			"minify": true,
+			"react": {
+				"jsx_runtime": "automatic"
+			},
+			"css": {
+				"css_modules": "[name]_[local]_[hash:base64:5]",
+				"less_compile": true
+			},
+		}
+
+		await bundlessJsAsync(cwd, Buffer.from(JSON.stringify(options)));
+
 		console.log("bundlessJsAsync success");
 	} catch (error) {
-		console.log("bundlessJsAsync error", error);
+		console.log("bundlessJsAsync error");
+		console.log(error);
 
+	} finally {
+		performance.mark("end");
 	}
 
 	const measure = performance.measure("bundlessJsAsync", "start", "end");
