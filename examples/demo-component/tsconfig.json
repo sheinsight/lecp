@@ -22,11 +22,10 @@
 		// react
 		"jsx": "preserve",
 
-
 		// alias
 		"baseUrl": "./",
 		"paths": {
 			"@/*": ["src/*"]
-		},
+		}
 	}
 }

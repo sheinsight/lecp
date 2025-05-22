@@ -22,9 +22,6 @@ export default () => <Demo />;
 
 console.log(React.version);
 
-
-
-
 // "PRODUCTION": "true",
 //  "VERSION": "\"5fa3b9\"",
 //  "BROWSER_SUPPORTS_HTML5": "true",
@@ -45,13 +42,13 @@ console.log(TWO);
 console.log(BROWSER_SUPPORTS_HTML5);
 
 if (!PRODUCTION) {
-  console.log('Debug info');
+	console.log("Debug info");
 }
 
 if (PRODUCTION) {
-  console.log('Production log');
+	console.log("Production log");
 }
 
-if (typeof window !== 'undefined')  {
-	  console.log('Browser environment');
+if (typeof window !== "undefined") {
+	console.log("Browser environment");
 }

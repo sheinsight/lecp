@@ -16,8 +16,8 @@
 	},
 	"devDependencies": {
 		"@shined/lecp": "workspace:*",
-		"@swc/cli": "^0.7.3",
-		"@swc/core": "1.11.24",
+		"@swc/cli": "^0.7.7",
+		"@swc/core": "1.11.29",
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
 		"react": "catalog:",
