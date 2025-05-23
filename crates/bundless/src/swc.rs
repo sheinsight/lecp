@@ -1,11 +1,13 @@
 use anyhow::{Context, Result};
-use log::debug;
-use std::{fs, path::Path, sync::Arc};
+use log::{debug, log};
+use std::{path::Path, sync::Arc};
 use swc_core::base::config::Options;
 use swc_core::{
     base::{Compiler, TransformOutput, try_with_handler},
     common::{FileName, GLOBALS, SourceMap},
 };
+
+use crate::util::write_file;
 
 // !options.config.error.filename -> skip_filename:true
 // handler config
@@ -47,81 +49,9 @@ pub fn transform_file(file: &Path, options: &Options) -> Result<TransformOutput>
         .map_err(|e| e.to_pretty_error())
 }
 
-pub fn transform_write_file(
-    path: &Path,
-    swc_options: &Options,
-    src_dir: &Path,
-    out_dir: &Path,
-    out_ext: &str,
-    cwd: &Path,
-) -> Result<()> {
-    // 转换文件
-    let mut output = transform_file(path, swc_options)?;
-
-    // 获取输出路径
-    let out_path = get_out_file_path(path, src_dir, out_dir, out_ext)?;
-
-    // 处理 sourcemap
-    if let Some(map) = output.map {
-        let map_path = out_path.with_extension(format!("{}.map", out_ext));
-        println!("Writing map file: {:?}", &map_path.strip_prefix(cwd)?);
-
-        output.code.push_str(&format!(
-            "\n//# sourceMappingURL={}",
-            &map_path.file_name().unwrap().to_string_lossy()
-        ));
-
-        write_file(map_path, map)?;
-    }
-
-    // 写入文件
-    println!("Writing     file: {:?}", &out_path.strip_prefix(cwd)?);
-    write_file(out_path, &output.code)?;
-
-    Ok(())
-}
-
-pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
-    path: P1,
-    src_dir: P2,
-    out_dir: P3,
-    js_ext: &str,
-) -> Result<std::path::PathBuf> {
-    let path = path.as_ref();
-    let src_dir = src_dir.as_ref();
-    let out_dir = out_dir.as_ref();
-
-    let out_ext = path
-        .extension()
-        .and_then(|ext| ext.to_str())
-        .map(|ext| match ext {
-            "ts" | "tsx" | "js" | "jsx" => js_ext,
-            _ => ext,
-        })
-        .unwrap_or("js"); // 如果没有扩展名，默认使用 .js
-
-    // src/utils/index.js -> dist
-    let rel_path = path.strip_prefix(src_dir)?;
-    let out_path = out_dir.join(rel_path.with_extension(out_ext));
-
-    debug!("out_path: {:?}", out_path);
-
-    Ok(out_path)
-}
-
-pub fn write_file<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, content: C) -> Result<()> {
-    let path = path.as_ref();
-
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)?;
-    }
-
-    fs::write(path, content)?;
-
-    Ok(())
-}
-
 pub fn transform(code: String, options: &Options) -> Result<TransformOutput> {
+    println!("11111 transform code ");
+
     let cm = Arc::<SourceMap>::default(); // cm -> code map
     let compiler = Compiler::new(cm.clone());
 
@@ -142,6 +72,31 @@ pub fn transform(code: String, options: &Options) -> Result<TransformOutput> {
             })
         })
         .map_err(|e| e.to_pretty_error())
+}
+
+pub fn write_file_and_sourcemap(output: TransformOutput, out_path: &Path) -> Result<()> {
+    let mut code = output.code;
+    // 处理 sourcemap
+    if let Some(map) = output.map {
+        let out_ext = out_path.extension().unwrap_or_default();
+        let map_path = out_path.with_extension(format!("{}.map", out_ext.to_string_lossy()));
+        // println!("Writing map file: {:?}", &map_path.strip_prefix(cwd)?);
+        println!("Writing map file: {:?}", &map_path);
+
+        code.push_str(&format!(
+            "\n//# sourceMappingURL={}",
+            &map_path.file_name().unwrap().to_string_lossy()
+        ));
+
+        write_file(map_path, map)?;
+    }
+
+    // 写入文件
+    // println!("Writing     file: {:?}", &out_path.strip_prefix(cwd)?);
+    println!("Writing     file: {:?}", &out_path);
+    write_file(out_path, code)?;
+
+    Ok(())
 }
 
 #[cfg(test)]

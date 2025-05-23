@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use swc_core::base::config::Options;
 
-use crate::serde_error_to_miette;
+use crate::{get_out_ext, serde_error_to_miette};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -66,7 +66,7 @@ pub enum ModuleType {
     #[default]
     Esm,
     Cjs,
-    Umd,
+    // Umd,
 }
 
 impl ModuleType {
@@ -74,7 +74,7 @@ impl ModuleType {
         match self {
             ModuleType::Esm => "es6".to_string(),
             ModuleType::Cjs => "commonjs".to_string(),
-            ModuleType::Umd => "umd".to_string(),
+            // ModuleType::Umd => "umd".to_string(),
         }
     }
 }
@@ -118,18 +118,32 @@ pub struct Define {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BundlessOptions {
+    #[serde(default = "default_cwd")]
     cwd: PathBuf,
-    format: ModuleType,
+    pub format: ModuleType,
     source_map: bool,
     minify: bool,
     targets: serde_json::Value,
     shims: Shims,
     external_helpers: Option<bool>,
     #[serde(default = "default_alias")]
-    alias: Option<Alias>,
+    pub alias: Option<Alias>,
     define: Option<Define>,
     css: Option<CSS>,
     react: React,
+
+    #[serde(default)]
+    pub out_ext: String,
+
+    #[serde(default)]
+    pub exclude: Vec<String>,
+    #[serde(default)]
+    pub out_dir: Option<PathBuf>,
+    #[serde(default)]
+    pub src_dir: Option<PathBuf>,
+
+    #[serde(default)]
+    is_module: bool,
 }
 
 fn default_cwd() -> PathBuf {
@@ -147,8 +161,9 @@ fn default_jsx_runtime() -> Option<JsxRuntime> {
 
 impl Default for BundlessOptions {
     fn default() -> Self {
+        let cwd = default_cwd();
         Self {
-            cwd: default_cwd(),
+            cwd: cwd.clone(),
             format: Default::default(),
             source_map: Default::default(),
             minify: Default::default(),
@@ -159,6 +174,11 @@ impl Default for BundlessOptions {
             external_helpers: Default::default(),
             css: Default::default(),
             react: Default::default(),
+            exclude: vec![],
+            out_dir: Default::default(),
+            out_ext: "js".to_string(),
+            src_dir: Default::default(),
+            is_module: Default::default(),
         }
     }
 }
@@ -219,6 +239,31 @@ impl BundlessOptions {
         self
     }
 
+    pub fn is_module(mut self, is_module: bool) -> Self {
+        self.is_module = is_module;
+        self
+    }
+
+    pub fn out_dir(&self) -> PathBuf {
+        self.out_dir.clone().unwrap_or_else(|| self.cwd.join("dist"))
+    }
+
+    pub fn src_dir(&self) -> PathBuf {
+        self.src_dir.clone().unwrap_or_else(|| self.cwd.join("src"))
+    }
+
+    pub fn out_ext(&self) -> String {
+        get_out_ext(self, self.is_module)
+    }
+
+    pub fn is_default_format(&self) -> bool {
+        match (&self.format, &self.is_module) {
+            (ModuleType::Esm, true) => true,
+            (ModuleType::Cjs, false) => true,
+            _ => false,
+        }
+    }
+
     pub fn build_for_swc(&self) -> Result<Options> {
         let config_json = json!({
             "swcrc": false,
@@ -270,6 +315,10 @@ impl BundlessOptions {
         })
     }
 
+    pub fn is_node(&self) -> bool {
+        self.targets.get("node").is_some()
+    }
+
     fn get_plugins(&self) -> Vec<serde_json::Value> {
         let mut plugins = vec![];
         plugins.push(json!(["@shined/swc-plugin-transform-ts2js", {}]));
@@ -279,7 +328,7 @@ impl BundlessOptions {
         // - 修正 type:module 省略的 .cjs/.mjs 后缀
         // - 修正 less 编译导致的 .less -> .css 后缀
         let mut extensions = serde_json::Map::new();
-        let js_ext = "js";
+        let js_ext = "js"; //
         extensions.insert("js".to_string(), json!(js_ext));
         extensions.insert("mjs".to_string(), json!(js_ext));
         extensions.insert("cjs".to_string(), json!(js_ext));

@@ -225,7 +225,7 @@ export const bundlessFiles = async (
 						const { code } = await swcTransformFile(
 							file,
 							getSwcOptions(
-								{ ...options, type: "esm", outJsExt: "js", resolveDir: true },
+								{ ...options, type: "esm", outJsExt: "js", shims: undefined },
 								config,
 							),
 						);

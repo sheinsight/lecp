@@ -1,40 +1,116 @@
 mod options;
 mod swc;
 mod util;
-pub use crate::options::{BundlessOptions, CSS, Define, JsxRuntime, React, Shims};
-use crate::swc::transform_write_file;
+pub use crate::options::{BundlessOptions, CSS, Define, JsxRuntime, ModuleType, React, Shims};
 pub use crate::util::serde_error_to_miette;
 
 use anyhow::Result;
+use log::debug;
 use rayon::prelude::*;
 use std::path::Path;
+use swc::{transform, transform_file, write_file_and_sourcemap};
 use wax::Glob;
+
+/**
+ * |     | module | commonjs |
+ * | --- | ------ | -------- |
+ * | esm | .js     | .mjs    |
+ * | cjs | .cjs    | .js     |
+ *
+ * @description
+ * - target: browser 不处理后缀
+ * - target: node 处理后缀
+ * - is_module: package.json type
+ */
+fn get_out_ext(options: &BundlessOptions, is_module: bool) -> String {
+    println!("is_node: {:?}", options.is_node());
+    if !options.is_node() {
+        return "js".to_string();
+    }
+
+    match (&options.format, is_module) {
+        (ModuleType::Esm, false) => "mjs",
+        (ModuleType::Cjs, true) => "cjs",
+        _ => "js",
+    }
+    .to_string()
+}
+
+// cwd: /demo
+// path: /demo/src/utils/index.ts
+// src_dir: /demo/src
+// out_dir: /demo/dist
+// out_path: /demo/dist/utils/index.js
+pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
+    path: P1,
+    src_dir: P2,
+    out_dir: P3,
+    out_ext: &str,
+) -> Result<std::path::PathBuf> {
+    let path = path.as_ref();
+    let src_dir = src_dir.as_ref();
+    let out_dir = out_dir.as_ref();
+
+    // "jsx" | "tsx" => "js",
+    let is_jsx_file = path.extension().map_or(false, |ext| ext == "jsx" || ext == "tsx");
+    let out_ext = if is_jsx_file { "js" } else { out_ext };
+
+    let rel_path = path.strip_prefix(src_dir)?;
+    let out_path = out_dir.join(rel_path.with_extension(out_ext));
+
+    debug!("out_path: {:?}", out_path);
+
+    Ok(out_path)
+}
 
 pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<()> {
     let cwd = cwd.as_ref();
     println!("Bundless CLI: {:?}", cwd);
 
-    println!("bundless raw options: {:#?}", &options);
+    let src_dir = options.src_dir();
+    let out_dir = options.out_dir();
 
-    let src_dir = cwd.join("src");
-    let out_dir = cwd.join("dist");
-
-    let out_ext = String::from("cjs"); //
+    let out_ext = options.out_ext();
+    let is_default_format = options.is_default_format();
 
     let swc_options = options.build_for_swc()?;
 
     // println!("bundless default options: {:#?}", BundlessOptions::default());
-    println!("bundless options: {:#?}", &options);
-    // println!("swc options: {:#?}", &swc_options);
+    // println!("bundless options: {:#?}", &options);
+    println!("swc options: {:#?}", &swc_options);
 
-    let glob: Glob<'_> = Glob::new("**/*.{ts,tsx}")?;
+    let ignore = std::iter::once("**/*.d.ts")
+        .chain(options.exclude.iter().map(|s| s.as_str()))
+        .collect::<Vec<_>>();
+
+    debug!("ignore: {:?}", ignore);
+
+    let glob: Glob<'_> = Glob::new("**/*.{ts,tsx,cts,mts,js,jsx,cjs,mjs}")?;
     glob.walk(&src_dir)
-        .not(Glob::new("**/*.d.ts"))?
+        .not(ignore)?
         .par_bridge()
         .filter_map(Result::ok)
         .map(|entry| entry.path().to_owned())
-        .try_for_each(|path| -> Result<(), anyhow::Error> {
-            transform_write_file(&path, &swc_options, &src_dir, &out_dir, &out_ext, cwd)
+        .try_for_each(|path| {
+            let out_path = get_out_file_path(&path, &src_dir, &out_dir, &out_ext)?;
+
+            println!("is_default_format {:?}, alias {:?}", is_default_format, options.alias);
+            // // esm: alias +.ts 后缀 无法同时处理, 需要二次编译
+            if !is_default_format || options.alias.is_some() {
+                let new_options = options
+                    .clone()
+                    .shims(Shims::Boolean(false))
+                    .format(ModuleType::Esm)
+                    .is_module(true);
+                let new_swc_options = new_options.build_for_swc()?;
+
+                let output = transform_file(&path, &new_swc_options)?;
+                let output = transform(output.code, &swc_options)?;
+                return write_file_and_sourcemap(output, &out_path);
+            }
+
+            let output = transform_file(&path, &swc_options)?;
+            write_file_and_sourcemap(output, &out_path)
         })?;
 
     Ok(())

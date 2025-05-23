@@ -56,7 +56,7 @@ fn main() -> Result<()> {
             "legacy": true
         },
         "sourceMap": true,
-        "minify": true,
+        "minify": false,
         "react": {
             "jsx_runtime": "automatic"
         },
@@ -64,6 +64,8 @@ fn main() -> Result<()> {
             "css_modules": "[name]_[local]_[hash:base64:5]",
             "less_compile": true
         },
+        "alias": null,
+        "exclude": [],
     });
 
     let options_str = options_json.to_string();

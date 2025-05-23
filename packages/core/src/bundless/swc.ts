@@ -90,7 +90,6 @@ export const getSwcOptions = (
 		minify,
 		shims,
 		outJsExt,
-		resolveDir,
 		mode,
 	} = options;
 
@@ -121,7 +120,7 @@ export const getSwcOptions = (
 			},
 		]);
 
-		if (shims && !resolveDir) {
+		if (shims) {
 			plugins.push([
 				require.resolve("@shined/swc-plugin-transform-shims"),
 				{ target: format, legacy: shims?.legacy },
