@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use swc_core::ecma::{
     ast::{self, Pass},
-    visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
+    visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass},
 };
 
 #[derive(Clone, Debug, Deserialize, Default)]
@@ -83,7 +83,7 @@ impl VisitMut for RewriteImportExtensions {
     }
 }
 
-pub fn init(config: Config) -> impl Pass {
+pub fn transform(config: Config) -> impl Pass {
     visit_mut_pass(RewriteImportExtensions { config })
 }
 
@@ -95,7 +95,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{}"#).unwrap()),
         fn_ts,
         r#"
             import a from "./foo.ts";
@@ -115,7 +115,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{}"#).unwrap()),
         fn_tsx,
         r#"
             import a from "./foo.tsx";
@@ -135,7 +135,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{}"#).unwrap()),
         fn_js,
         r#"
             import a from "./foo.js";
@@ -155,7 +155,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{}"#).unwrap()),
         fn_mts,
         r#"
             import a from "./foo.mts";
@@ -175,7 +175,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{"preserveImportExtension":true}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{"preserveImportExtension":true}"#).unwrap()),
         fn_mts_preserve,
         r#"
             import a from "./foo.mts";
@@ -195,7 +195,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{}"#).unwrap()),
         fn_cts,
         r#"
             import a from "./foo.cts";
@@ -215,7 +215,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{"preserveImportExtension":true}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{"preserveImportExtension":true}"#).unwrap()),
         fn_cts_preserve,
         r#"
             import a from "./foo.cts";

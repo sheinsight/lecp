@@ -14,7 +14,7 @@ use swc_core::{
 };
 
 #[derive(Clone, Debug, Deserialize, Default, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "lowercase")]
 pub enum Target {
     #[default]
     UNKNOWN,
@@ -228,7 +228,7 @@ impl VisitMut for TransformShims {
     }
 }
 
-pub fn init(config: Config) -> impl Pass {
+pub fn transform(config: Config) -> impl Pass {
     visit_mut_pass(TransformShims {
         config,
         id_map: HashMap::with_capacity(4),
@@ -243,7 +243,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
         fn_shims_esm,
         r#"
             console.log(__dirname);
@@ -257,7 +257,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
         fn_shims_esm_legacy,
         r#"
             console.log(__dirname);
@@ -274,7 +274,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
         fn_shims_esm_legacy_2,
         r#"
             import { fileURLToPath } from "node:url";
@@ -292,7 +292,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
         fn_shims_cjs,
         r#"
             console.log(import.meta.dirname);
@@ -308,7 +308,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
         fn_shims_cjs_2,
         r#"
             const { dirname, filename } = {};
@@ -332,7 +332,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
+        |_| transform(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
         fn_shims_cjs_3,
         r#"
             const d1 = "1"; const f1 = "2";

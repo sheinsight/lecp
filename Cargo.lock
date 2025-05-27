@@ -1166,6 +1166,10 @@ dependencies = [
  "serde",
  "serde_json",
  "swc_core",
+ "swc_transform_define",
+ "swc_transform_extensions",
+ "swc_transform_shims",
+ "swc_transform_ts2js",
  "thiserror 2.0.12",
  "wax",
 ]
@@ -1318,9 +1322,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "3.0.0-beta.1"
+version = "3.0.0-beta.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2584ca65c02941c297bec6c77bbb18845a45465fcefbdee44bd525445fbe2d99"
+checksum = "3357a01f87a8c7a1b060067212436b0ab9d3b1f06084406edb926a64b7400985"
 dependencies = [
  "bitflags",
  "ctor",
@@ -1337,9 +1341,9 @@ checksum = "03acbfa4f156a32188bfa09b86dc11a431b5725253fc1fc6f6df5bed273382c4"
 
 [[package]]
 name = "napi-derive"
-version = "3.0.0-beta.1"
+version = "3.0.0-beta.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e972aaeb88ee894ba926a0e0c6698fef12f7032432a2981d986186721bf57f4"
+checksum = "cb71c236fe23004d7abf4a00ad5e86332ea3468f6c48935d283a5d71aa7cca0c"
 dependencies = [
  "convert_case",
  "ctor",
@@ -1351,9 +1355,9 @@ dependencies = [
 
 [[package]]
 name = "napi-derive-backend"
-version = "2.0.0-beta.1"
+version = "2.0.0-beta.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9ba2844c69473593881c22de67530b554ed9af134f0bd19d296ce7f78ea583f"
+checksum = "6aeebae33f1d5d0ad2b65d97e4fa1266d46454dd1a74dc4a9f1f406e7358f5eb"
 dependencies = [
  "convert_case",
  "proc-macro2",
@@ -2353,9 +2357,9 @@ dependencies = [
 
 [[package]]
 name = "swc_core"
-version = "26.0.1"
+version = "26.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ef2bbd0f5f516bb59cfec72708e113049d5932968a761bdfb828f39cf410736"
+checksum = "f255cbd1630703f1dd633a647f2cc3e401bf8bac0af360d309e8a3139af04369"
 dependencies = [
  "once_cell",
  "swc",
@@ -2837,9 +2841,9 @@ dependencies = [
 
 [[package]]
 name = "swc_ecma_transforms_base"
-version = "15.0.1"
+version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a5edda2a747bd4fb14476d87175eed51064456b1d147e2904b8f4f16e662d6f"
+checksum = "bb01eeec1de9e2cfd089e3afcf3db60df10c812f97a42d953d094eba32e9d26f"
 dependencies = [
  "better_scoped_tls",
  "bitflags",
@@ -3086,9 +3090,9 @@ dependencies = [
 
 [[package]]
 name = "swc_ecma_utils"
-version = "15.0.0"
+version = "15.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1764198783b3dda9604ab31cd16e2418b120169b8ac404bb13a4d8031faadf82"
+checksum = "199e2f048c1998d550ebe5296e0876a3e5b2f963d75a925c2208466071edb9d8"
 dependencies = [
  "indexmap",
  "num_cpus",
@@ -3213,6 +3217,7 @@ version = "0.1.0"
 dependencies = [
  "serde_json",
  "swc_core",
+ "swc_transform_define",
 ]
 
 [[package]]
@@ -3222,6 +3227,7 @@ dependencies = [
  "serde",
  "serde_json",
  "swc_core",
+ "swc_transform_extensions",
 ]
 
 [[package]]
@@ -3231,6 +3237,7 @@ dependencies = [
  "serde",
  "serde_json",
  "swc_core",
+ "swc_transform_shims",
 ]
 
 [[package]]
@@ -3240,6 +3247,7 @@ dependencies = [
  "serde",
  "serde_json",
  "swc_core",
+ "swc_transform_ts2js",
 ]
 
 [[package]]
@@ -3274,6 +3282,42 @@ dependencies = [
  "serde",
  "serde_json",
  "swc_common",
+]
+
+[[package]]
+name = "swc_transform_define"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "swc_core",
+]
+
+[[package]]
+name = "swc_transform_extensions"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "swc_core",
+]
+
+[[package]]
+name = "swc_transform_shims"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "swc_core",
+]
+
+[[package]]
+name = "swc_transform_ts2js"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "swc_core",
 ]
 
 [[package]]
@@ -3488,9 +3532,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.45.0"
+version = "1.45.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2513ca694ef9ede0fb23fe71a4ee4107cb102b9dc1930f6d0fd77aae068ae165"
+checksum = "75ef51a33ef1da925cea3e4eb122833cb377c61439ca401b770f54902b806779"
 dependencies = [
  "backtrace",
  "pin-project-lite",

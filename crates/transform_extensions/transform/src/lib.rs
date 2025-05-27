@@ -3,7 +3,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use swc_core::ecma::{
     ast::{self, Pass},
-    visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith},
+    visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass},
 };
 
 #[derive(Clone, Debug, Deserialize, Default)]
@@ -90,7 +90,7 @@ impl VisitMut for RewriteImportingExtensions {
     }
 }
 
-pub fn init(config: Config) -> impl Pass {
+pub fn transform(config: Config) -> impl Pass {
     visit_mut_pass(RewriteImportingExtensions { config })
 }
 
@@ -101,7 +101,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {
@@ -126,7 +126,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {
@@ -151,7 +151,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {
@@ -176,7 +176,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| init(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {

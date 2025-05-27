@@ -14,7 +14,7 @@ fn main() -> Result<()> {
     env_logger::init();
 
     let start_time = std::time::Instant::now();
-    let cwd = std::env::current_dir()?.join("./examples/demo-component").canonicalize()?;
+    let cwd = std::env::current_dir()?.join("./examples/demo-sdk").canonicalize()?;
 
     // way1: rust struct
     let options = BundlessOptions::default()
@@ -40,10 +40,11 @@ fn main() -> Result<()> {
 
     // way2: json
     let options_json = json!({
-        "format": "cjs",
+        "format": "esm",
         "cwd": &cwd,
         "targets": {
-            "chrome": "55"
+            // "chrome": "55"
+            "node": "20.11.0",
         },
         "define": {
             "PRODUCTION": "\"true\"",

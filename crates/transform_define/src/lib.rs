@@ -1,11 +1,9 @@
-mod transform;
-
 use swc_core::ecma::ast::Program;
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
-use transform::transform_define;
+use swc_transform_define::transform;
 
 #[plugin_transform]
-fn process_transform(program: Program, data: TransformPluginProgramMetadata) -> Program {
+fn transform_plugin(program: Program, data: TransformPluginProgramMetadata) -> Program {
     let config = serde_json::from_str(
         &data
             .get_transform_plugin_config()
@@ -13,5 +11,5 @@ fn process_transform(program: Program, data: TransformPluginProgramMetadata) -> 
     )
     .expect("invalid config for plugin transform-define");
 
-    program.apply(transform_define(config))
+    program.apply(transform(config))
 }

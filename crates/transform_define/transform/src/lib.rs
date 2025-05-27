@@ -6,7 +6,7 @@ use swc_core::{
             ArrayLit, Expr, ExprOrSpread, Ident, ImportSpecifier, KeyValueProp, Lit, MemberExpr,
             MemberProp, ObjectLit, Pass, Prop, PropName, PropOrSpread, UnaryOp,
         },
-        visit::{visit_mut_pass, VisitMut, VisitMutWith},
+        visit::{VisitMut, VisitMutWith, visit_mut_pass},
     },
 };
 
@@ -22,7 +22,7 @@ impl TransformDefine {
     }
 }
 
-pub fn transform_define(options: Value) -> impl Pass {
+pub fn transform(options: Value) -> impl Pass {
     visit_mut_pass(TransformDefine::new(options))
 }
 
@@ -169,7 +169,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| transform_define(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {
@@ -205,7 +205,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| transform_define(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {
@@ -231,7 +231,7 @@ mod tests {
 
     test_inline!(
         Default::default(),
-        |_| transform_define(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {
@@ -254,7 +254,7 @@ mod tests {
     // 'process.env.NODE_ENV 被正确转化-字符串参数
     test_inline!(
         Default::default(),
-        |_| transform_define(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {
@@ -305,7 +305,7 @@ mod tests {
     // 'process.env.NODE_ENV 被正确转化-对象参数
     test_inline!(
         Default::default(),
-        |_| transform_define(
+        |_| transform(
             serde_json::from_str(
                 r#"
             {

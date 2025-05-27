@@ -299,12 +299,13 @@ impl BundlessOptions {
                 },
                 "experimental": {
                     "cacheRoot": "node_modules/.cache/swc",
-                    "plugins": self.get_plugins()
+                    // "plugins": self.get_plugins()
                 }
             },
             "module": {
                 "type": self.format.to_string(),
                 "resolveFully": true,
+                // "outFileExtension": self.out_ext(),
             }
         });
 
