@@ -45,3 +45,9 @@ console.log(_dirname, _filename);
 
 
 console.log(__dirname, __filename);
+
+
+
+import { a as a5 } from "@/util";
+import { a as a6 } from "@/util/index.ts";
+console.log(a5,a6);

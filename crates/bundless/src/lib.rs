@@ -95,22 +95,6 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
             let out_path = get_out_file_path(&path, &src_dir, &out_dir, &out_ext)?;
 
             println!("is_default_format {:?}, alias {:?}", is_default_format, options.alias);
-            // esm: alias +.ts 后缀 无法同时处理, 需要二次编译
-            // format:esm + is_module: true -> .js 无需处理后缀，先解决 alias问题
-            // 二次编译输出正确的后缀
-            if !is_default_format || options.alias.is_some() {
-                let new_swc_options = options
-                    .clone()
-                    .shims(Shims::Boolean(false))
-                    .format(ModuleType::Esm)
-                    .is_module(true)
-                    .build_for_swc()?;
-
-                let output = transform_file(&path, &new_swc_options)?;
-                let output = transform(output.code, &swc_options)?;
-                return write_file_and_sourcemap(output, &out_path);
-            }
-
             let output = transform_file(&path, &swc_options)?;
             write_file_and_sourcemap(output, &out_path)
         })?;

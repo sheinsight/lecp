@@ -65,7 +65,9 @@ fn main() -> Result<()> {
             "css_modules": "[name]_[local]_[hash:base64:5]",
             "less_compile": true
         },
-        "alias": null,
+        "alias": {
+            "@": "./src",
+        },
         "exclude": [],
     });
 

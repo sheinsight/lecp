@@ -54,20 +54,32 @@ pub fn transform_file(file: &Path, options: &Options) -> Result<TransformOutput>
                         handler,
                         options,
                         SingleThreadedComments::default(),
+                        |_| noop_pass(),
                         |_| {
-                            let mut extensions: HashMap<String, String> = HashMap::new();
-                            let js_ext = "js"; //
-                            extensions.insert("js".to_string(), js_ext.to_string());
-                            extensions.insert("mjs".to_string(), js_ext.to_string());
-                            extensions.insert("cjs".to_string(), js_ext.to_string());
+                            let ts2js_pass =
+                                swc_transform_ts2js::transform(swc_transform_ts2js::Config {
+                                    preserve_import_extension: Default::default(),
+                                });
 
+                            let shims_pass =
+                                swc_transform_shims::transform(swc_transform_shims::Config {
+                                    legacy: true,
+                                    target: swc_transform_shims::Target::ESM,
+                                });
+
+                            let out_ext = "mjs";
                             let extensions_pass = swc_transform_extensions::transform(
-                                swc_transform_extensions::Config { extensions },
+                                swc_transform_extensions::Config {
+                                    extensions: HashMap::from([
+                                        ("js".into(), out_ext.into()),
+                                        ("mjs".into(), out_ext.into()),
+                                        ("cjs".into(), out_ext.into()),
+                                    ]),
+                                },
                             );
 
-                            extensions_pass
+                            (ts2js_pass, extensions_pass, shims_pass)
                         },
-                        |_| noop_pass(),
                     )
                     .context("failed to process file")
             })
@@ -94,35 +106,7 @@ pub fn transform(code: String, options: &Options) -> Result<TransformOutput> {
                     code.to_string(),
                 );
 
-                // compiler.process_js_file(fm, handler, &options)
-                compiler.process_js_with_custom_pass(
-                    fm,
-                    None,
-                    handler,
-                    options,
-                    SingleThreadedComments::default(),
-                    |_| {
-                        let ts2js_pass =
-                            swc_transform_ts2js::transform(swc_transform_ts2js::Config {
-                                preserve_import_extension: Default::default(),
-                            });
-
-                        let mut extensions: HashMap<String, String> = HashMap::new();
-                        let js_ext = "js"; //
-                        extensions.insert("js".to_string(), js_ext.to_string());
-                        extensions.insert("mjs".to_string(), js_ext.to_string());
-                        extensions.insert("cjs".to_string(), js_ext.to_string());
-
-                        let shims_pass =
-                            swc_transform_shims::transform(swc_transform_shims::Config {
-                                legacy: true,
-                                target: swc_transform_shims::Target::ESM,
-                            });
-
-                        (ts2js_pass, shims_pass)
-                    },
-                    |_| noop_pass(),
-                )
+                compiler.process_js_file(fm, handler, &options)
             })
         })
         .map_err(|e| e.to_pretty_error())
