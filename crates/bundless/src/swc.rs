@@ -11,6 +11,7 @@ use swc_core::{
 };
 
 use crate::util::write_file;
+use crate::{BundlessOptions, ModuleType};
 
 // !options.config.error.filename -> skip_filename:true
 // handler config
@@ -19,12 +20,16 @@ use crate::util::write_file;
 //     ..Default::default()
 // },
 
-pub fn parallel_transform_file(files: Vec<&Path>, options: &Options) -> Result<()> {
+pub fn parallel_transform_file(
+    files: Vec<&Path>,
+    options: &Options,
+    bundless_options: &BundlessOptions,
+) -> Result<()> {
     use rayon::prelude::*;
 
     let res = files
         .into_par_iter()
-        .map(|file| transform_file(file, options))
+        .map(|file| transform_file(file, options, bundless_options))
         .collect::<Result<Vec<_>>>()?;
 
     debug!("Successfully transformed {} files in parallel", res.len());
@@ -35,7 +40,11 @@ pub fn parallel_transform_file(files: Vec<&Path>, options: &Options) -> Result<(
     Ok(())
 }
 
-pub fn transform_file(file: &Path, options: &Options) -> Result<TransformOutput> {
+pub fn transform_file(
+    file: &Path,
+    options: &Options,
+    bundless_options: &BundlessOptions,
+) -> Result<TransformOutput> {
     let cm = Arc::<SourceMap>::default(); // cm -> code map
     let compiler = Compiler::new(cm.clone());
 
@@ -56,26 +65,41 @@ pub fn transform_file(file: &Path, options: &Options) -> Result<TransformOutput>
                         SingleThreadedComments::default(),
                         |_| noop_pass(),
                         |_| {
+                            // ts2js
                             let ts2js_pass =
                                 swc_transform_ts2js::transform(swc_transform_ts2js::Config {
                                     preserve_import_extension: Default::default(),
                                 });
 
+                            // shims
+                            let shims_target = match bundless_options.format {
+                                ModuleType::ESM => swc_transform_shims::Target::ESM,
+                                ModuleType::CJS => swc_transform_shims::Target::CJS,
+                            };
+
                             let shims_pass =
                                 swc_transform_shims::transform(swc_transform_shims::Config {
                                     legacy: true,
-                                    target: swc_transform_shims::Target::ESM,
+                                    target: shims_target,
                                 });
 
-                            let out_ext = "mjs";
+                            // extensions
+                            let out_ext = &bundless_options.out_ext();
+                            println!("out_ext: {}", out_ext);
+                            let mut extensions_map = HashMap::from([
+                                ("js".to_string(), out_ext.clone()),
+                                ("mjs".to_string(), out_ext.clone()),
+                                ("cjs".to_string(), out_ext.clone()),
+                            ]);
+
+                            if let Some(css) = &bundless_options.css {
+                                if css.less_compile {
+                                    extensions_map.insert("less".to_string(), "css".to_string());
+                                }
+                            }
+
                             let extensions_pass = swc_transform_extensions::transform(
-                                swc_transform_extensions::Config {
-                                    extensions: HashMap::from([
-                                        ("js".into(), out_ext.into()),
-                                        ("mjs".into(), out_ext.into()),
-                                        ("cjs".into(), out_ext.into()),
-                                    ]),
-                                },
+                                swc_transform_extensions::Config { extensions: extensions_map },
                             );
 
                             (ts2js_pass, extensions_pass, shims_pass)
@@ -165,7 +189,11 @@ mod tests {
 
     #[test]
     fn test_transform_file_not_found() {
-        let result = transform_file(Path::new("./transform-input-404.js"), &Default::default());
+        let result = transform_file(
+            Path::new("./transform-input-404.js"),
+            &Default::default(),
+            &Default::default(),
+        );
         assert!(result.is_err());
         if let Err(err) = result {
             println!("{:?}", err);
@@ -196,8 +224,10 @@ mod tests {
     fn test_transform_parallel() {
         let files: Vec<&Path> =
             vec!["./transform-input.js".as_ref(), "./transform-input.js".as_ref()];
-        parallel_transform_file(files, &Default::default()).unwrap_or_else(|err| {
-            println!("Error: {:?}", err);
-        });
+        parallel_transform_file(files, &Default::default(), &Default::default()).unwrap_or_else(
+            |err| {
+                println!("Error: {:?}", err);
+            },
+        );
     }
 }

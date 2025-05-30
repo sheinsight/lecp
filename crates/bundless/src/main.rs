@@ -40,7 +40,8 @@ fn main() -> Result<()> {
 
     // way2: json
     let options_json = json!({
-        "format": "esm",
+        "isModule": true,
+        "format": "cjs",
         "cwd": &cwd,
         "targets": {
             // "chrome": "55"

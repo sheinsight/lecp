@@ -61,19 +61,19 @@ impl Default for React {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "lowercase")]
 pub enum ModuleType {
     #[default]
-    Esm,
-    Cjs,
+    ESM,
+    CJS,
     // Umd,
 }
 
 impl ModuleType {
     pub fn to_string(&self) -> String {
         match self {
-            ModuleType::Esm => "es6".to_string(),
-            ModuleType::Cjs => "commonjs".to_string(),
+            ModuleType::ESM => "es6".to_string(),
+            ModuleType::CJS => "commonjs".to_string(),
             // ModuleType::Umd => "umd".to_string(),
         }
     }
@@ -81,8 +81,8 @@ impl ModuleType {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct CSS {
-    css_modules: Option<String>,
-    less_compile: bool,
+    pub css_modules: Option<String>,
+    pub less_compile: bool,
 }
 
 impl CSS {
@@ -129,11 +129,11 @@ pub struct BundlessOptions {
     #[serde(default = "default_alias")]
     pub alias: Option<Alias>,
     define: Option<Define>,
-    css: Option<CSS>,
-    react: React,
+    pub css: Option<CSS>,
+    pub react: React,
 
     #[serde(default)]
-    pub out_ext: String,
+    out_ext: String,
 
     #[serde(default)]
     pub exclude: Vec<String>,
@@ -176,7 +176,7 @@ impl Default for BundlessOptions {
             react: Default::default(),
             exclude: vec![],
             out_dir: Default::default(),
-            out_ext: "js".to_string(),
+            out_ext: Default::default(),
             src_dir: Default::default(),
             is_module: Default::default(),
         }
@@ -257,9 +257,10 @@ impl BundlessOptions {
     }
 
     pub fn is_default_format(&self) -> bool {
+        // 默认格式为 ESM 且是模块
         match (&self.format, &self.is_module) {
-            (ModuleType::Esm, true) => true,
-            (ModuleType::Cjs, false) => true,
+            (ModuleType::ESM, true) => true,
+            (ModuleType::CJS, false) => true,
             _ => false,
         }
     }
@@ -329,7 +330,7 @@ impl BundlessOptions {
         // - 修正 type:module 省略的 .cjs/.mjs 后缀
         // - 修正 less 编译导致的 .less -> .css 后缀
         let mut extensions = serde_json::Map::new();
-        let js_ext = "js"; //
+        let js_ext = &self.out_ext();
         extensions.insert("js".to_string(), json!(js_ext));
         extensions.insert("mjs".to_string(), json!(js_ext));
         extensions.insert("cjs".to_string(), json!(js_ext));

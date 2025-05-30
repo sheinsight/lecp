@@ -8,7 +8,7 @@ use anyhow::Result;
 use log::debug;
 use rayon::prelude::*;
 use std::path::Path;
-use swc::{transform, transform_file, write_file_and_sourcemap};
+use swc::{transform_file, write_file_and_sourcemap};
 use wax::Glob;
 
 /**
@@ -23,14 +23,13 @@ use wax::Glob;
  * - is_module: package.json type
  */
 fn get_out_ext(options: &BundlessOptions, is_module: bool) -> String {
-    println!("is_node: {:?}", options.is_node());
     if !options.is_node() {
         return "js".to_string();
     }
 
     match (&options.format, is_module) {
-        (ModuleType::Esm, false) => "mjs",
-        (ModuleType::Cjs, true) => "cjs",
+        (ModuleType::ESM, false) => "mjs",
+        (ModuleType::CJS, true) => "cjs",
         _ => "js",
     }
     .to_string()
@@ -77,7 +76,7 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
 
     // println!("bundless default options: {:#?}", BundlessOptions::default());
     // println!("bundless options: {:#?}", &options);
-    println!("swc options: {:#?}", &swc_options);
+    // println!("swc options: {:#?}", &swc_options);
 
     let ignore = std::iter::once("**/*.d.ts")
         .chain(options.exclude.iter().map(|s| s.as_str()))
@@ -95,7 +94,7 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
             let out_path = get_out_file_path(&path, &src_dir, &out_dir, &out_ext)?;
 
             println!("is_default_format {:?}, alias {:?}", is_default_format, options.alias);
-            let output = transform_file(&path, &swc_options)?;
+            let output = transform_file(&path, &swc_options, &options)?;
             write_file_and_sourcemap(output, &out_path)
         })?;
 

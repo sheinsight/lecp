@@ -12,4 +12,4 @@ rust-version.workspace = true
 [dependencies]
 serde      = { workspace = true }
 serde_json = { workspace = true }
-swc_core   = { workspace = true }
+swc_core   = { workspace = true, features = ["ecma_plugin_transform"] }

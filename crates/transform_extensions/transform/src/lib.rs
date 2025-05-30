@@ -117,10 +117,15 @@ mod tests {
         r#"
         import a from "./a.js";
         import b from "./b.mjs";
+        const c = import("./c.js");
+        const d = import("./d.mjs");
+
     "#, // Input codes,
         r#"
         import a from "./a.cjs";
         import b from "./b.cjs";
+        const c = import("./c.cjs");
+        const d = import("./d.cjs");
     "# // Output codes after transformed with plugin
     );
 
@@ -142,10 +147,14 @@ mod tests {
         r#"
         import a from "./a.js";
         import b from "./b.mjs";
+        const c = import("./c.js");
+        const d = import("./d.mjs");
     "#, // Input codes,
         r#"
         import a from "./a.js";
         import b from "./b.js";
+        const c = import("./c.js");
+        const d = import("./d.js");
     "# // Output codes after transformed with plugin
     );
 
@@ -167,10 +176,14 @@ mod tests {
         r#"
         import a from "./a.cjs";
         import b from "./b.js";
+        const c = import("./c.cjs");
+        const d = import("./d.js");
     "#, // Input codes,
         r#"
         import a from "./a.mjs";
         import b from "./b.mjs";
+        const c = import("./c.mjs");
+        const d = import("./d.mjs");
     "# // Output codes after transformed with plugin
     );
 
@@ -192,11 +205,15 @@ mod tests {
         r#"
         import a from "./a.cjs";
         import b from "./b.js";
+        const c = import("./c.cjs");
+        const d = import("./d.js");
         // import c from "./c";
     "#, // Input codes,
         r#"
         import a from "./a.js";
         import b from "./b.js";
+        const c = import("./c.js");
+        const d = import("./d.js");
         // import c from "./c.js";
     "# // Output codes after transformed with plugin
     );
