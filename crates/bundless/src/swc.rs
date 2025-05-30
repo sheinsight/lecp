@@ -63,14 +63,16 @@ pub fn transform_file(
                         handler,
                         options,
                         SingleThreadedComments::default(),
-                        |_| noop_pass(),
                         |_| {
-                            // ts2js
+                            // ts2js (由于 cjs 插件暂不读取 require，需要提前转换ts -> js)
                             let ts2js_pass =
                                 swc_transform_ts2js::transform(swc_transform_ts2js::Config {
                                     preserve_import_extension: Default::default(),
                                 });
 
+                            ts2js_pass
+                        },
+                        |_| {
                             // shims
                             let shims_target = match bundless_options.format {
                                 ModuleType::ESM => swc_transform_shims::Target::ESM,
@@ -102,7 +104,7 @@ pub fn transform_file(
                                 swc_transform_extensions::Config { extensions: extensions_map },
                             );
 
-                            (ts2js_pass, extensions_pass, shims_pass)
+                            (extensions_pass, shims_pass)
                         },
                     )
                     .context("failed to process file")

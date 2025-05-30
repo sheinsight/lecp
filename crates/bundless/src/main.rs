@@ -15,7 +15,7 @@ fn main() -> Result<()> {
 
     let start_time = std::time::Instant::now();
     let cwd = std::env::current_dir()?.join("./examples/demo-sdk").canonicalize()?;
-    let cwd = std::env::current_dir()?.join("./examples/demo-component").canonicalize()?;
+    // let cwd = std::env::current_dir()?.join("./examples/demo-component").canonicalize()?;
 
     // way1: rust struct
     let options = BundlessOptions::default()
@@ -42,7 +42,7 @@ fn main() -> Result<()> {
     // way2: json
     let options_json = json!({
         "isModule": true,
-        "format": "esm",
+        "format": "cjs",
         "cwd": &cwd,
         "targets": {
             "chrome": "55"
