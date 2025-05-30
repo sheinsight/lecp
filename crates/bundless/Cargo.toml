@@ -19,9 +19,18 @@ path-clean   = { workspace = true }
 rayon        = { workspace = true }
 serde        = { workspace = true }
 serde_json   = { workspace = true }
-swc_core     = { workspace = true, features = ["base", "ecma_ast", "common", "ecma_utils", "ecma_visit"] }
 thiserror    = { workspace = true }
 wax          = { workspace = true }
+
+swc_core = { workspace = true, features = [
+    "base",
+    "ecma_ast",
+    "common",
+    "ecma_utils",
+    "ecma_visit",
+    "plugin_transform_host_native",
+    "plugin_transform_host_native_filesystem_cache",
+] }
 
 swc_transform_define     = { workspace = true }
 swc_transform_extensions = { workspace = true }

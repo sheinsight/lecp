@@ -300,7 +300,7 @@ impl BundlessOptions {
                 },
                 "experimental": {
                     "cacheRoot": "node_modules/.cache/swc",
-                    // "plugins": self.get_plugins()
+                    "plugins": self.get_plugins()
                 }
             },
             "module": {
@@ -323,41 +323,18 @@ impl BundlessOptions {
 
     fn get_plugins(&self) -> Vec<serde_json::Value> {
         let mut plugins = vec![];
-        plugins.push(json!(["@shined/swc-plugin-transform-ts2js", {}]));
 
-        // 修正 后缀
-        // - 补全 cjs省略的 .js 后缀
-        // - 修正 type:module 省略的 .cjs/.mjs 后缀
-        // - 修正 less 编译导致的 .less -> .css 后缀
-        let mut extensions = serde_json::Map::new();
-        let js_ext = &self.out_ext();
-        extensions.insert("js".to_string(), json!(js_ext));
-        extensions.insert("mjs".to_string(), json!(js_ext));
-        extensions.insert("cjs".to_string(), json!(js_ext));
-
-        // 如果启用了 less 编译，添加 less -> css 的扩展名映射
-        if let Some(css) = &self.css {
-            if let true = css.less_compile {
-                extensions.insert("less".to_string(), json!("css"));
-            }
-        }
-
-        plugins.push(json!(["@shined/swc-plugin-transform-extensions", {
-            "extensions": extensions
-        }]));
-
-        if self.shims.is_enabled() {
-            plugins.push(json!([
-                "@shined/swc-plugin-transform-shims",
-                { "target": self.format, "legacy": self.shims.legacy() },
-            ]));
-        }
+        let plugin_path = self
+            .cwd
+            .join("../../packages/core/node_modules/swc-plugin-css-modules")
+            .canonicalize()
+            .unwrap();
 
         if let Some(css) = &self.css {
             if let Some(css_modules) = &css.css_modules {
                 plugins.push(json!([
-                    "swc-plugin-css-modules",
-                    { "generate_scoped_name": css_modules },
+                    plugin_path,
+                    { "generate_scoped_name": css_modules},
                 ]));
             }
         }

@@ -76,7 +76,7 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
 
     // println!("bundless default options: {:#?}", BundlessOptions::default());
     // println!("bundless options: {:#?}", &options);
-    // println!("swc options: {:#?}", &swc_options);
+    println!("swc options: {:#?}", &swc_options);
 
     let ignore = std::iter::once("**/*.d.ts")
         .chain(options.exclude.iter().map(|s| s.as_str()))
