@@ -35,7 +35,7 @@
     "demo": "node --experimental-strip-types demo.mts"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^3.0.0-alpha.81",
+    "@napi-rs/cli": "^3.0.0-alpha.82",
     "@types/node": "catalog:"
   },
   "packageManager": "pnpm@10.11.0",
