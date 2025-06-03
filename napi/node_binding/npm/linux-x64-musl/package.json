@@ -1,5 +1,5 @@
 {
-  "name": "@sheind/lecp-binding-linux-x64-musl",
+  "name": "@shined/lecp-binding-linux-x64-musl",
   "version": "0.0.0",
   "cpu": [
     "x64"

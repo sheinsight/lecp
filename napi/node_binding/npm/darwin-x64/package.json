@@ -1,5 +1,5 @@
 {
-  "name": "@sheind/lecp-binding-darwin-x64",
+  "name": "@shined/lecp-binding-darwin-x64",
   "version": "0.0.0",
   "cpu": [
     "x64"

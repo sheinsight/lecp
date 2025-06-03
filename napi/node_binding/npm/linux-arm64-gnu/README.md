@@ -1,3 +1,3 @@
-# `@sheind/lecp-binding-linux-arm64-gnu`
+# `@shined/lecp-binding-linux-arm64-gnu`
 
-This is the **aarch64-unknown-linux-gnu** binary for `@sheind/lecp-binding`
+This is the **aarch64-unknown-linux-gnu** binary for `@shined/lecp-binding`

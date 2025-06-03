@@ -1,5 +1,5 @@
 {
-  "name": "@sheind/lecp-binding-win32-arm64-msvc",
+  "name": "@shined/lecp-binding-win32-arm64-msvc",
   "version": "0.0.0",
   "cpu": [
     "arm64"

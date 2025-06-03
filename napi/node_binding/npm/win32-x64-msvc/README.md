@@ -1,3 +1,3 @@
-# `@sheind/lecp-binding-win32-x64-msvc`
+# `@shined/lecp-binding-win32-x64-msvc`
 
-This is the **x86_64-pc-windows-msvc** binary for `@sheind/lecp-binding`
+This is the **x86_64-pc-windows-msvc** binary for `@shined/lecp-binding`
