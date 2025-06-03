@@ -10,17 +10,16 @@ repository.workspace   = true
 rust-version.workspace = true
 
 [dependencies]
-anyhow       = { workspace = true }
-env_logger   = { workspace = true }
-log          = { workspace = true }
-miette       = { workspace = true }
-oxc_resolver = { workspace = true }
-path-clean   = { workspace = true }
-rayon        = { workspace = true }
-serde        = { workspace = true }
-serde_json   = { workspace = true }
-thiserror    = { workspace = true }
-wax          = { workspace = true }
+anyhow     = { workspace = true }
+env_logger = { workspace = true }
+log        = { workspace = true }
+miette     = { workspace = true }
+path-clean = { workspace = true }
+rayon      = { workspace = true }
+serde      = { workspace = true }
+serde_json = { workspace = true }
+thiserror  = { workspace = true }
+wax        = { workspace = true }
 
 swc_core = { workspace = true, features = [
     "base",
@@ -28,10 +27,11 @@ swc_core = { workspace = true, features = [
     "common",
     "ecma_utils",
     "ecma_visit",
-    "plugin_transform_host_native",
-    "plugin_transform_host_native_filesystem_cache",
+    # "plugin_transform_host_native",
+    # "plugin_transform_host_native_filesystem_cache",
 ] }
 
+swc-plugin-css-modules   = { workspace = true }
 swc_transform_define     = { workspace = true }
 swc_transform_extensions = { workspace = true }
 swc_transform_shims      = { workspace = true }

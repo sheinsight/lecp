@@ -119,7 +119,7 @@ pub struct Define {
 #[serde(rename_all = "camelCase")]
 pub struct BundlessOptions {
     #[serde(default = "default_cwd")]
-    cwd: PathBuf,
+    pub cwd: PathBuf,
     pub format: ModuleType,
     source_map: bool,
     minify: bool,
@@ -322,22 +322,7 @@ impl BundlessOptions {
     }
 
     fn get_plugins(&self) -> Vec<serde_json::Value> {
-        let mut plugins = vec![];
-
-        let plugin_path = self
-            .cwd
-            .join("../../packages/core/node_modules/swc-plugin-css-modules")
-            .canonicalize()
-            .unwrap();
-
-        if let Some(css) = &self.css {
-            if let Some(css_modules) = &css.css_modules {
-                plugins.push(json!([
-                    plugin_path,
-                    { "generate_scoped_name": css_modules},
-                ]));
-            }
-        }
+        let plugins = vec![];
 
         println!("bundless plugins: {:#?}", &plugins);
 

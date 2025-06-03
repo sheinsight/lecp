@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::{path::Path, sync::Arc};
 use swc_core::base::config::Options;
 use swc_core::common::comments::SingleThreadedComments;
-use swc_core::ecma::ast::noop_pass;
+use swc_core::ecma::ast::{Pass, noop_pass};
 use swc_core::{
     base::{Compiler, TransformOutput, try_with_handler},
     common::{FileName, GLOBALS, SourceMap},
@@ -87,7 +87,6 @@ pub fn transform_file(
 
                             // extensions
                             let out_ext = &bundless_options.out_ext();
-                            println!("out_ext: {}", out_ext);
                             let mut extensions_map = HashMap::from([
                                 ("js".to_string(), out_ext.clone()),
                                 ("mjs".to_string(), out_ext.clone()),
@@ -104,7 +103,28 @@ pub fn transform_file(
                                 swc_transform_extensions::Config { extensions: extensions_map },
                             );
 
-                            (extensions_pass, shims_pass)
+                            // css modules
+                            let css_modules_pass = bundless_options
+                                .css
+                                .as_ref()
+                                .and_then(|css| css.css_modules.as_ref())
+                                .map_or_else(
+                                    || Box::new(noop_pass()) as Box<dyn Pass>,
+                                    |css_modules| {
+                                        Box::new(swc_plugin_css_modules::transform(
+                                            bundless_options.cwd.as_path().to_str().unwrap_or(""),
+                                            &file.to_string_lossy(),
+                                            swc_plugin_css_modules::Config {
+                                                generate_scoped_name: css_modules.to_string(),
+                                                hash_prefix: String::new(),
+                                                css_modules_suffix: ".css".to_string(),
+                                                root: String::new(),
+                                            },
+                                        )) as Box<dyn Pass>
+                                    },
+                                );
+
+                            (extensions_pass, shims_pass, css_modules_pass)
                         },
                     )
                     .context("failed to process file")

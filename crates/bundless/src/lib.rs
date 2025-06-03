@@ -70,13 +70,13 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
     let out_dir = options.out_dir();
 
     let out_ext = options.out_ext();
-    let is_default_format = options.is_default_format();
+    // let is_default_format = options.is_default_format();
 
     let swc_options = options.build_for_swc()?;
 
     // println!("bundless default options: {:#?}", BundlessOptions::default());
     // println!("bundless options: {:#?}", &options);
-    println!("swc options: {:#?}", &swc_options);
+    debug!("swc options: {:#?}", &swc_options);
 
     let ignore = std::iter::once("**/*.d.ts")
         .chain(options.exclude.iter().map(|s| s.as_str()))
@@ -92,8 +92,6 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
         .map(|entry| entry.path().to_owned())
         .try_for_each(|path| {
             let out_path = get_out_file_path(&path, &src_dir, &out_dir, &out_ext)?;
-
-            println!("is_default_format {:?}, alias {:?}", is_default_format, options.alias);
             let output = transform_file(&path, &swc_options, &options)?;
             write_file_and_sourcemap(output, &out_path)
         })?;

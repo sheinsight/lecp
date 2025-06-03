@@ -15,8 +15,7 @@ const TS_EXTENSIONS: [(&str, &str); 4] =
     [(".ts", ".js"), (".tsx", ".js"), (".mts", ".mjs"), (".cts", ".cjs")];
 
 fn replace_ts_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
-    // TODO: node_module 下需要忽略
-
+    // TODO: 第三方包下的 ts 文件不处理
     // if !src.value.starts_with('.') {
     //     return None;
     // }
@@ -42,7 +41,6 @@ impl VisitMut for RewriteImportExtensions {
 
     // import './foo.ts'
     fn visit_mut_import_decl(&mut self, n: &mut ast::ImportDecl) {
-        println!("visit_mut_import_decl: {:?}", n);
         n.visit_mut_children_with(self);
 
         if let Some(replaced) = replace_ts_extension(&n.src, &self.config) {
