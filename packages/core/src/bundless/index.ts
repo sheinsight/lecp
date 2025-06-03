@@ -27,6 +27,8 @@ import {
 } from "./style.ts";
 import { getSwcOptions } from "./swc.ts";
 
+import { bundlessJsAsync } from "@shined/lecp-binding";
+
 export interface SourceMap {
 	file?: string;
 	sources?: string[];
@@ -154,15 +156,15 @@ export const bundlessFiles = async (
 	logger.info(`🧹 清除${format}目录: ${outDir.replace(cwd, "")}`);
 	await fs.rm(outDir, { recursive: true, force: true });
 
-	const outJsExt = getOutJsExt(
-		!!targets.node,
-		config.pkg.type === "module",
-		format,
-	);
+	// const outJsExt = getOutJsExt(
+	// 	!!targets.node,
+	// 	config.pkg.type === "module",
+	// 	format,
+	// );
 
-	const isDefaultFormat =
-		(format === "esm" && config.pkg.type === "module") ||
-		(format === "cjs" && config.pkg.type !== "module");
+	// const isDefaultFormat =
+	// 	(format === "esm" && config.pkg.type === "module") ||
+	// 	(format === "cjs" && config.pkg.type !== "module");
 
 	const getOutFilePath = (
 		filePath: string,
@@ -177,11 +179,11 @@ export const bundlessFiles = async (
 		}
 
 		// 目前暂不考虑 .cjs, .mjs源文件后缀对产物后缀的影响
-		if (type === "script") {
-			outFile = filePath
-				.replace(/\.(t|j)sx$/, ".js")
-				.replace(/\.(c|m)?(t|j)s$/, `.${outJsExt}`);
-		}
+		// if (type === "script") {
+		// 	outFile = filePath
+		// 		.replace(/\.(t|j)sx$/, ".js")
+		// 		.replace(/\.(c|m)?(t|j)s$/, `.${outJsExt}`);
+		// }
 
 		if (type === "dts") {
 			outFile = filePath
@@ -210,32 +212,32 @@ export const bundlessFiles = async (
 		}
 
 		if (isScript.test(file) && !isDts.test(file)) {
-			logger.info(colors.white(`编译到${format}:`), colors.yellow(fileRelPath));
+			// logger.info(colors.white(`编译到${format}:`), colors.yellow(fileRelPath));
 
-			await compileScript(file, {
-				compile: async file => {
-					const swcOptions = getSwcOptions(
-						{ ...options, outJsExt: isJsx.test(file) ? "js" : outJsExt },
-						config,
-					);
+			// await compileScript(file, {
+			// 	compile: async file => {
+			// 		const swcOptions = getSwcOptions(
+			// 			{ ...options, outJsExt: isJsx.test(file) ? "js" : outJsExt },
+			// 			config,
+			// 		);
 
-					// 非默认 format: 先处理后缀再编译
-					// esm: alias +.ts 后缀 无法同时处理, 需要二次编译
-					if (!isDefaultFormat || swcOptions.jsc?.paths) {
-						const { code } = await swcTransformFile(
-							file,
-							getSwcOptions(
-								{ ...options, type: "esm", outJsExt: "js", shims: undefined },
-								config,
-							),
-						);
-						return swcTransform(code, { filename: file, ...swcOptions });
-					}
+			// 		// 非默认 format: 先处理后缀再编译
+			// 		// esm: alias +.ts 后缀 无法同时处理, 需要二次编译
+			// 		if (!isDefaultFormat || swcOptions.jsc?.paths) {
+			// 			const { code } = await swcTransformFile(
+			// 				file,
+			// 				getSwcOptions(
+			// 					{ ...options, type: "esm", outJsExt: "js", shims: undefined },
+			// 					config,
+			// 				),
+			// 			);
+			// 			return swcTransform(code, { filename: file, ...swcOptions });
+			// 		}
 
-					return swcTransformFile(file, swcOptions);
-				},
-				outFilePath: getOutFilePath(filePath, "script"),
-			});
+			// 		return swcTransformFile(file, swcOptions);
+			// 	},
+			// 	outFilePath: getOutFilePath(filePath, "script"),
+			// });
 
 			return;
 		}
@@ -251,6 +253,14 @@ export const bundlessFiles = async (
 		absolute: true,
 	});
 	files.forEach(compileFile);
+
+
+	let bundlessOptions = {
+		...options,format: options.type, "isModule": config.pkg.type === "module",
+	}
+	console.log("bundlessOptions", bundlessOptions);
+
+	bundlessJsAsync(cwd, Buffer.from(JSON.stringify(bundlessOptions)));
 
 	const watchers: Watcher[] = [];
 

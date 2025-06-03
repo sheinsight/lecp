@@ -92,6 +92,7 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 		builder: "swc",
 		entry: "src",
 		outDir: "es",
+		minify: false,
 	} as BundlessFormat,
 	cjs: {
 		type: "cjs",
@@ -99,6 +100,7 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 		builder: "swc",
 		entry: "src",
 		outDir: "lib",
+		minify: false,
 	} as BundlessFormat,
 	umd: {
 		type: "umd",
@@ -180,6 +182,7 @@ export const getFinalUserOptions = (
 		return data as FinalUserConfig["format"][0];
 	});
 
+	buildOptions.shims ??= false;
 	if (buildOptions.shims === true) {
 		buildOptions.shims = { legacy: false };
 	}

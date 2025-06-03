@@ -29,11 +29,11 @@ import { bundlessJsAsync } from "./index.js";
 			sourceMap: true,
 			minify: false,
 			react: {
-				jsx_runtime: "automatic",
+				jsxRuntime: "automatic",
 			},
 			css: {
-				css_modules: "demo-component__[name]_[local]",
-				less_compile: true,
+				cssModules: "demo-component__[name]_[local]",
+				lessCompile: true,
 			},
 			alias: {
 				"@": "./src",

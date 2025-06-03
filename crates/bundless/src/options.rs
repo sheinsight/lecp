@@ -49,6 +49,7 @@ pub enum JsxRuntime {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct React {
     #[serde(default = "default_jsx_runtime")]
     pub jsx_runtime: Option<JsxRuntime>,
@@ -80,6 +81,7 @@ impl ModuleType {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CSS {
     pub css_modules: Option<String>,
     pub less_compile: bool,
@@ -116,12 +118,12 @@ pub struct Define {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct BundlessOptions {
     #[serde(default = "default_cwd")]
     pub cwd: PathBuf,
     pub format: ModuleType,
-    source_map: bool,
+    sourcemap: bool,
     minify: bool,
     targets: serde_json::Value,
     shims: Shims,
@@ -131,18 +133,10 @@ pub struct BundlessOptions {
     define: Option<Define>,
     pub css: Option<CSS>,
     pub react: React,
-
-    #[serde(default)]
     out_ext: String,
-
-    #[serde(default)]
     pub exclude: Vec<String>,
-    #[serde(default)]
     pub out_dir: Option<PathBuf>,
-    #[serde(default)]
     pub src_dir: Option<PathBuf>,
-
-    #[serde(default)]
     is_module: bool,
 }
 
@@ -165,7 +159,7 @@ impl Default for BundlessOptions {
         Self {
             cwd: cwd.clone(),
             format: Default::default(),
-            source_map: Default::default(),
+            sourcemap: Default::default(),
             minify: Default::default(),
             targets: Default::default(),
             alias: Some(Default::default()),
@@ -224,8 +218,8 @@ impl BundlessOptions {
         self
     }
 
-    pub fn source_map(mut self, source_map: bool) -> Self {
-        self.source_map = source_map;
+    pub fn sourcemap(mut self, sourcemap: bool) -> Self {
+        self.sourcemap = sourcemap;
         self
     }
 
@@ -255,21 +249,14 @@ impl BundlessOptions {
     pub fn out_ext(&self) -> String {
         get_out_ext(self, self.is_module)
     }
+}
 
-    pub fn is_default_format(&self) -> bool {
-        // 默认格式为 ESM 且是模块
-        match (&self.format, &self.is_module) {
-            (ModuleType::ESM, true) => true,
-            (ModuleType::CJS, false) => true,
-            _ => false,
-        }
-    }
-
+impl BundlessOptions {
     pub fn build_for_swc(&self) -> Result<Options> {
         let config_json = json!({
             "swcrc": false,
             "configFile": false,
-            "sourceMaps": self.source_map,
+            "sourceMaps": self.sourcemap,
             "minify": self.minify,
             "env": {
                 "mode": "entry",
@@ -315,6 +302,15 @@ impl BundlessOptions {
             let miette_err = serde_error_to_miette(e, &config_str, "Could not parse swc config");
             anyhow::anyhow!("{:?}", miette_err)
         })
+    }
+
+    pub fn is_default_format(&self) -> bool {
+        // 默认格式为 ESM 且是模块
+        match (&self.format, &self.is_module) {
+            (ModuleType::ESM, true) => true,
+            (ModuleType::CJS, false) => true,
+            _ => false,
+        }
     }
 
     pub fn is_node(&self) -> bool {

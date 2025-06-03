@@ -21,9 +21,9 @@ export default defineConfig({
 		cssModules: true, // pkgName__[local]
 		lessCompile: true,
 	},
-	// react: {
-	// 	jsxRuntime: "classic",
-	// },
+	react: {
+		jsxRuntime: "automatic", // "classic" | "automatic"
+	},
 	// dts: { builder: "ts", mode: "bundless" },
 	targets: {
 		chrome: 55,
