@@ -50,7 +50,7 @@ pub enum JsxRuntime {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct React {
-    #[serde(rename = "runtime", default = "default_jsx_runtime")]
+    #[serde(default = "default_jsx_runtime")]
     pub jsx_runtime: Option<JsxRuntime>,
 }
 
