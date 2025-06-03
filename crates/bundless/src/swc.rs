@@ -134,8 +134,6 @@ pub fn transform_file(
 }
 
 pub fn transform(code: String, options: &Options) -> Result<TransformOutput> {
-    println!("11111 transform code ");
-
     let cm = Arc::<SourceMap>::default(); // cm -> code map
     let compiler = Compiler::new(cm.clone());
 

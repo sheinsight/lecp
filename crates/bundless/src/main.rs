@@ -18,26 +18,26 @@ fn main() -> Result<()> {
     let cwd = std::env::current_dir()?.join("./examples/demo-component").canonicalize()?;
 
     // way1: rust struct
-    let options = BundlessOptions::default()
-        .cwd(&cwd)
-        .targets(json!({
-            "chrome": "55"
-        }))
-        .define(Define {
-            variables: [
-                ("PRODUCTION".to_string(), "\"true\"".to_string()),
-                ("VERSION".to_string(), "\"5fa3b9\"".to_string()),
-                ("BROWSER_SUPPORTS_HTML5".to_string(), "\"true\"".to_string()),
-                ("typeof window".to_string(), "\"object\"".to_string()),
-                ("process.env.NODE_ENV".to_string(), "\"production\"".to_string()),
-            ]
-            .into(),
-        })
-        .shims(Shims::Object { legacy: Some(true) })
-        .source_map(true)
-        .minify(true)
-        .react(React { jsx_runtime: Some(JsxRuntime::Automatic) })
-        .css(CSS::default().css_modules("[name]_[local]_[hash:base64:5]").less_compile(true));
+    // let options = BundlessOptions::default()
+    //     .cwd(&cwd)
+    //     .targets(json!({
+    //         "chrome": "55"
+    //     }))
+    //     .define(Define {
+    //         variables: [
+    //             ("PRODUCTION".to_string(), "\"true\"".to_string()),
+    //             ("VERSION".to_string(), "\"5fa3b9\"".to_string()),
+    //             ("BROWSER_SUPPORTS_HTML5".to_string(), "\"true\"".to_string()),
+    //             ("typeof window".to_string(), "\"object\"".to_string()),
+    //             ("process.env.NODE_ENV".to_string(), "\"production\"".to_string()),
+    //         ]
+    //         .into(),
+    //     })
+    //     .shims(Shims::Object { legacy: Some(true) })
+    //     .source_map(true)
+    //     .minify(true)
+    //     .react(React { jsx_runtime: Some(JsxRuntime::Automatic) })
+    //     .css(CSS::default().css_modules("[name]_[local]_[hash:base64:5]").less_compile(true));
 
     // way2: json
     let options_json = json!({

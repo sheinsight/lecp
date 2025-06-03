@@ -75,7 +75,7 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
     let swc_options = options.build_for_swc()?;
 
     // println!("bundless default options: {:#?}", BundlessOptions::default());
-    // println!("bundless options: {:#?}", &options);
+    debug!("bundless options: {:#?}", &options);
     debug!("swc options: {:#?}", &swc_options);
 
     let ignore = std::iter::once("**/*.d.ts")

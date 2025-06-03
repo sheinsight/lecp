@@ -9,10 +9,12 @@ import { bundlessJsAsync } from "./index.js";
 		console.log("cwd", process.cwd());
 		const cwd = path.resolve(process.cwd(), "../../examples/demo-component");
 		const options = {
-			format: "cjs",
-			cwd: cwd,
+			"isModule": true,
+			format: "esm",
+			cwd,
 			targets: {
 				chrome: "55",
+				// node: "20.11.0",
 			},
 			define: {
 				PRODUCTION: '"true"',
@@ -25,14 +27,18 @@ import { bundlessJsAsync } from "./index.js";
 				legacy: true,
 			},
 			sourceMap: true,
-			minify: true,
+			minify: false,
 			react: {
 				jsx_runtime: "automatic",
 			},
 			css: {
-				css_modules: "[name]_[local]_[hash:base64:5]",
+				css_modules: "demo-component__[name]_[local]",
 				less_compile: true,
 			},
+			alias: {
+				"@": "./src",
+			},
+			exclude: [],
 		};
 
 		await bundlessJsAsync(cwd, Buffer.from(JSON.stringify(options)));
