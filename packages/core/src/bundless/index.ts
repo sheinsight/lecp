@@ -27,7 +27,7 @@ import {
 } from "./style.ts";
 import { getSwcOptions } from "./swc.ts";
 
-import { bundlessJsAsync } from "@shined/lecp-binding";
+import { bundlessFileAsync, bundlessFilesAsync } from "@shined/lecp-binding";
 
 export interface SourceMap {
 	file?: string;
@@ -156,15 +156,15 @@ export const bundlessFiles = async (
 	logger.info(`🧹 清除${format}目录: ${outDir.replace(cwd, "")}`);
 	await fs.rm(outDir, { recursive: true, force: true });
 
-	// const outJsExt = getOutJsExt(
-	// 	!!targets.node,
-	// 	config.pkg.type === "module",
-	// 	format,
-	// );
+	const outJsExt = getOutJsExt(
+		!!targets.node,
+		config.pkg.type === "module",
+		format,
+	);
 
-	// const isDefaultFormat =
-	// 	(format === "esm" && config.pkg.type === "module") ||
-	// 	(format === "cjs" && config.pkg.type !== "module");
+	const isDefaultFormat =
+		(format === "esm" && config.pkg.type === "module") ||
+		(format === "cjs" && config.pkg.type !== "module");
 
 	const getOutFilePath = (
 		filePath: string,
@@ -179,11 +179,11 @@ export const bundlessFiles = async (
 		}
 
 		// 目前暂不考虑 .cjs, .mjs源文件后缀对产物后缀的影响
-		// if (type === "script") {
-		// 	outFile = filePath
-		// 		.replace(/\.(t|j)sx$/, ".js")
-		// 		.replace(/\.(c|m)?(t|j)s$/, `.${outJsExt}`);
-		// }
+		if (type === "script") {
+			outFile = filePath
+				.replace(/\.(t|j)sx$/, ".js")
+				.replace(/\.(c|m)?(t|j)s$/, `.${outJsExt}`);
+		}
 
 		if (type === "dts") {
 			outFile = filePath
@@ -256,11 +256,13 @@ export const bundlessFiles = async (
 
 
 	let bundlessOptions = {
-		...options,format: options.type, "isModule": config.pkg.type === "module",
+		...options,
+		format: options.type, "isModule": config.pkg.type === "module",
+		cwd
 	}
 	console.log("bundlessOptions", bundlessOptions);
 
-	bundlessJsAsync(cwd, Buffer.from(JSON.stringify(bundlessOptions)));
+	bundlessFilesAsync(Buffer.from(JSON.stringify(bundlessOptions)));
 
 	const watchers: Watcher[] = [];
 
@@ -272,8 +274,17 @@ export const bundlessFiles = async (
 		});
 
 		const handleChange = async (event: string, file: string) => {
-			if (event === "add" || event === "change")
-				return compileFile(path.join(srcDir, file));
+			console.log(`🔄 ${colors.white(event)}: ${colors.yellow(file)}`);
+
+			if (event === "add" || event === "change"){
+				let filePath = path.join(srcDir, file)
+				if (isScript.test(file) && !isDts.test(file)) {
+					return	bundlessFileAsync(filePath, Buffer.from(JSON.stringify(bundlessOptions)));
+				}
+
+				return compileFile(filePath);
+			}
+
 			if (event === "unlinkDir")
 				return fs.rm(path.join(outDir, file), { recursive: true, force: true });
 			if (event === "unlink") {

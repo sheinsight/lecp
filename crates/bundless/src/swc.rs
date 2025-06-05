@@ -54,7 +54,7 @@ pub fn transform_file(
             try_with_handler(cm.clone(), Default::default(), |handler| {
                 debug!("load file {:?}", file);
 
-                let fm = cm.load_file(file).context("failed to load file")?;
+                let fm = cm.load_file(file).context("swc failed to load file")?;
                 // compiler.process_js_file(fm, handler, options).context("failed to process file")
                 compiler
                     .process_js_with_custom_pass(
@@ -127,7 +127,7 @@ pub fn transform_file(
                             (extensions_pass, shims_pass, css_modules_pass)
                         },
                     )
-                    .context("failed to process file")
+                    .context("swc failed to process file")
             })
         })
         .map_err(|e| e.to_pretty_error())

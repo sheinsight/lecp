@@ -135,6 +135,7 @@ pub struct BundlessOptions {
     pub react: React,
     out_ext: String,
     pub exclude: Vec<String>,
+    //
     pub out_dir: Option<PathBuf>,
     pub src_dir: Option<PathBuf>,
     is_module: bool,
@@ -320,7 +321,7 @@ impl BundlessOptions {
     fn get_plugins(&self) -> Vec<serde_json::Value> {
         let plugins = vec![];
 
-        println!("bundless plugins: {:#?}", &plugins);
+        // println!("bundless plugins: {:#?}", &plugins);
 
         plugins
     }

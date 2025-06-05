@@ -1,9 +1,9 @@
-use lecp_bundless::{BundlessOptions, bundless_js};
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
+use lecp_bundless::{BundlessOptions, bundless_file, bundless_files};
+
 pub struct BundlessJsTask {
-    cwd: String,
     options: Buffer,
 }
 
@@ -18,7 +18,7 @@ impl Task for BundlessJsTask {
             Err(e) => return Err(Error::from_reason(format!("解析选项失败: {}", e))),
         };
 
-        bundless_js(&self.cwd, &options).map_err(|e| Error::from_reason(format!("构建失败: {}", e)))
+        bundless_files(&options).map_err(|e| Error::from_reason(format!("构建失败: {}", e)))
     }
 
     fn resolve(&mut self, _: Env, _output: Self::Output) -> Result<Self::JsValue> {
@@ -27,6 +27,16 @@ impl Task for BundlessJsTask {
 }
 
 #[napi]
-pub fn bundless_js_async(cwd: String, options: Buffer) -> AsyncTask<BundlessJsTask> {
-    AsyncTask::new(BundlessJsTask { cwd, options })
+pub fn bundless_files_async(options: Buffer) -> AsyncTask<BundlessJsTask> {
+    AsyncTask::new(BundlessJsTask { options })
+}
+
+#[napi]
+pub async fn bundless_file_async(file: String, options: Buffer) -> Result<()> {
+    let options = match serde_json::from_slice::<BundlessOptions>(options.as_ref()) {
+        Ok(opts) => opts,
+        Err(e) => return Err(Error::from_reason(format!("解析选项失败: {}", e))),
+    };
+
+    bundless_file(&file, &options).map_err(|e| Error::from_reason(format!("构建失败: {}", e)))
 }

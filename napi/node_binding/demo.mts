@@ -1,6 +1,6 @@
 // ------------------------------------------------------
 import path from "path";
-import { bundlessJsAsync } from "./index.js";
+import { bundlessFilesAsync } from "./index.js";
 
 (async () => {
 	performance.mark("start");
@@ -9,9 +9,12 @@ import { bundlessJsAsync } from "./index.js";
 		console.log("cwd", process.cwd());
 		const cwd = path.resolve(process.cwd(), "../../examples/demo-component");
 		const options = {
+			// config
 			"isModule": true,
-			format: "esm",
 			cwd,
+			exclude: [],
+			// -------
+			format: "esm",
 			targets: {
 				chrome: "55",
 				// node: "20.11.0",
@@ -38,19 +41,18 @@ import { bundlessJsAsync } from "./index.js";
 			alias: {
 				"@": "./src",
 			},
-			exclude: [],
 		};
 
-		await bundlessJsAsync(cwd, Buffer.from(JSON.stringify(options)));
+		await bundlessFilesAsync(Buffer.from(JSON.stringify(options)));
 
-		console.log("bundlessJsAsync success");
+		console.log("bundlessFilesAsync success");
 	} catch (error) {
-		console.log("bundlessJsAsync error");
+		console.log("bundlessFilesAsync error");
 		console.log(error);
 	} finally {
 		performance.mark("end");
 	}
 
-	const measure = performance.measure("bundlessJsAsync", "start", "end");
+	const measure = performance.measure("bundlessFilesAsync", "start", "end");
 	console.log("bundlessJsAsync measure", measure.duration);
 })();

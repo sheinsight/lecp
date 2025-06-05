@@ -62,14 +62,12 @@ pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
     Ok(out_path)
 }
 
-pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<()> {
-    let cwd = cwd.as_ref();
+pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
+    let cwd = &options.cwd;
     println!("Bundless CLI: {:?}", cwd);
 
     let src_dir = options.src_dir();
-    let out_dir = options.out_dir();
 
-    let out_ext = options.out_ext();
     // let is_default_format = options.is_default_format();
 
     let swc_options = options.build_for_swc()?;
@@ -78,9 +76,30 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
     println!("bundless options: {:#?}", &options);
     println!("swc options: {:#?}", &swc_options);
 
-    let ignore = std::iter::once("**/*.d.ts")
+    // 测试相关文件(glob格式)
+    // wax crate 不支持某些高级的 glob 语法，特别是 {,/**} 这种大括号扩展和 **/*.+(test|e2e|spec).* 这种扩展模式。
+    let test_pattern = vec![
+        "**/fixtures",
+        "**/fixtures/**",
+        "**/demos",
+        "**/demos/**",
+        "**/mocks",
+        "**/mocks/**",
+        "**/__test__",
+        "**/__test__/**",
+        "**/__snapshots__",
+        "**/__snapshots__/**",
+        "**/*.test.*",
+        "**/*.e2e.*",
+        "**/*.spec.*",
+    ];
+
+    let ignore: Vec<&str> = ["**/*.d.ts"]
+        .iter()
+        .copied()
         .chain(options.exclude.iter().map(|s| s.as_str()))
-        .collect::<Vec<_>>();
+        .chain(test_pattern.iter().copied())
+        .collect();
 
     debug!("ignore: {:?}", ignore);
 
@@ -90,11 +109,27 @@ pub fn bundless_js<P: AsRef<Path>>(cwd: P, options: &BundlessOptions) -> Result<
         .par_bridge()
         .filter_map(Result::ok)
         .map(|entry| entry.path().to_owned())
-        .try_for_each(|path| {
-            let out_path = get_out_file_path(&path, &src_dir, &out_dir, &out_ext)?;
-            let output = transform_file(&path, &swc_options, &options)?;
-            write_file_and_sourcemap(output, &out_path)
-        })?;
+        .try_for_each(|path| bundless_file(path, options))?;
+
+    Ok(())
+}
+
+pub fn bundless_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Result<()> {
+    let file = file.as_ref();
+    // let cwd = &options.cwd;
+
+    if !file.exists() {
+        return Err(anyhow::anyhow!("File does not exist: {:?}", file));
+    }
+
+    let src_dir = options.src_dir();
+    let out_dir = options.out_dir();
+    let out_ext = options.out_ext();
+    let swc_options = options.build_for_swc()?;
+
+    let out_path = get_out_file_path(file, &src_dir, &out_dir, &out_ext)?;
+    let output = transform_file(file, &swc_options, &options)?;
+    write_file_and_sourcemap(output, &out_path)?;
 
     Ok(())
 }

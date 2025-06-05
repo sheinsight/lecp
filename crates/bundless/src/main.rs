@@ -1,6 +1,9 @@
+use std::fmt::format;
+
 use anyhow::Result;
 use lecp_bundless::{
-    BundlessOptions, CSS, Define, JsxRuntime, React, Shims, bundless_js, serde_error_to_miette,
+    BundlessOptions, CSS, Define, JsxRuntime, React, Shims, bundless_files, bundless_script,
+    serde_error_to_miette,
 };
 use serde_json::json;
 
@@ -16,6 +19,7 @@ fn main() -> Result<()> {
     let start_time = std::time::Instant::now();
     let cwd = std::env::current_dir()?.join("./examples/demo-sdk").canonicalize()?;
     let cwd = std::env::current_dir()?.join("./examples/demo-component").canonicalize()?;
+    let cwd = std::env::current_dir()?.join("./packages/core").canonicalize()?;
 
     // way1: rust struct
     // let options = BundlessOptions::default()
@@ -40,37 +44,46 @@ fn main() -> Result<()> {
     //     .css(CSS::default().css_modules("[name]_[local]_[hash:base64:5]").less_compile(true));
 
     // way2: json
+    // let options_json = json!({
+    //     "isModule": true,
+    //     "format": "esm",
+    //     "cwd": &cwd,
+    //     "targets": {
+    //         "chrome": "55"
+    //         // "node": "20.11.0",
+    //     },
+    //     "define": {
+    //         "PRODUCTION": "\"true\"",
+    //         "VERSION": "\"5fa3b9\"",
+    //         "BROWSER_SUPPORTS_HTML5": "\"true\"",
+    //         "typeof window": "\"object\"",
+    //         "process.env.NODE_ENV": "\"production\""
+    //     },
+    //     // "shims": {
+    //     //     "legacy": true
+    //     // },
+    //     // "sourcemap": true,
+    //     // "minify": false,
+    //     "react": {
+    //         "jsxRuntime": "automatic"
+    //     },
+    //     "css": {
+    //         "cssModules": "demo-component__[name]_[local]",
+    //         "lessCompile": true
+    //     },
+    //     "alias": {
+    //         "@": "./src",
+    //     },
+    //     "exclude": [],
+    // });
+
     let options_json = json!({
-        "isModule": true,
-        "format": "esm",
+        "format":"esm",
         "cwd": &cwd,
+        "isModule": true,
         "targets": {
-            "chrome": "55"
-            // "node": "20.11.0",
+            "node": "20.19.0",
         },
-        "define": {
-            "PRODUCTION": "\"true\"",
-            "VERSION": "\"5fa3b9\"",
-            "BROWSER_SUPPORTS_HTML5": "\"true\"",
-            "typeof window": "\"object\"",
-            "process.env.NODE_ENV": "\"production\""
-        },
-        // "shims": {
-        //     "legacy": true
-        // },
-        // "sourcemap": true,
-        // "minify": false,
-        "react": {
-            "jsxRuntime": "automatic"
-        },
-        "css": {
-            "cssModules": "demo-component__[name]_[local]",
-            "lessCompile": true
-        },
-        "alias": {
-            "@": "./src",
-        },
-        "exclude": [],
     });
 
     let options_str = options_json.to_string();
@@ -79,7 +92,7 @@ fn main() -> Result<()> {
         anyhow::anyhow!("{:?}", miette_err)
     })?;
 
-    let res = bundless_js(&cwd, &options);
+    let res = bundless_files(&options);
     if let Err(e) = res {
         eprintln!("\n{:?}", e);
         std::process::exit(1);
