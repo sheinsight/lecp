@@ -35,10 +35,9 @@
     "demo": "node --experimental-strip-types demo.mts"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^3.0.0-alpha.82",
+    "@napi-rs/cli": "^3.0.0-alpha.87",
     "@types/node": "catalog:"
   },
-  "packageManager": "pnpm@10.11.0",
   "optionalDependencies": {
     "@shined/lecp-binding-darwin-arm64": "workspace:*",
     "@shined/lecp-binding-darwin-x64": "workspace:*",
