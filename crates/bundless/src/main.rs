@@ -1,10 +1,6 @@
-use std::fmt::format;
-
 use anyhow::Result;
-use lecp_bundless::{
-    BundlessOptions, CSS, Define, JsxRuntime, React, Shims, bundless_files, bundless_script,
-    serde_error_to_miette,
-};
+use lecp_bundless::{BundlessOptions, bundless_files, serde_error_to_miette};
+use log::debug;
 use serde_json::json;
 
 fn main() -> Result<()> {
@@ -79,13 +75,13 @@ fn main() -> Result<()> {
 
     let options_json = json!({
         "format":"esm",
+        "sourcemap": true,
         "cwd": &cwd,
         "isModule": true,
         "targets": {
             "node": "20.19.0",
         },
     });
-
     let options_str = options_json.to_string();
     let options = serde_json::from_str::<BundlessOptions>(&options_str).map_err(|e| {
         let miette_err = serde_error_to_miette(e, &options_str, "Could not parse lecp config");
@@ -99,7 +95,7 @@ fn main() -> Result<()> {
     }
 
     let end_time = std::time::Instant::now();
-    println!("Transforming files took: {} ms", (end_time - start_time).as_millis());
+    debug!("Transforming files took: {} ms", (end_time - start_time).as_millis());
 
     Ok(())
 }

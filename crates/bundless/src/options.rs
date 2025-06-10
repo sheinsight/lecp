@@ -78,6 +78,14 @@ impl ModuleType {
             // ModuleType::Umd => "umd".to_string(),
         }
     }
+
+    pub fn get_type(&self) -> String {
+        match self {
+            ModuleType::ESM => "esm".to_string(),
+            ModuleType::CJS => "cjs".to_string(),
+            // ModuleType::Umd => "umd".to_string(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -123,7 +131,7 @@ pub struct BundlessOptions {
     #[serde(default = "default_cwd")]
     pub cwd: PathBuf,
     pub format: ModuleType,
-    sourcemap: bool,
+    pub sourcemap: bool,
     minify: bool,
     targets: serde_json::Value,
     shims: Shims,
@@ -240,7 +248,12 @@ impl BundlessOptions {
     }
 
     pub fn out_dir(&self) -> PathBuf {
-        self.out_dir.clone().unwrap_or_else(|| self.cwd.join("dist"))
+        let out = match &self.format {
+            ModuleType::ESM => "es",
+            ModuleType::CJS => "lib",
+        };
+
+        self.out_dir.clone().unwrap_or_else(|| self.cwd.join(out))
     }
 
     pub fn src_dir(&self) -> PathBuf {

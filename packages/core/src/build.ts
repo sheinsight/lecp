@@ -35,7 +35,7 @@ export const build = async (
 	userConfig: UserConfig,
 	inputSystemConfig: InputSystemConfig,
 ): Promise<Watcher[]> => {
-	logger.info("start build");
+	logger.info("LECP start build");
 
 	let watchers: Watcher[] = [];
 
@@ -56,7 +56,7 @@ export const build = async (
 
 	for (const task of format) {
 		const { mode, outDir, dts } = task;
-		logger.info(colors.white(`编译 script(${mode}-${task.type})`));
+		logger.info(colors.white(`\n${mode} script(${task.type})`));
 
 		if (mode === "bundless") {
 			const watcher = await bundlessFiles({ ...others, ...task }, systemConfig);
@@ -69,7 +69,7 @@ export const build = async (
 		}
 
 		if (dts) {
-			logger.info(colors.white(`编译 dts(${dts.mode})`));
+			logger.info(`generate dts (${dts.mode})`);
 
 			if (dts.mode === "bundless") {
 				const watcher = await bundlessDts({ ...others, ...task }, systemConfig);

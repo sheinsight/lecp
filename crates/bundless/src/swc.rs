@@ -158,13 +158,11 @@ pub fn transform(code: String, options: &Options) -> Result<TransformOutput> {
 
 pub fn write_file_and_sourcemap(output: TransformOutput, out_path: &Path) -> Result<()> {
     let mut code = output.code;
-    // 处理 sourcemap
+
+    // sourcemap
     if let Some(map) = output.map {
         let out_ext = out_path.extension().unwrap_or_default();
         let map_path = out_path.with_extension(format!("{}.map", out_ext.to_string_lossy()));
-        // println!("Writing map file: {:?}", &map_path.strip_prefix(cwd)?);
-        println!("Writing map file: {:?}", &map_path);
-
         code.push_str(&format!(
             "\n//# sourceMappingURL={}",
             &map_path.file_name().unwrap().to_string_lossy()
@@ -173,9 +171,6 @@ pub fn write_file_and_sourcemap(output: TransformOutput, out_path: &Path) -> Res
         write_file(map_path, map)?;
     }
 
-    // 写入文件
-    // println!("Writing     file: {:?}", &out_path.strip_prefix(cwd)?);
-    println!("Writing     file: {:?}", &out_path);
     write_file(out_path, code)?;
 
     Ok(())

@@ -153,7 +153,7 @@ export const bundlessFiles = async (
 	const { sourcemap, targets, minify } = options;
 
 	// 清除文件
-	logger.info(`🧹 清除${format}目录: ${outDir.replace(cwd, "")}`);
+	logger.info(`clear out dir: ${outDir.replace(cwd, ".")}`);
 	await fs.rm(outDir, { recursive: true, force: true });
 
 	const outJsExt = getOutJsExt(
@@ -260,7 +260,7 @@ export const bundlessFiles = async (
 		format: options.type, "isModule": config.pkg.type === "module",
 		cwd
 	}
-	console.log("bundlessOptions", bundlessOptions);
+	// console.log("bundlessOptions", bundlessOptions);
 
 	bundlessFilesAsync(Buffer.from(JSON.stringify(bundlessOptions)));
 

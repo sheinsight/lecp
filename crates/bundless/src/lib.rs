@@ -6,6 +6,7 @@ pub use crate::util::serde_error_to_miette;
 
 use anyhow::Result;
 use log::debug;
+use owo_colors::OwoColorize;
 use rayon::prelude::*;
 use std::path::Path;
 use swc::{transform_file, write_file_and_sourcemap};
@@ -64,17 +65,13 @@ pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
 
 pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
     let cwd = &options.cwd;
-    println!("Bundless CLI: {:?}", cwd);
+    // println!("Bundless CLI: {:?}", cwd);
 
     let src_dir = options.src_dir();
-
-    // let is_default_format = options.is_default_format();
-
     let swc_options = options.build_for_swc()?;
 
-    // println!("bundless default options: {:#?}", BundlessOptions::default());
-    println!("bundless options: {:#?}", &options);
-    println!("swc options: {:#?}", &swc_options);
+    debug!("bundless options: {:#?}", &options);
+    debug!("swc options: {:#?}", &swc_options);
 
     // 测试相关文件(glob格式)
     // wax crate 不支持某些高级的 glob 语法，特别是 {,/**} 这种大括号扩展和 **/*.+(test|e2e|spec).* 这种扩展模式。
@@ -103,6 +100,13 @@ pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
 
     debug!("ignore: {:?}", ignore);
 
+    // println!(
+    //     "\nbundless for {} to {} with {} and dts\n",
+    //     src_dir.strip_prefix(cwd)?.display().yellow(),
+    //     options.format.get_type().yellow(),
+    //     options.sourcemap.then(|| "sourcemap").unwrap_or_else(|| "no sourcemap")
+    // );
+
     let glob: Glob<'_> = Glob::new("**/*.{ts,tsx,cts,mts,js,jsx,cjs,mjs}")?;
     glob.walk(&src_dir)
         .not(ignore)?
@@ -116,7 +120,7 @@ pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
 
 pub fn bundless_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Result<()> {
     let file = file.as_ref();
-    // let cwd = &options.cwd;
+    let cwd = &options.cwd;
 
     if !file.exists() {
         return Err(anyhow::anyhow!("File does not exist: {:?}", file));
@@ -129,6 +133,13 @@ pub fn bundless_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Resu
 
     let out_path = get_out_file_path(file, &src_dir, &out_dir, &out_ext)?;
     let output = transform_file(file, &swc_options, &options)?;
+
+    println!(
+        "bundless({}) {} to {}",
+        options.format.get_type(),
+        &file.strip_prefix(cwd)?.display().yellow(),
+        &out_path.strip_prefix(cwd)?.display().bright_black()
+    );
     write_file_and_sourcemap(output, &out_path)?;
 
     Ok(())

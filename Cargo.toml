@@ -16,6 +16,7 @@ anyhow     = "1.0.98"
 env_logger = "0.11.8"
 log        = "0.4.17"
 miette     = { version = "7.6.0", features = ["fancy"] }
+owo-colors = { version = "4.0", features = ["supports-colors"] }
 path-clean = "1.0.1"
 rayon      = "1.10.0"
 serde      = { version = "1.0.219", features = ["derive"] }
@@ -33,9 +34,9 @@ swc_transform_shims      = { path = "./crates/transform_shims/transform" }
 swc_transform_ts2js      = { path = "./crates/transform_ts2js/transform" }
 
 # napi
-napi        = { version = "3.0.0-beta.7", features = ["async", "anyhow"] }
+napi        = { version = "3.0.0-beta.8", features = ["async", "anyhow"] }
 napi-build  = { version = "2.2.1" }
-napi-derive = { version = "3.0.0-beta.6", default-features = false, features = ["type-def"] }
+napi-derive = { version = "3.0.0-beta.8", default-features = false, features = ["type-def"] }
 
 # .cargo/config defines few alias to build plugin.
 # cargo build-wasi ge1.0.219 wasm-wasi32 binary
