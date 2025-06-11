@@ -19,7 +19,14 @@
 		"enabled": true,
 		"indentStyle": "tab",
 		"indentWidth": 2,
-		"ignore": ["napi/**/npm/**"]
+		"ignore": [
+			"napi/**/npm/**",
+			"target/**",
+			"dist/**",
+			"es/**",
+			"lib/**",
+			"umd/**"
+		]
 	},
 	"javascript": {
 		"formatter": {

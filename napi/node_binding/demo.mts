@@ -10,7 +10,7 @@ import { bundlessFilesAsync } from "./index.js";
 		const cwd = path.resolve(process.cwd(), "../../examples/demo-component");
 		const options = {
 			// config
-			"isModule": true,
+			isModule: true,
 			cwd,
 			exclude: [],
 			// -------

@@ -135,7 +135,7 @@ pub fn bundless_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Resu
     let output = transform_file(file, &swc_options, &options)?;
 
     println!(
-        "bundless({}) {} to {}",
+        " bundless({}) {} to {}",
         options.format.get_type(),
         &file.strip_prefix(cwd)?.display().yellow(),
         &out_path.strip_prefix(cwd)?.display().bright_black()

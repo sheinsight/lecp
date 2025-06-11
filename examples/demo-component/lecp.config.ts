@@ -25,6 +25,7 @@ export default defineConfig({
 		jsxRuntime: "automatic", // "classic" | "automatic"
 	},
 	// dts: { builder: "ts", mode: "bundless" },
+	dts: { mode: "bundless", builder: "swc" },
 	targets: {
 		chrome: 55,
 	},

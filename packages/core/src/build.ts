@@ -10,7 +10,7 @@ import { bundlessDts, getTsConfigFileContent } from "./bundless/dts.ts";
 import { bundlessFiles } from "./bundless/index.ts";
 import { getConfig, getFinalUserOptions } from "./config.ts";
 import type { UserConfig } from "./define-config.ts";
-import { pathExists } from "./util/index.ts";
+import { measure, pathExists } from "./util/index.ts";
 import { type LogLevel, logger } from "./util/logger.ts";
 
 export interface InputSystemConfig {
@@ -56,7 +56,7 @@ export const build = async (
 
 	for (const task of format) {
 		const { mode, outDir, dts } = task;
-		logger.info(colors.white(`\n${mode} script(${task.type})`));
+		logger.info(`\n${colors.white(`${mode} ${task.type}`)}`);
 
 		if (mode === "bundless") {
 			const watcher = await bundlessFiles({ ...others, ...task }, systemConfig);
@@ -71,7 +71,8 @@ export const build = async (
 		if (dts) {
 			logger.info(`generate dts (${dts.mode})`);
 
-			if (dts.mode === "bundless") {
+		const { duration} = await	measure(async () => {
+				if (dts.mode === "bundless") {
 				const watcher = await bundlessDts({ ...others, ...task }, systemConfig);
 				if (watcher) watchers.push(watcher);
 			}
@@ -91,6 +92,9 @@ export const build = async (
 				);
 				if (watcher) watchers.push(watcher);
 			}
+			});
+
+			logger.info(`dts generated in ${duration}ms`);
 		}
 	}
 

@@ -71,7 +71,7 @@ export const getTsConfigFileContent = (options: {
 	const { cwd, exclude = [] } = options;
 	const configFileName = ts.findConfigFile(cwd, ts.sys.fileExists);
 	if (!configFileName) {
-		logger.error(`${cwd}下未找到tsconfig.json`);
+		logger.error(`cannot find tsconfig.json in ${cwd}`);
 		return {} as never;
 	}
 
@@ -100,14 +100,12 @@ const bundlessEmitDts = async (
 ): Promise<Watcher | void> => {
 	const { cwd, watch } = config;
 
-	// logger.verbose("dts编译目录:", srcDir);
-
 	const { fileNames, options } = getTsConfigFileContent({ cwd, exclude: [] });
-	logger.verbose("dts编译文件: ", fileNames);
+	logger.verbose("dts 编译文件: ", fileNames);
 
 	// 没有文件提前退出
 	if (!fileNames?.length && !watch) return;
-	logger.verbose("用户tsconfig配置: ", options);
+	logger.verbose("user tsconfig options: ", options);
 
 	const overrideTsconfig = {
 		...OVERRIDE_TS_OPTIONS,
@@ -123,7 +121,7 @@ const bundlessEmitDts = async (
 		...overrideTsconfig,
 	};
 
-	logger.verbose("最终tsconfig配置: ", compilerOptions);
+	logger.verbose("final tsconfig options: ", compilerOptions);
 
 	if (watch) {
 		return watchDeclaration(fileNames, compilerOptions, onSuccess);
@@ -232,7 +230,7 @@ export const tsTransformDeclaration = async (
 ): Promise<TransformResult | undefined> => {
 	const code = ts.sys.readFile(fileName);
 	if (code === undefined) {
-		logger.error(`文件不存在: ${fileName}`);
+		logger.error(`file not found: ${fileName}`);
 		return;
 	}
 
@@ -358,18 +356,23 @@ export async function bundlessTransformDts(
 	};
 
 	const compileFile = async (file: string) => {
-		const fileRelPath = file.replace(cwd, "");
-		const filePath = file.replace(srcDir, "");
-		logger.info(colors.white(`编译dts:`), colors.yellow(fileRelPath));
 
-		const result = await dtsBuilders[dts.builder](file);
-		if (!result) return;
-		const { code, map } = result;
+		const filePath = file.replace(srcDir, "");
+		const fileRelPath = file.replace(`${cwd}/`, "");
 
 		const outFilePath = path.join(
 			outDir,
 			filePath.replace(/\.(t|j)sx?$/, ".d.ts").replace(/\.(c|m)ts$/, ".d.$1ts"),
 		);
+		const outFileRelPath = outFilePath.replace(`${cwd}/`, "");
+
+		logger.info(colors.white(`bundless(dts)`), `${colors.yellow(fileRelPath)} to ${colors.blackBright(outFileRelPath)}`);
+
+		const result = await dtsBuilders[dts.builder](file);
+		if (!result) return;
+		const { code, map } = result;
+
+
 		await fs.mkdir(path.dirname(outFilePath), { recursive: true });
 
 		// .d.ts

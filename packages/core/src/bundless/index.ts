@@ -144,6 +144,8 @@ const copyAsset = async (
 type BundlessOptions = Omit<FinalUserConfig, "format"> &
 	Required<BundlessFormat>;
 
+const TITLE_WIDTH = 13;
+
 export const bundlessFiles = async (
 	options: BundlessOptions,
 	config: SystemConfig,
@@ -153,7 +155,7 @@ export const bundlessFiles = async (
 	const { sourcemap, targets, minify } = options;
 
 	// 清除文件
-	logger.info(`clear out dir: ${outDir.replace(cwd, ".")}`);
+	logger.info(`clear directory: ${outDir.replace(cwd, ".")}`);
 	await fs.rm(outDir, { recursive: true, force: true });
 
 	const outJsExt = getOutJsExt(
@@ -195,14 +197,19 @@ export const bundlessFiles = async (
 	};
 
 	const compileFile = async (file: string) => {
-		const fileRelPath = file.replace(cwd, "");
+		const fileRelPath = file.replace(`${cwd}/`, "");
 		const filePath = file.replace(srcDir, "");
 
 		if (isCss.test(file) || (isLess.test(file) && css?.lessCompile)) {
-			logger.info(colors.white(`编译样式:`), colors.yellow(fileRelPath));
+			const outFilePath = getOutFilePath(filePath, "style");
+			const outFileRelPath = outFilePath.replace(`${cwd}/`, "");
+			logger.info(
+				"compile style".padEnd(TITLE_WIDTH),
+				`${colors.yellow(fileRelPath)} to ${colors.blackBright(outFileRelPath)}`,
+			);
 
 			await compileStyle(file, {
-				outFilePath: getOutFilePath(filePath, "style"),
+				outFilePath,
 				sourcemap,
 				targets,
 				cssModules: css?.cssModules,
@@ -242,27 +249,28 @@ export const bundlessFiles = async (
 			return;
 		}
 
-		logger.info(colors.white(`复制文件:`), colors.yellow(fileRelPath));
+		logger.info("copy file".padEnd(TITLE_WIDTH), colors.yellow(fileRelPath));
 		await copyAsset(file, { srcDir, outDir });
 	};
 
 	const excludePatterns = testPattern.concat(exclude);
+
+	let bundlessOptions = {
+		...options,
+		format: options.type,
+		isModule: config.pkg.type === "module",
+		cwd,
+	};
+	// console.log("bundlessOptions", bundlessOptions);
+
+	await bundlessFilesAsync(Buffer.from(JSON.stringify(bundlessOptions)));
+
 	const files = await glob("**/*", {
 		cwd: srcDir,
 		ignore: excludePatterns,
 		absolute: true,
 	});
-	files.forEach(compileFile);
-
-
-	let bundlessOptions = {
-		...options,
-		format: options.type, "isModule": config.pkg.type === "module",
-		cwd
-	}
-	// console.log("bundlessOptions", bundlessOptions);
-
-	bundlessFilesAsync(Buffer.from(JSON.stringify(bundlessOptions)));
+	 files.map(compileFile);
 
 	const watchers: Watcher[] = [];
 
@@ -276,10 +284,13 @@ export const bundlessFiles = async (
 		const handleChange = async (event: string, file: string) => {
 			console.log(`🔄 ${colors.white(event)}: ${colors.yellow(file)}`);
 
-			if (event === "add" || event === "change"){
-				let filePath = path.join(srcDir, file)
+			if (event === "add" || event === "change") {
+				let filePath = path.join(srcDir, file);
 				if (isScript.test(file) && !isDts.test(file)) {
-					return	bundlessFileAsync(filePath, Buffer.from(JSON.stringify(bundlessOptions)));
+					return bundlessFileAsync(
+						filePath,
+						Buffer.from(JSON.stringify(bundlessOptions)),
+					);
 				}
 
 				return compileFile(filePath);

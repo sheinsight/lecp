@@ -64,11 +64,11 @@ export const bundleDts = (options: BundleDtsOptions): void => {
 		});
 		if (!succeeded) {
 			// errorCount, warningCount
-			logger.error("bundle dts编译失败:");
+			logger.error("bundle dts failed:");
 		}
 	} catch (error: any) {
 		logger.error(
-			"bundle dts编译失败:",
+			"bundle dts failed:",
 			error.unformattedMessage || error.message,
 		);
 	}

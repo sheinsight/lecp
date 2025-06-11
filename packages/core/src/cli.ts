@@ -3,6 +3,7 @@ import { hideBin } from "yargs/helpers";
 import { type Watcher, build, init } from "./build.ts";
 import { watchConfig } from "./restart.ts";
 import { logger } from "./util/logger.ts";
+import { measure } from "./util/index.ts";
 
 yargs(hideBin(process.argv))
 	.alias("v", "version")
@@ -33,7 +34,11 @@ yargs(hideBin(process.argv))
 
 				const { config, files } = await init(systemConfig);
 
-				watchers = await build(config, systemConfig);
+				const { duration } = await measure(async () => {
+					watchers = await build(config, systemConfig);
+				});
+
+				logger.info(`\nbuild success in ${duration}ms`);
 
 				if (argv.watch) {
 					watchConfig(Array.from(files), handler);

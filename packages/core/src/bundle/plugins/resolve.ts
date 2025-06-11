@@ -4,9 +4,9 @@ import type { PluginFn } from "../chain.ts";
 
 // '@': './src'  -> '@': path.join(cwd, 'src'),
 export const aliasToWebpackAlias = (
-	alias: Record<string, string> = {},
+	alias: Record<string, string> | undefined = {},
 	cwd: string,
-) => {
+): Record<string, string> => {
 	return Object.entries(alias).reduce(
 		(acc, [name, value]) => {
 			acc[name] = path.isAbsolute(value) ? value : path.join(cwd, value);

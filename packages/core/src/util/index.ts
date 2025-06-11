@@ -2,6 +2,15 @@ import { createRequire } from "module";
 import fs from "fs/promises";
 import type { FormatType } from "../define-config.ts";
 
+export const measure = async <T>(fn: () => Promise<T>): Promise<{
+	result: Awaited<T>;
+	duration: string;
+}> => {
+	const start = performance.now();
+	const result = await fn();
+	return { result, duration: (performance.now() - start).toFixed(0) };
+};
+
 export const pathExists = (path: string): Promise<boolean> =>
 	fs
 		.access(path)
@@ -73,13 +82,13 @@ export function getOutJsExt(
 	return "js";
 }
 
-export function getBrowsersList({ targets }: { targets: Record<string, any> }) {
+export function getBrowsersList({ targets }: { targets: Record<string, any> }): string[] {
 	return Object.keys(targets).map(key => {
 		return `${key} >= ${targets[key] === true ? "0" : targets[key]}`;
 	});
 }
 
-export const requireResolve = (id: string) => {
+export const requireResolve = (id: string): string => {
 	try {
 		return require.resolve(id);
 	} catch {

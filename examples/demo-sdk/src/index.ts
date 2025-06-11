@@ -15,8 +15,6 @@
 
 // console.log(resolve1, resolve2, resolve3, resolve4);
 
-
-
 import { a } from "./util";
 import { a as a1 } from "./util/index.js";
 import { a as a2 } from "./util/index.ts";
@@ -24,9 +22,9 @@ import { a as a2 } from "./util/index.ts";
 console.log(a, a1, a2);
 
 (async () => {
-	const { a : b0 } = await import("./util");
-	const { a : b1 } = await import("./util/index.js");
-	const { a : b2 } = await import("./util/index.ts");
+	const { a: b0 } = await import("./util");
+	const { a: b1 } = await import("./util/index.js");
+	const { a: b2 } = await import("./util/index.ts");
 
 	console.log(b0, b1, b2);
 })();
@@ -49,7 +47,6 @@ console.log(c0, c1, c2);
 // const { a: a3 } = require("./util");
 // console.log(a3);
 
-
 //  -----------
 
 // TODO: auto shim
@@ -61,20 +58,17 @@ console.log(_dirname, _filename);
 
 console.log(__dirname, __filename);
 
-
 console.log(import.meta.dirname);
 console.log(import.meta.filename);
 console.log(import.meta.url);
 
-
-const { dirname, filename,url } = import.meta;
-                console.log(dirname);
-                console.log(filename);
-				console.log(url);
-
+const { dirname, filename, url } = import.meta;
+console.log(dirname);
+console.log(filename);
+console.log(url);
 
 // 0000
-const r1  = require("./util");
-const r2  = require("./util/index.js");
-const r3  = require("./util/index.ts");
+const r1 = require("./util");
+const r2 = require("./util/index.js");
+const r3 = require("./util/index.ts");
 console.log(r1, r2, r3);

@@ -20,44 +20,44 @@
 - js/css/dts
 
 ## TODO
-- [ ] extends
+- [x] extends
     - web/web-legacy/node/node-legacy/...
-    - workspace
-- [ ] format 格式 (esm/cjs/umd)数组
+    - ~~workspace~~
+- [x] format 格式 (esm/cjs/umd)数组
     - 场景1: 多个 umd
     - 场景2: 多个 target
-- [ ] css
+- [x] css
     - css-modules 支持
         - swc 插件 👌
         - LightningCSS 支持 👌
-    - less 支持 ?
+    - [ ] less 支持 ?
         - 支持, 多线程并行编译
         - 不支持, 但提供 less 语法检查无痛转 css
-- [ ] dts
+- [x] dts
     - bundle: `@microsoft/api-extractor` 📡
     - bundless:
         - fast: `isolated declarations` 📡
             - ts, oxc, swc 都支持
         - default: rollup-plugin-dts(5.3~6.1 差异跟踪)
-- [ ] shim
+- [x] shim
 	 - cjs 支持 `import.meta.url`
 	 - esm 支持 `__filename`, `__dirname`,
-- [ ] polyfill
+- [x] polyfill
 	 - core-js
 	 - node-polyfill
-- [ ] externalHelpers
+- [x] externalHelpers
 	 - @swc/helpers
 	 - @babel/runtime
-- [ ] targets
+- [x] targets
     - browserlist
     - rspack.target 考虑 node, web
-- [ ] define
+- [x] define
 	 - `process.env.NODE_ENV`
 	 - `__DEV__`
-- [ ] alias
+- [x] alias
 	 - `@` -> `src`
 - [ ] 内置 banner
     - 微前端 umd sourcemap 支持
 - [ ] check/doctor
     - package.json 导出检查
-- [ ] auto restart
+- [x] auto restart

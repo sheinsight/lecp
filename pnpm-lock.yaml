@@ -7,7 +7,7 @@ settings:
 catalogs:
   default:
     '@types/node':
-      specifier: ^22.15.29
+      specifier: 22.15.29
       version: 22.15.29
     '@types/react':
       specifier: ^19.1.7
@@ -68,6 +68,9 @@ importers:
       '@swc/core':
         specifier: 1.11.31
         version: 1.11.31
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.15.29
       '@types/react':
         specifier: 'catalog:'
         version: 19.1.7
