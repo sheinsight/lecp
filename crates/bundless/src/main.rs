@@ -13,8 +13,8 @@ fn main() -> Result<()> {
     env_logger::init();
 
     let start_time = std::time::Instant::now();
-    let cwd = std::env::current_dir()?.join("./examples/demo-sdk").canonicalize()?;
-    let cwd = std::env::current_dir()?.join("./examples/demo-component").canonicalize()?;
+    // let cwd = std::env::current_dir()?.join("./examples/demo-sdk").canonicalize()?;
+    // let cwd = std::env::current_dir()?.join("./examples/demo-component").canonicalize()?;
     let cwd = std::env::current_dir()?.join("./packages/core").canonicalize()?;
 
     // way1: rust struct

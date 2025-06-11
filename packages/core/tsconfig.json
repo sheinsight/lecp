@@ -1,7 +1,7 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"isolatedDeclarations": true, // perf
+		"isolatedDeclarations": true // perf
 	},
 	"include": ["src"]
 }

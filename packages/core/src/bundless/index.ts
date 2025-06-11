@@ -1,9 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import {
-	transform as swcTransform,
-	transformFile as swcTransformFile,
-} from "@swc/core";
 import chokidar from "chokidar";
 import colors from "picocolors";
 import { glob } from "tinyglobby";
@@ -11,21 +7,13 @@ import type { SystemConfig, Watcher } from "../build.ts";
 import type { FinalUserConfig } from "../config.ts";
 import { testPattern } from "../constant.ts";
 import type { BundlessFormat } from "../define-config.ts";
-import {
-	getOutJsExt,
-	isCss,
-	isDts,
-	isJsx,
-	isLess,
-	isScript,
-} from "../util/index.ts";
+import { getOutJsExt, isCss, isDts, isLess, isScript } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
 import {
 	type TransformLessOptions,
 	transformCSS,
 	transformLess,
 } from "./style.ts";
-import { getSwcOptions } from "./swc.ts";
 
 import { bundlessFileAsync, bundlessFilesAsync } from "@shined/lecp-binding";
 
@@ -92,41 +80,6 @@ const compileStyle = async (
 	await fs.writeFile(outFilePath, code);
 };
 
-interface CompileScriptOptions {
-	compile: (file: string) => Promise<{ code: string; map?: string }>;
-	outFilePath: string;
-}
-const compileScript = async (
-	file: string,
-	{ compile, outFilePath }: CompileScriptOptions,
-): Promise<void> => {
-	let { code, map } = await compile(file);
-
-	const outDir = path.dirname(outFilePath);
-	await fs.mkdir(outDir, { recursive: true });
-
-	if (map) {
-		const mapFilePath = outFilePath + ".map";
-		code += `\n//# sourceMappingURL=${path.basename(mapFilePath)}`;
-
-		const mapJson: SourceMap = typeof map === "string" ? JSON.parse(map) : map;
-		mapJson.file = path.basename(outFilePath);
-
-		// 绝对路径 -> 相对路径
-		if (mapJson.sources) {
-			mapJson.sources = mapJson.sources.map(filePath =>
-				path.relative(outDir, filePath),
-			);
-		}
-
-		// .js.map
-		await fs.writeFile(mapFilePath, JSON.stringify(mapJson));
-	}
-
-	// .js
-	await fs.writeFile(outFilePath, code);
-};
-
 interface CopyAssetOptions {
 	srcDir: string;
 	outDir: string;
@@ -164,9 +117,9 @@ export const bundlessFiles = async (
 		format,
 	);
 
-	const isDefaultFormat =
-		(format === "esm" && config.pkg.type === "module") ||
-		(format === "cjs" && config.pkg.type !== "module");
+	// const isDefaultFormat =
+	// 	(format === "esm" && config.pkg.type === "module") ||
+	// 	(format === "cjs" && config.pkg.type !== "module");
 
 	const getOutFilePath = (
 		filePath: string,
@@ -219,33 +172,6 @@ export const bundlessFiles = async (
 		}
 
 		if (isScript.test(file) && !isDts.test(file)) {
-			// logger.info(colors.white(`编译到${format}:`), colors.yellow(fileRelPath));
-
-			// await compileScript(file, {
-			// 	compile: async file => {
-			// 		const swcOptions = getSwcOptions(
-			// 			{ ...options, outJsExt: isJsx.test(file) ? "js" : outJsExt },
-			// 			config,
-			// 		);
-
-			// 		// 非默认 format: 先处理后缀再编译
-			// 		// esm: alias +.ts 后缀 无法同时处理, 需要二次编译
-			// 		if (!isDefaultFormat || swcOptions.jsc?.paths) {
-			// 			const { code } = await swcTransformFile(
-			// 				file,
-			// 				getSwcOptions(
-			// 					{ ...options, type: "esm", outJsExt: "js", shims: undefined },
-			// 					config,
-			// 				),
-			// 			);
-			// 			return swcTransform(code, { filename: file, ...swcOptions });
-			// 		}
-
-			// 		return swcTransformFile(file, swcOptions);
-			// 	},
-			// 	outFilePath: getOutFilePath(filePath, "script"),
-			// });
-
 			return;
 		}
 
@@ -261,7 +187,6 @@ export const bundlessFiles = async (
 		isModule: config.pkg.type === "module",
 		cwd,
 	};
-	// console.log("bundlessOptions", bundlessOptions);
 
 	await bundlessFilesAsync(Buffer.from(JSON.stringify(bundlessOptions)));
 
@@ -270,7 +195,7 @@ export const bundlessFiles = async (
 		ignore: excludePatterns,
 		absolute: true,
 	});
-	 files.map(compileFile);
+	files.map(compileFile);
 
 	const watchers: Watcher[] = [];
 

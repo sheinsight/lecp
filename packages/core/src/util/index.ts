@@ -2,7 +2,9 @@ import { createRequire } from "module";
 import fs from "fs/promises";
 import type { FormatType } from "../define-config.ts";
 
-export const measure = async <T>(fn: () => Promise<T>): Promise<{
+export const measure = async <T>(
+	fn: () => Promise<T>,
+): Promise<{
 	result: Awaited<T>;
 	duration: string;
 }> => {
@@ -82,7 +84,9 @@ export function getOutJsExt(
 	return "js";
 }
 
-export function getBrowsersList({ targets }: { targets: Record<string, any> }): string[] {
+export function getBrowsersList({
+	targets,
+}: { targets: Record<string, any> }): string[] {
 	return Object.keys(targets).map(key => {
 		return `${key} >= ${targets[key] === true ? "0" : targets[key]}`;
 	});

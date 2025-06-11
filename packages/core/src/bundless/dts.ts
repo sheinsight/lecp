@@ -356,7 +356,6 @@ export async function bundlessTransformDts(
 	};
 
 	const compileFile = async (file: string) => {
-
 		const filePath = file.replace(srcDir, "");
 		const fileRelPath = file.replace(`${cwd}/`, "");
 
@@ -366,12 +365,14 @@ export async function bundlessTransformDts(
 		);
 		const outFileRelPath = outFilePath.replace(`${cwd}/`, "");
 
-		logger.info(colors.white(`bundless(dts)`), `${colors.yellow(fileRelPath)} to ${colors.blackBright(outFileRelPath)}`);
+		logger.info(
+			colors.white(`bundless(dts)`),
+			`${colors.yellow(fileRelPath)} to ${colors.blackBright(outFileRelPath)}`,
+		);
 
 		const result = await dtsBuilders[dts.builder](file);
 		if (!result) return;
 		const { code, map } = result;
-
 
 		await fs.mkdir(path.dirname(outFilePath), { recursive: true });
 

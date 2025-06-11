@@ -64,7 +64,7 @@ pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
 }
 
 pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
-    let cwd = &options.cwd;
+    // let cwd = &options.cwd;
     // println!("Bundless CLI: {:?}", cwd);
 
     let src_dir = options.src_dir();

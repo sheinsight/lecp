@@ -71,27 +71,30 @@ export const build = async (
 		if (dts) {
 			logger.info(`generate dts (${dts.mode})`);
 
-		const { duration} = await	measure(async () => {
+			const { duration } = await measure(async () => {
 				if (dts.mode === "bundless") {
-				const watcher = await bundlessDts({ ...others, ...task }, systemConfig);
-				if (watcher) watchers.push(watcher);
-			}
-
-			if (dts.mode === "bundle") {
-				const tempDir = path.join(cwd, ".lecp"); // api-extractor 在 node_module 下 合并 dts 失败
-				if (!(await pathExists(tempDir))) {
-					await fs.mkdir(tempDir);
-					await fs.writeFile(path.resolve(tempDir, ".gitignore"), "**/*");
+					const watcher = await bundlessDts(
+						{ ...others, ...task },
+						systemConfig,
+					);
+					if (watcher) watchers.push(watcher);
 				}
 
-				const tempOutDir = path.join(tempDir, path.relative(cwd, outDir));
-				const watcher = await bundlessDts(
-					{ ...others, ...task, outDir: tempOutDir },
-					systemConfig,
-					() => bundleDts({ srcDir: tempOutDir, outDir, cwd }),
-				);
-				if (watcher) watchers.push(watcher);
-			}
+				if (dts.mode === "bundle") {
+					const tempDir = path.join(cwd, ".lecp"); // api-extractor 在 node_module 下 合并 dts 失败
+					if (!(await pathExists(tempDir))) {
+						await fs.mkdir(tempDir);
+						await fs.writeFile(path.resolve(tempDir, ".gitignore"), "**/*");
+					}
+
+					const tempOutDir = path.join(tempDir, path.relative(cwd, outDir));
+					const watcher = await bundlessDts(
+						{ ...others, ...task, outDir: tempOutDir },
+						systemConfig,
+						() => bundleDts({ srcDir: tempOutDir, outDir, cwd }),
+					);
+					if (watcher) watchers.push(watcher);
+				}
 			});
 
 			logger.info(`dts generated in ${duration}ms`);

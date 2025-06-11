@@ -7,7 +7,7 @@ use swc_core::common::comments::SingleThreadedComments;
 use swc_core::ecma::ast::{Pass, noop_pass};
 use swc_core::{
     base::{Compiler, TransformOutput, try_with_handler},
-    common::{FileName, GLOBALS, SourceMap},
+    common::{GLOBALS, SourceMap},
 };
 
 use crate::util::write_file;
@@ -20,25 +20,25 @@ use crate::{BundlessOptions, ModuleType};
 //     ..Default::default()
 // },
 
-pub fn parallel_transform_file(
-    files: Vec<&Path>,
-    options: &Options,
-    bundless_options: &BundlessOptions,
-) -> Result<()> {
-    use rayon::prelude::*;
+// pub fn parallel_transform_file(
+//     files: Vec<&Path>,
+//     options: &Options,
+//     bundless_options: &BundlessOptions,
+// ) -> Result<()> {
+//     use rayon::prelude::*;
 
-    let res = files
-        .into_par_iter()
-        .map(|file| transform_file(file, options, bundless_options))
-        .collect::<Result<Vec<_>>>()?;
+//     let res = files
+//         .into_par_iter()
+//         .map(|file| transform_file(file, options, bundless_options))
+//         .collect::<Result<Vec<_>>>()?;
 
-    debug!("Successfully transformed {} files in parallel", res.len());
-    for (i, output) in res.iter().enumerate() {
-        debug!("File {}: {:?}", i, output);
-    }
+//     debug!("Successfully transformed {} files in parallel", res.len());
+//     for (i, output) in res.iter().enumerate() {
+//         debug!("File {}: {:?}", i, output);
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 pub fn transform_file(
     file: &Path,
@@ -133,28 +133,28 @@ pub fn transform_file(
         .map_err(|e| e.to_pretty_error())
 }
 
-pub fn transform(code: String, options: &Options) -> Result<TransformOutput> {
-    let cm = Arc::<SourceMap>::default(); // cm -> code map
-    let compiler = Compiler::new(cm.clone());
+// pub fn transform(code: String, options: &Options) -> Result<TransformOutput> {
+//     let cm = Arc::<SourceMap>::default(); // cm -> code map
+//     let compiler = Compiler::new(cm.clone());
 
-    // 计算 SyntaxContext
-    GLOBALS
-        .set(&Default::default(), || {
-            try_with_handler(cm.clone(), Default::default(), |handler| {
-                let fm = compiler.cm.new_source_file(
-                    if options.filename.is_empty() {
-                        FileName::Anon.into()
-                    } else {
-                        FileName::Real(options.filename.clone().into()).into()
-                    },
-                    code.to_string(),
-                );
+//     // 计算 SyntaxContext
+//     GLOBALS
+//         .set(&Default::default(), || {
+//             try_with_handler(cm.clone(), Default::default(), |handler| {
+//                 let fm = compiler.cm.new_source_file(
+//                     if options.filename.is_empty() {
+//                         FileName::Anon.into()
+//                     } else {
+//                         FileName::Real(options.filename.clone().into()).into()
+//                     },
+//                     code.to_string(),
+//                 );
 
-                compiler.process_js_file(fm, handler, &options)
-            })
-        })
-        .map_err(|e| e.to_pretty_error())
-}
+//                 compiler.process_js_file(fm, handler, &options)
+//             })
+//         })
+//         .map_err(|e| e.to_pretty_error())
+// }
 
 pub fn write_file_and_sourcemap(output: TransformOutput, out_path: &Path) -> Result<()> {
     let mut code = output.code;
@@ -215,34 +215,34 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_transform() {
-        let code = "const a = 1;".to_string();
-        let result = transform(code, &Default::default());
-        assert!(result.is_ok());
-        if let Ok(output) = result {
-            println!("{:?}", output);
-        }
-    }
+    // #[test]
+    // fn test_transform() {
+    //     let code = "const a = 1;".to_string();
+    //     let result = transform(code, &Default::default());
+    //     assert!(result.is_ok());
+    //     if let Ok(output) = result {
+    //         println!("{:?}", output);
+    //     }
+    // }
 
-    #[test]
-    fn test_transform_error() {
-        let code = "cont a = 1;".to_string();
-        let result = transform(code, &Default::default());
-        assert!(result.is_err());
-        if let Err(err) = result {
-            println!("{:?}", err);
-        }
-    }
+    // #[test]
+    // fn test_transform_error() {
+    //     let code = "cont a = 1;".to_string();
+    //     let result = transform(code, &Default::default());
+    //     assert!(result.is_err());
+    //     if let Err(err) = result {
+    //         println!("{:?}", err);
+    //     }
+    // }
 
-    #[test]
-    fn test_transform_parallel() {
-        let files: Vec<&Path> =
-            vec!["./transform-input.js".as_ref(), "./transform-input.js".as_ref()];
-        parallel_transform_file(files, &Default::default(), &Default::default()).unwrap_or_else(
-            |err| {
-                println!("Error: {:?}", err);
-            },
-        );
-    }
+    // #[test]
+    // fn test_transform_parallel() {
+    //     let files: Vec<&Path> =
+    //         vec!["./transform-input.js".as_ref(), "./transform-input.js".as_ref()];
+    //     parallel_transform_file(files, &Default::default(), &Default::default()).unwrap_or_else(
+    //         |err| {
+    //             println!("Error: {:?}", err);
+    //         },
+    //     );
+    // }
 }
