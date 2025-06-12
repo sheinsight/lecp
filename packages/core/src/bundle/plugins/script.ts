@@ -18,6 +18,12 @@ export const pluginScript: PluginFn = (
 		config,
 	);
 
+	// swc-loader 只需要config，不需要 options
+	delete swcOptions.swcrc;
+	delete swcOptions.configFile;
+	// @ts-expect-error
+	delete swcOptions.module.resolveFully;
+
 	chain.module
 		.rule("js")
 		.test(/\.(js|mjs|cjs|jsx|ts|mts|cts|tsx)$/i)
