@@ -1505,6 +1505,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "757892557993c69e82f9de0f9051e87144278aa342f03bf53617bbf044554484"
 dependencies = [
  "once_cell",
+ "rayon",
 ]
 
 [[package]]
@@ -2449,6 +2450,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "083af217e9715a7c1b020f7c9e71e4961285adb0333ee3f0e5e92962a0494a11"
 dependencies = [
  "once_cell",
+ "par-core",
  "swc",
  "swc_allocator",
  "swc_atoms",

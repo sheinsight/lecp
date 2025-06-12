@@ -35,9 +35,15 @@ importers:
       '@biomejs/biome':
         specifier: ^1.9.4
         version: 1.9.4
+      '@shined/lecp':
+        specifier: workspace:*
+        version: link:packages/core
       oxlint:
         specifier: ^1.0.0
         version: 1.0.0
+      tinyglobby:
+        specifier: ^0.2.14
+        version: 0.2.14
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
