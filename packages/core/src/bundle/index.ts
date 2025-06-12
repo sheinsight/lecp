@@ -29,7 +29,7 @@ export const bundleFiles = async (
 
 	const rspackConfig = getRspackConfig(options, config);
 
-	console.log(stringify(rspackConfig, { verbose: true }));
+	// console.log(stringify(rspackConfig, { verbose: true }));
 
 	const compiler = rspack(rspackConfig);
 

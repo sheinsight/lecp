@@ -6,6 +6,7 @@ import type { BundleOptions } from "./index.ts";
 import { pluginAsset } from "./plugins/asset.ts";
 import { pluginCjs } from "./plugins/cjs.ts";
 import { pluginCss } from "./plugins/css.ts";
+import { pluginDefine } from "./plugins/define.ts";
 import { pluginEsm } from "./plugins/esm.ts";
 import { pluginMinimize } from "./plugins/minimize.ts";
 import { pluginOutput } from "./plugins/output.ts";
@@ -42,6 +43,7 @@ export function getRspackConfig(
 		pluginAsset,
 		pluginMinimize,
 		pluginResolve,
+		pluginDefine,
 		format === "esm" && pluginEsm,
 		format === "cjs" && pluginCjs,
 	]

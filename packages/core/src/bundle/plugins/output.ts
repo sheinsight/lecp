@@ -15,7 +15,7 @@ export const pluginOutput: PluginFn = (chain, { options, config: { pkg } }) => {
 	// chunk ext ???
 	chain.output
 		.path(outDir)
-		.filename(`[name]${outJsExt}`)
+		.filename(`[name].${outJsExt}`)
 		.library({
 			name: format === "umd" ? toUmdName(name) : undefined,
 			type: rspackModuleMap[format],
