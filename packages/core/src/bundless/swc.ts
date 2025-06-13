@@ -195,7 +195,7 @@ export const getSwcOptions = (
 				type: swcModuleMap[format],
 				resolveFully: true,
 				// node@14+ 支持在 cjs import(),无需转换
-				ignoreDynamic: true,
+				// ignoreDynamic: true,
 				// outFileExtension: outJsExt.slice(1), // 1.10.1+ 支持
 			},
 			minify,

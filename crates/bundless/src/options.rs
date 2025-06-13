@@ -317,7 +317,7 @@ impl BundlessOptions {
                 "type": self.format.to_string(),
                 "resolveFully": true,
                 // node@14+ 支持在 cjs import(),无需转换
-                "ignoreDynamic": true,
+                // "ignoreDynamic": true, -> 导致 alias 无法生效
                 // "outFileExtension": self.out_ext(),
             }
         });
