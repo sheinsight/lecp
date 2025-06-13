@@ -267,6 +267,20 @@ impl BundlessOptions {
 
 impl BundlessOptions {
     pub fn build_for_swc(&self) -> Result<Options> {
+        let minify_options = if self.minify {
+            // @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
+            Some(serde_json::json!({
+                "mangle": true,
+                "compress": {
+                    "passes": 2,
+                },
+                "format": {
+                    "comments": false,
+                },
+            }))
+        } else {
+            None
+        };
         let config_json = json!({
             "swcrc": false,
             "configFile": false,
@@ -299,15 +313,7 @@ impl BundlessOptions {
                     }
                 },
                 // @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
-                "minify": {
-                    "mangle": true,
-                    "compress": {
-                        "passes": 2,
-                    },
-                    "format": {
-                        "comments": false,
-                    },
-                },
+                "minify": minify_options,
                 "experimental": {
                     "cacheRoot": "node_modules/.cache/swc",
                     "plugins": self.get_plugins()

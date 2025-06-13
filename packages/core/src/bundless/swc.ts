@@ -168,15 +168,17 @@ export const getSwcOptions = (
 			paths: aliasToTsPath(alias),
 
 			// @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
-			minify: {
-				mangle: true,
-				compress: {
-					passes: 2,
-				},
-				format: {
-					comments: false,
-				},
-			},
+			minify: minify
+				? {
+						mangle: true,
+						compress: {
+							passes: 2,
+						},
+						format: {
+							comments: false,
+						},
+					}
+				: undefined,
 
 			experimental: {
 				plugins,
