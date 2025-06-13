@@ -1,5 +1,5 @@
 {
-	"name": "alias-test",
+	"name": "shims-test",
 	"version": "1.0.0",
 	"private": true,
 	"type": "module",

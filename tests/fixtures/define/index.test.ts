@@ -39,4 +39,6 @@ describe("bundless define ok", async () => {
 		expect(content).toContain('"object"');
 		expect(content).not.toContain("typeof window");
 	});
+
+	// TODO: minify 后会删除部分代码
 });
