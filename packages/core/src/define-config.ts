@@ -179,7 +179,7 @@ export interface UserConfig {
 	alias?: Record<string, string>;
 
 	/**
-	 * 设置代码中的可用变量(swc 暂不支持)
+	 * 设置代码中的可用变量
 	 * @description 参考 rspack.DefinePlugin
 	 * @default {}
 	 */

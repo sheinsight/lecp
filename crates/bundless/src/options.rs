@@ -297,7 +297,16 @@ impl BundlessOptions {
                         // @swc/core@1.2.101+ 支持无需插件实现 @see https://swc.rs/docs/configuration/compilation#jsctransformoptimizerglobals
                         "globals": self.get_globals_from_define(),
                     }
-
+                },
+                // @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
+                "minify": {
+                    "mangle": true,
+                    "compress": {
+                        "passes": 2,
+                    },
+                    "format": {
+                        "comments": false,
+                    },
                 },
                 "experimental": {
                     "cacheRoot": "node_modules/.cache/swc",

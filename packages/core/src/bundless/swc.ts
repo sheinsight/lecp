@@ -167,6 +167,17 @@ export const getSwcOptions = (
 			// 暂不支持替换 require 和 require.resolve @see https://github.com/swc-project/swc/issues/3614
 			paths: aliasToTsPath(alias),
 
+			// @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
+			minify: {
+				mangle: true,
+				compress: {
+					passes: 2,
+				},
+				format: {
+					comments: false,
+				},
+			},
+
 			experimental: {
 				plugins,
 				cacheRoot: "node_modules/.cache/swc",
