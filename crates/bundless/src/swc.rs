@@ -70,7 +70,25 @@ pub fn transform_file(
                                     preserve_import_extension: Default::default(),
                                 });
 
-                            ts2js_pass
+                            // extensions
+                            let out_ext = &bundless_options.out_ext();
+                            let mut extensions_map = HashMap::from([
+                                ("js".to_string(), out_ext.clone()),
+                                ("mjs".to_string(), out_ext.clone()),
+                                ("cjs".to_string(), out_ext.clone()),
+                            ]);
+
+                            if let Some(css) = &bundless_options.css {
+                                if css.less_compile {
+                                    extensions_map.insert("less".to_string(), "css".to_string());
+                                }
+                            }
+
+                            let extensions_pass = swc_transform_extensions::transform(
+                                swc_transform_extensions::Config { extensions: extensions_map },
+                            );
+
+                            (ts2js_pass, extensions_pass)
                         },
                         |_| {
                             // shims
