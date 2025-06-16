@@ -18,7 +18,7 @@ describe("bundless alias ok", async () => {
 	it("node cjs alias ok", async () => {
 		const fileMap = await getOutputMap(path.join(import.meta.dirname, "lib"));
 		let content = fileMap["index.cjs"];
-		expect(content).toContain("./util/index.js");
+		expect(content).toContain("./util/index.cjs");
 		expect(content).not.toContain("@/util");
 		expect(content).not.toContain("util/index.ts");
 	});
