@@ -92,6 +92,7 @@ impl ModuleType {
 #[serde(rename_all = "camelCase")]
 pub struct CSS {
     pub css_modules: Option<String>,
+    #[serde(default)]
     pub less_compile: bool,
 }
 
