@@ -188,14 +188,15 @@ export const bundlessFiles = async (
 		cwd,
 	};
 
-	await bundlessFilesAsync(Buffer.from(JSON.stringify(bundlessOptions)));
+	let res = bundlessFilesAsync(Buffer.from(JSON.stringify(bundlessOptions)));
 
 	const files = await glob("**/*", {
 		cwd: srcDir,
 		ignore: excludePatterns,
 		absolute: true,
 	});
-	files.map(compileFile);
+
+	await Promise.all([res, ...files.map(compileFile)]);
 
 	const watchers: Watcher[] = [];
 
