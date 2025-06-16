@@ -81,6 +81,7 @@ fn main() -> Result<()> {
         "targets": {
             "node": "20.19.0",
         },
+        "css": {},
     });
     let options_str = options_json.to_string();
     let options = serde_json::from_str::<BundlessOptions>(&options_str).map_err(|e| {
