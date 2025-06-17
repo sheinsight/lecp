@@ -1139,6 +1139,7 @@ dependencies = [
  "miette",
  "owo-colors",
  "path-clean 1.0.1",
+ "pathdiff",
  "rayon",
  "serde",
  "serde_json",

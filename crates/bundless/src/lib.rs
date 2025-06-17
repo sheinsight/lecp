@@ -126,12 +126,16 @@ pub fn bundless_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Resu
         return Err(anyhow::anyhow!("File does not exist: {:?}", file));
     }
 
+    let mut swc_options = options.build_for_swc()?;
+
     let src_dir = options.src_dir();
     let out_dir = options.out_dir();
     let out_ext = options.out_ext();
-    let swc_options = options.build_for_swc()?;
 
     let out_path = get_out_file_path(file, &src_dir, &out_dir, &out_ext)?;
+
+    swc_options.output_path = Some(out_path.parent().unwrap().to_owned());
+
     let output = transform_file(file, &swc_options, &options)?;
 
     println!(

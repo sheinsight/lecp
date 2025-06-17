@@ -16,6 +16,7 @@ log        = { workspace = true }
 miette     = { workspace = true }
 owo-colors = { workspace = true }
 path-clean = { workspace = true }
+pathdiff   = { workspace = true }
 rayon      = { workspace = true }
 serde      = { workspace = true }
 serde_json = { workspace = true }
