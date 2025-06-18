@@ -2,7 +2,9 @@
 	"name": "@shined/swc-plugin-transform-shims",
 	"version": "0.1.0",
 	"description": "",
-	"keywords": ["swc-plugin"],
+	"keywords": [
+		"swc-plugin"
+	],
 	"license": "ISC",
 	"author": "",
 	"main": "swc_plugin_transform_shims.wasm",

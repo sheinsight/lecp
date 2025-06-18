@@ -1,5 +1,5 @@
-import { createRequire } from "module";
 import fs from "fs/promises";
+import { createRequire } from "module";
 import type { FormatType } from "../define-config.ts";
 
 export const measure = async <T>(
@@ -86,7 +86,9 @@ export function getOutJsExt(
 
 export function getBrowsersList({
 	targets,
-}: { targets: Record<string, any> }): string[] {
+}: {
+	targets: Record<string, any>;
+}): string[] {
 	return Object.keys(targets).map(key => {
 		return `${key} >= ${targets[key] === true ? "0" : targets[key]}`;
 	});

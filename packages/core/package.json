@@ -24,7 +24,7 @@
 		"@shined/swc-plugin-transform-extensions": "workspace:*",
 		"@shined/swc-plugin-transform-shims": "workspace:*",
 		"@shined/swc-plugin-transform-ts2js": "workspace:*",
-		"@swc/core": "1.11.31",
+		"@swc/core": "1.12.1",
 		"chokidar": "^4.0.3",
 		"css-loader": "^7.1.2",
 		"deepmerge": "^4.3.1",

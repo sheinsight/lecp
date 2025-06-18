@@ -4,7 +4,7 @@ import type { FinalUserConfig } from "../config.ts";
 import type { BundleFormat } from "../define-config.ts";
 import { logger } from "../util/logger.ts";
 import { getRspackConfig } from "./chain.ts";
-import { stringify } from "./util.ts";
+// import { stringify } from "./util.ts";
 
 export type BundleOptions = Omit<FinalUserConfig, "format"> &
 	Required<BundleFormat>;
