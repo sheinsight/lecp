@@ -17,11 +17,11 @@ describe("bundless dts(swc isolatedDeclarations) ok", async () => {
 		expect(fileMap["util/index.d.ts"]).toContain("export declare const a = 1;");
 
 		// sourcemap(swc 不支持生成 d.ts 的 sourcemap)
-		// expect(fileMap["index.d.ts.map"]).toContain("../src/index.ts");
+		// expect(fileMap["index.d.ts.map"]).toContain(`"../src/index.ts"`);
 		// expect(fileMap["index.d.ts"]).toContain(
 		// 	"//# sourceMappingURL=index.d.ts.map",
 		// );
-		// expect(fileMap["util/index.d.ts.map"]).toContain("../../src/util/index.ts");
+		// expect(fileMap["util/index.d.ts.map"]).toContain(`"../../src/util/index.ts"`);
 		// expect(fileMap["util/index.d.ts"]).toContain(
 		// 	"//# sourceMappingURL=index.d.ts.map",
 		// );
@@ -37,11 +37,11 @@ describe("bundless dts(swc isolatedDeclarations) ok", async () => {
 		expect(fileMap["util/index.d.ts"]).toContain("export declare const a = 1;");
 
 		// sourcemap(swc 不支持生成 d.ts 的 sourcemap)
-		// expect(fileMap["index.d.ts.map"]).toContain("../src/index.ts");
+		// expect(fileMap["index.d.ts.map"]).toContain(`"../src/index.ts"`);
 		// expect(fileMap["index.d.ts"]).toContain(
 		// 	"//# sourceMappingURL=index.d.ts.map",
 		// );
-		// expect(fileMap["util/index.d.ts.map"]).toContain("../../src/util/index.ts");
+		// expect(fileMap["util/index.d.ts.map"]).toContain(`"../../src/util/index.ts"`);
 		// expect(fileMap["util/index.d.ts"]).toContain(
 		// 	"//# sourceMappingURL=index.d.ts.map",
 		// );

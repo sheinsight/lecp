@@ -9,13 +9,13 @@ describe("bundless sourcemap ok", async () => {
 
 	it("bundless esm sourcemap ok", async () => {
 		const fileMap = await getOutputMap(path.join(import.meta.dirname, "es"));
-		expect(fileMap["index.js.map"]).toContain("../src/index.tsx");
+		expect(fileMap["index.js.map"]).toContain(`"../src/index.tsx"`);
 		expect(fileMap["index.js"]).toContain("//# sourceMappingURL=index.js.map");
-		expect(fileMap["index.css.map"]).toContain("../src/index.less");
+		expect(fileMap["index.css.map"]).toContain(`"../src/index.less"`);
 		expect(fileMap["index.css"]).toContain(
 			"/*# sourceMappingURL=index.css.map*/",
 		);
-		expect(fileMap["util/index.js.map"]).toContain("../../src/util/index.ts");
+		expect(fileMap["util/index.js.map"]).toContain(`"../../src/util/index.ts"`);
 		expect(fileMap["util/index.js"]).toContain(
 			"//# sourceMappingURL=index.js.map",
 		);
@@ -23,13 +23,13 @@ describe("bundless sourcemap ok", async () => {
 
 	it("bundless cjs sourcemap ok", async () => {
 		const fileMap = await getOutputMap(path.join(import.meta.dirname, "lib"));
-		expect(fileMap["index.js.map"]).toContain("../src/index.tsx");
+		expect(fileMap["index.js.map"]).toContain(`"../src/index.tsx"`);
 		expect(fileMap["index.js"]).toContain("//# sourceMappingURL=index.js.map");
-		expect(fileMap["index.css.map"]).toContain("../src/index.less");
+		expect(fileMap["index.css.map"]).toContain(`"../src/index.less"`);
 		expect(fileMap["index.css"]).toContain(
 			"/*# sourceMappingURL=index.css.map*/",
 		);
-		expect(fileMap["util/index.js.map"]).toContain("../../src/util/index.ts");
+		expect(fileMap["util/index.js.map"]).toContain(`"../../src/util/index.ts"`);
 		expect(fileMap["util/index.js"]).toContain(
 			"//# sourceMappingURL=index.js.map",
 		);
