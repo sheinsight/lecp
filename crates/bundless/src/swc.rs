@@ -71,16 +71,16 @@ pub fn transform_file(
                                 });
 
                             // extensions
-                            let out_ext = &bundless_options.out_ext();
+                            let out_ext = format!(".{}", bundless_options.out_ext());
                             let mut extensions_map = HashMap::from([
-                                ("js".to_string(), out_ext.clone()),
-                                ("mjs".to_string(), out_ext.clone()),
-                                ("cjs".to_string(), out_ext.clone()),
+                                (".js".to_string(), out_ext.clone()),
+                                (".mjs".to_string(), out_ext.clone()),
+                                (".cjs".to_string(), out_ext.clone()),
                             ]);
 
                             if let Some(css) = &bundless_options.css {
                                 if css.less_compile {
-                                    extensions_map.insert("less".to_string(), "css".to_string());
+                                    extensions_map.insert(".less".to_string(), ".css".to_string());
                                 }
                             }
 
@@ -104,16 +104,16 @@ pub fn transform_file(
                                 });
 
                             // extensions
-                            let out_ext = &bundless_options.out_ext();
+                            let out_ext = format!(".{}", bundless_options.out_ext());
                             let mut extensions_map = HashMap::from([
-                                ("js".to_string(), out_ext.clone()),
-                                ("mjs".to_string(), out_ext.clone()),
-                                ("cjs".to_string(), out_ext.clone()),
+                                (".js".to_string(), out_ext.clone()),
+                                (".mjs".to_string(), out_ext.clone()),
+                                (".cjs".to_string(), out_ext.clone()),
                             ]);
 
                             if let Some(css) = &bundless_options.css {
                                 if css.less_compile {
-                                    extensions_map.insert("less".to_string(), "css".to_string());
+                                    extensions_map.insert(".less".to_string(), ".css".to_string());
                                 }
                             }
 
