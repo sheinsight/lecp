@@ -352,6 +352,7 @@ export async function bundlessTransformDts(
 				...tsconfig,
 				outDir,
 				declarationDir: outDir,
+				rootDir: srcDir,
 			}),
 	};
 
@@ -384,7 +385,7 @@ export async function bundlessTransformDts(
 		map && (await fs.writeFile(outFilePath + ".map", map));
 	};
 
-	files.forEach(compileFile);
+	await Promise.all(files.map(compileFile));
 
 	if (watch) {
 		const watcher = chokidar.watch(".", {
