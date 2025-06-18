@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/*", "napi/*"]
+members = ["crates/*"]
 
 resolver = "2"
 
