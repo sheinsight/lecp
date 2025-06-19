@@ -109,11 +109,8 @@ impl VisitMut for TransformDefine {
 
 // 获取 MemberExpr 的路径
 fn get_node_path(e: MemberExpr, paths: &mut Vec<String>) -> &mut Vec<String> {
-    match e.prop {
-        MemberProp::Ident(i) => {
-            paths.insert(0, format!("{}", i.sym));
-        }
-        _ => (),
+    if let MemberProp::Ident(i) = e.prop {
+        paths.insert(0, format!("{}", i.sym));
     }
 
     match *e.obj {

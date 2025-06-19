@@ -117,7 +117,7 @@ impl VisitMut for TransformShims {
         v.visit_mut_children_with(self);
 
         if self.config.target == Target::CJS {
-            let is_import_meta = v.init.as_ref().map_or(false, |init| {
+            let is_import_meta = v.init.as_ref().is_some_and(|init| {
                 matches!(&**init, Expr::MetaProp(MetaPropExpr { kind, .. }) if *kind == MetaPropKind::ImportMeta)
             });
 
@@ -133,7 +133,7 @@ impl VisitMut for TransformShims {
                         ObjectPatProp::Assign(assign) => {
                             self.id_map.insert(assign.key.to_string(), assign.key.sym.to_string());
                         }
-                        _ => return,
+                        _ => (),
                     });
                 }
 
@@ -162,13 +162,10 @@ impl VisitMut for TransformShims {
     fn visit_mut_stmt(&mut self, stmt: &mut Stmt) {
         stmt.visit_mut_children_with(self);
 
-        match stmt {
-            Stmt::Decl(Decl::Var(var)) => {
-                if var.decls.is_empty() {
-                    stmt.take();
-                }
+        if let Stmt::Decl(Decl::Var(var)) = stmt {
+            if var.decls.is_empty() {
+                stmt.take();
             }
-            _ => {}
         }
     }
 

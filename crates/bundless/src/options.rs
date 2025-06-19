@@ -2,6 +2,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
+use std::fmt::Display;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use swc_core::base::config::Options;
@@ -70,15 +71,18 @@ pub enum ModuleType {
     // Umd,
 }
 
-impl ModuleType {
-    pub fn to_string(&self) -> String {
-        match self {
-            ModuleType::ESM => "es6".to_string(),
-            ModuleType::CJS => "commonjs".to_string(),
-            // ModuleType::Umd => "umd".to_string(),
-        }
+impl Display for ModuleType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            ModuleType::ESM => "es6",
+            ModuleType::CJS => "commonjs",
+            // ModuleType::Umd => "umd",
+        };
+        write!(f, "{}", s)
     }
+}
 
+impl ModuleType {
     pub fn get_type(&self) -> String {
         match self {
             ModuleType::ESM => "esm".to_string(),
@@ -338,11 +342,10 @@ impl BundlessOptions {
 
     pub fn is_default_format(&self) -> bool {
         // 默认格式为 ESM 且是模块
-        match (&self.format, &self.is_module) {
-            (ModuleType::ESM, true) => true,
-            (ModuleType::CJS, false) => true,
-            _ => false,
-        }
+        matches!(
+            (&self.format, &self.is_module),
+            (ModuleType::ESM, true) | (ModuleType::CJS, false)
+        )
     }
 
     pub fn is_node(&self) -> bool {

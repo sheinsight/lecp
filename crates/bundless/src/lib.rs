@@ -52,7 +52,7 @@ pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
     let out_dir = out_dir.as_ref();
 
     // "jsx" | "tsx" => "js",
-    let is_jsx_file = path.extension().map_or(false, |ext| ext == "jsx" || ext == "tsx");
+    let is_jsx_file = path.extension().is_some_and(|ext| ext == "jsx" || ext == "tsx");
     let out_ext = if is_jsx_file { "js" } else { out_ext };
 
     let rel_path = path.strip_prefix(src_dir)?;
@@ -136,7 +136,7 @@ pub fn bundless_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Resu
 
     swc_options.output_path = Some(out_path.to_owned());
 
-    let output = transform_file(file, &swc_options, &options)?;
+    let output = transform_file(file, &swc_options, options)?;
 
     println!(
         " bundless({}) {} to {}",
