@@ -1,4 +1,7 @@
 import styles from "./Demo.css";
+import styles2 from "./Demo.less";
+
+console.log("styles", styles2);
 
 const Demo = () => {
 	return (

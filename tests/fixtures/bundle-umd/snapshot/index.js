@@ -30,15 +30,26 @@ __webpack_require__.d(__webpack_exports__, {
 /* ESM default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"title":"demo-component__title","foo":"demo-component__foo"});
 
 }),
+886: (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+});
+// extracted by css-extract-rspack-plugin
+/* ESM default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"title":"demo-component__title","foo":"demo-component__foo"});
+
+}),
 474: (function (module, exports, __webpack_require__) {
 (function(global, factory) {
-    if ( true && typeof module.exports === "object") factory(exports, __webpack_require__(439));
+    if ( true && typeof module.exports === "object") factory(exports, __webpack_require__(439), __webpack_require__(886));
     else if (typeof define === "function" && define.amd) define([
         "exports",
-        "./Demo.css"
+        "./Demo.css",
+        "./Demo.less"
     ], factory);
-    else if (global = typeof globalThis !== "undefined" ? globalThis : global || self) factory(global.demo = {}, global.demoCss);
-})(this, function(exports, _Democss) {
+    else if (global = typeof globalThis !== "undefined" ? globalThis : global || self) factory(global.demo = {}, global.demoCss, global.demoLess);
+})(this, function(exports, _Democss, _Demoless) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {
         value: true
@@ -50,11 +61,13 @@ __webpack_require__.d(__webpack_exports__, {
         }
     });
     _Democss = /*#__PURE__*/ _interop_require_default(_Democss);
+    _Demoless = /*#__PURE__*/ _interop_require_default(_Demoless);
     function _interop_require_default(obj) {
         return obj && obj.__esModule ? obj : {
             default: obj
         };
     }
+    console.log("styles", _Demoless.default);
     const Demo = ()=>{
         return /*#__PURE__*/ React.createElement("div", {
             className: _Democss.default.container
@@ -89,6 +102,9 @@ __webpack_require__.d(__webpack_exports__, {
         });
     }
     _export(exports, {
+        get asyncFn () {
+            return asyncFn;
+        },
         get default () {
             return _default;
         },
@@ -104,10 +120,14 @@ __webpack_require__.d(__webpack_exports__, {
         };
     }
     const _default = ()=>/*#__PURE__*/ _react.default.createElement(_Demo.default, null);
-    if (true) {
-        console.log("env_dev");
-    }
+    const asyncFn = async ()=>{
+        await (0, _utils.sleep)(1000);
+        console.log("Async function executed");
+    };
     if (false) {}
+    if (true) {
+        console.log("env_prod");
+    }
     if (true) {
         console.log("Debug info");
     }

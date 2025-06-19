@@ -6,6 +6,11 @@ export { sleep };
 
 export default () => <Demo />;
 
+export const asyncFn = async () => {
+	await sleep(1000);
+	console.log("Async function executed");
+};
+
 if (process.env.NODE_ENV === "development") {
 	console.log("env_dev");
 }

@@ -8,6 +8,7 @@ import { pluginCjs } from "./plugins/cjs.ts";
 import { pluginCss } from "./plugins/css.ts";
 import { pluginDefine } from "./plugins/define.ts";
 import { pluginEsm } from "./plugins/esm.ts";
+import { pluginLess } from "./plugins/less.ts";
 import { pluginMinimize } from "./plugins/minimize.ts";
 import { pluginOutput } from "./plugins/output.ts";
 import { pluginResolve } from "./plugins/resolve.ts";
@@ -40,6 +41,7 @@ export function getRspackConfig(
 		pluginOutput,
 		pluginScript,
 		pluginCss,
+		options.css?.lessCompile && pluginLess,
 		pluginAsset,
 		pluginMinimize,
 		pluginResolve,
