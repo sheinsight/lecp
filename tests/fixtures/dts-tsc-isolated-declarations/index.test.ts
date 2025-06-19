@@ -25,6 +25,9 @@ describe("bundless dts(tsc isolatedDeclarations) ok", async () => {
 		expect(fileMap["util/index.d.ts"]).toContain(
 			"//# sourceMappingURL=index.d.ts.map",
 		);
+
+		// copy global.d.ts
+		expect(fileMap["global.d.ts"]).toBeDefined();
 	});
 
 	it("bundless cjs dts ok(.cjs)", async () => {
@@ -45,5 +48,8 @@ describe("bundless dts(tsc isolatedDeclarations) ok", async () => {
 		expect(fileMap["util/index.d.ts"]).toContain(
 			"//# sourceMappingURL=index.d.ts.map",
 		);
+
+		// copy global.d.ts
+		expect(fileMap["global.d.ts"]).toBeDefined();
 	});
 });

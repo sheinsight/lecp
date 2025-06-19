@@ -316,7 +316,10 @@ export async function bundlessTransformDts(
 	const { entry: srcDir, outDir, targets, type: format, dts } = options;
 	const { pkg, cwd, tsconfig, watch } = config;
 
-	const excludePatterns = testPattern.concat(options.exclude ?? []);
+	const excludePatterns = testPattern.concat(
+		"**/*.d.ts",
+		options.exclude ?? [],
+	);
 
 	const files = await glob("**/*.ts", {
 		cwd: srcDir,
