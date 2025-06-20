@@ -23,7 +23,6 @@ export default defineConfig({
 		"typeof window": "object",
 		__DEV__: JSON.stringify(true),
 		PRODUCTION: JSON.stringify(false),
-		// "process.env.NODE_ENV": JSON.stringify("development"),
 	},
 	css: {
 		cssModules: true, // pkgName__[local]

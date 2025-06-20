@@ -59,6 +59,11 @@ export const build = async (
 		logger.info(`\n${colors.white(`${mode} ${task.type}`)}`);
 
 		if (mode === "bundless") {
+			// @ts-expect-error
+			if (task.type === "umd") {
+				throw new Error("umd format is not supported in bundless mode");
+			}
+
 			const watcher = await bundlessFiles({ ...others, ...task }, systemConfig);
 			watchers = watchers.concat(watcher ?? []);
 		}
