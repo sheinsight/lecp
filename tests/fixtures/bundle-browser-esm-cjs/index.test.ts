@@ -16,7 +16,7 @@ describe("bundless esm and cjs for browser ok", async () => {
 
 		// content
 		await expect(fileMap["index.js"]).toMatchFileSnapshot(
-			"./snapshots/es/index.js",
+			"./snapshots/es-index.js",
 		);
 
 		// css sourcemap
@@ -47,7 +47,7 @@ describe("bundless esm and cjs for browser ok", async () => {
 
 		// content
 		await expect(fileMap["index.js"]).toMatchFileSnapshot(
-			"./snapshots/lib/index.js",
+			"./snapshots/lib-index.js",
 		);
 
 		// css sourcemap
