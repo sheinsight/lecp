@@ -18,7 +18,7 @@ describe("bundless esm and cjs for node ok", async () => {
 
 		// content
 		await expect(fileMap["index.mjs"]).toMatchFileSnapshot(
-			"./snapshot/es/index.mjs",
+			"./snapshots/es/index.mjs",
 		);
 
 		// define
@@ -33,7 +33,7 @@ describe("bundless esm and cjs for node ok", async () => {
 
 		// content
 		await expect(fileMap["index.js"]).toMatchFileSnapshot(
-			"./snapshot/lib/index.js",
+			"./snapshots/lib/index.js",
 		);
 		// define + minify
 	});

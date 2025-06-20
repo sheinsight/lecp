@@ -20,7 +20,7 @@
       })(self, (__WEBPACK_EXTERNAL_MODULE__24__) => {
           return (() => { // webpackBootstrap
 var __webpack_modules__ = ({
-439: (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+157: (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
@@ -30,7 +30,7 @@ __webpack_require__.d(__webpack_exports__, {
 /* ESM default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"title":"demo-component__title","foo":"demo-component__foo"});
 
 }),
-886: (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+684: (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
@@ -40,9 +40,9 @@ __webpack_require__.d(__webpack_exports__, {
 /* ESM default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"title":"demo-component__title","foo":"demo-component__foo"});
 
 }),
-474: (function (module, exports, __webpack_require__) {
+569: (function (module, exports, __webpack_require__) {
 (function(global, factory) {
-    if ( true && typeof module.exports === "object") factory(exports, __webpack_require__(439), __webpack_require__(886));
+    if ( true && typeof module.exports === "object") factory(exports, __webpack_require__(157), __webpack_require__(684));
     else if (typeof define === "function" && define.amd) define([
         "exports",
         "./Demo.css",
@@ -80,9 +80,9 @@ __webpack_require__.d(__webpack_exports__, {
 
 
 }),
-908: (function (module, exports, __webpack_require__) {
+193: (function (module, exports, __webpack_require__) {
 (function(global, factory) {
-    if ( true && typeof module.exports === "object") factory(exports, __webpack_require__(24), __webpack_require__(474), __webpack_require__(322));
+    if ( true && typeof module.exports === "object") factory(exports, __webpack_require__(24), __webpack_require__(569), __webpack_require__(745));
     else if (typeof define === "function" && define.amd) define([
         "exports",
         "react",
@@ -139,7 +139,7 @@ __webpack_require__.d(__webpack_exports__, {
 
 
 }),
-322: (function (module, exports) {
+745: (function (module, exports) {
 (function(global, factory) {
     if ( true && typeof module.exports === "object") factory(exports);
     else if (typeof define === "function" && define.amd) define([
@@ -222,7 +222,7 @@ __webpack_require__.r = (exports) => {
 // startup
 // Load entry module and return exports
 // This entry module is referenced by other modules so it can't be inlined
-var __webpack_exports__ = __webpack_require__(908);
+var __webpack_exports__ = __webpack_require__(193);
 return __webpack_exports__;
 })()
 

@@ -24,7 +24,7 @@
 		"@shined/swc-plugin-transform-extensions": "workspace:*",
 		"@shined/swc-plugin-transform-shims": "workspace:*",
 		"@shined/swc-plugin-transform-ts2js": "workspace:*",
-		"@swc/core": "1.12.1",
+		"@swc/core": "1.12.4",
 		"chokidar": "^4.0.3",
 		"css-loader": "^7.1.2",
 		"deepmerge": "^4.3.1",
@@ -36,7 +36,7 @@
 		"read-pkg": "^9.0.1",
 		"rspack-chain": "^1.2.5",
 		"source-map-loader": "^5.0.0",
-		"swc-plugin-css-modules": "3.1.1",
+		"swc-plugin-css-modules": "4.0.0",
 		"tinyglobby": "^0.2.14",
 		"typescript-transform-paths": "^3.5.5",
 		"yargs": "^17.7.2"

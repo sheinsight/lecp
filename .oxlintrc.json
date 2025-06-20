@@ -9,6 +9,7 @@
 	"globals": {},
 	"settings": {},
 	"rules": {},
+	"ignorePatterns": ["**/snapshots/**"],
 	"overrides": [
 		{
 			"files": ["*.test.ts", "*.spec.ts"],

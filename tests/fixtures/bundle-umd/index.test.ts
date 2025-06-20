@@ -17,7 +17,7 @@ describe("bundless umd ok", async () => {
 		// content
 		expect(fileMap["index.js"]).toContain(`root["DemoComponent"]`);
 		await expect(fileMap["index.js"]).toMatchFileSnapshot(
-			"./snapshot/index.js",
+			"./snapshots/index.js",
 		);
 
 		// css sourcemap
@@ -51,7 +51,7 @@ describe("bundless umd ok", async () => {
 		// content
 		expect(fileMap["index.min.js"]).toContain(`.DemoComponent`);
 		await expect(fileMap["index.min.js"]).toMatchFileSnapshot(
-			"./snapshot/index.min.js",
+			"./snapshots/index.min.js",
 		);
 
 		// css sourcemap

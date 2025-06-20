@@ -19,7 +19,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
 		"@shined/lecp": "workspace:*",
-		"oxlint": "^1.1.0",
+		"oxlint": "^1.2.0",
 		"tinyglobby": "^0.2.14",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
