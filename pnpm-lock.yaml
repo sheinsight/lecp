@@ -60,6 +60,22 @@ importers:
         specifier: 'catalog:'
         version: 22.15.29
 
+  crates/node_binding/npm/darwin-arm64: {}
+
+  crates/node_binding/npm/darwin-x64: {}
+
+  crates/node_binding/npm/linux-arm64-gnu: {}
+
+  crates/node_binding/npm/linux-arm64-musl: {}
+
+  crates/node_binding/npm/linux-x64-gnu: {}
+
+  crates/node_binding/npm/linux-x64-musl: {}
+
+  crates/node_binding/npm/win32-arm64-msvc: {}
+
+  crates/node_binding/npm/win32-x64-msvc: {}
+
   crates/transform_define: {}
 
   crates/transform_extensions: {}

@@ -24,7 +24,8 @@
 			"!**/dist/**",
 			"!**/es/**",
 			"!**/lib/**",
-			"!**/umd/**"
+			"!**/umd/**",
+			"!**/tests/**/snapshots/**"
 		]
 	},
 	"javascript": {
