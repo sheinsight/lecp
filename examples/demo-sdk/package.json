@@ -2,7 +2,7 @@
 	"name": "demo-sdk",
 	"type": "module",
 	"private": true,
-	"version": "1.0.0",
+	"version": "0.0.1-beta.1",
 	"main": "index.js",
 	"scripts": {
 		"dev": "lecp --watch",

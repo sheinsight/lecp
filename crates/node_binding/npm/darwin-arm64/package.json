@@ -1,6 +1,6 @@
 {
   "name": "@shined/lecp-binding-darwin-arm64",
-  "version": "0.0.0",
+  "version": "0.0.1-beta.1",
   "cpu": [
     "arm64"
   ],
