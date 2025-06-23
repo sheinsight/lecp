@@ -1,7 +1,7 @@
 (()=>{
     "use strict";
     var __webpack_modules__ = {
-        157: function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+        656: function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
             __webpack_require__.r(__webpack_exports__);
             __webpack_require__.d(__webpack_exports__, {
                 "default": ()=>__WEBPACK_DEFAULT_EXPORT__
@@ -11,7 +11,7 @@
                 "foo": "demo-component__foo"
             };
         },
-        684: function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+        221: function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
             __webpack_require__.r(__webpack_exports__);
             __webpack_require__.d(__webpack_exports__, {
                 "default": ()=>__WEBPACK_DEFAULT_EXPORT__
@@ -21,7 +21,7 @@
                 "foo": "demo-component__foo"
             };
         },
-        569: function(__unused_webpack_module, exports1, __webpack_require__) {
+        866: function(__unused_webpack_module, exports1, __webpack_require__) {
             Object.defineProperty(exports1, "__esModule", {
                 value: true
             });
@@ -31,8 +31,8 @@
                     return _default;
                 }
             });
-            const _Democss = /*#__PURE__*/ _interop_require_default(__webpack_require__(157));
-            const _Demoless = /*#__PURE__*/ _interop_require_default(__webpack_require__(684));
+            const _Democss = /*#__PURE__*/ _interop_require_default(__webpack_require__(656));
+            const _Demoless = /*#__PURE__*/ _interop_require_default(__webpack_require__(221));
             function _interop_require_default(obj) {
                 return obj && obj.__esModule ? obj : {
                     default: obj
@@ -48,7 +48,7 @@
             };
             const _default = Demo;
         },
-        193: function(__unused_webpack_module, exports1, __webpack_require__) {
+        913: function(__unused_webpack_module, exports1, __webpack_require__) {
             Object.defineProperty(exports1, "__esModule", {
                 value: true
             });
@@ -70,8 +70,8 @@
                 }
             });
             const _react = /*#__PURE__*/ _interop_require_default(__webpack_require__(617));
-            const _Demo = /*#__PURE__*/ _interop_require_default(__webpack_require__(569));
-            const _utils = __webpack_require__(745);
+            const _Demo = /*#__PURE__*/ _interop_require_default(__webpack_require__(866));
+            const _utils = __webpack_require__(328);
             function _interop_require_default(obj) {
                 return obj && obj.__esModule ? obj : {
                     default: obj
@@ -94,7 +94,7 @@
                 console.log("Browser environment");
             }
         },
-        745: function(__unused_webpack_module, exports1) {
+        328: function(__unused_webpack_module, exports1) {
             Object.defineProperty(exports1, "__esModule", {
                 value: true
             });
@@ -149,7 +149,7 @@
             });
         };
     })();
-    var __webpack_exports__ = __webpack_require__(193);
+    var __webpack_exports__ = __webpack_require__(913);
     var __webpack_export_target__ = exports;
     for(var __webpack_i__ in __webpack_exports__)__webpack_export_target__[__webpack_i__] = __webpack_exports__[__webpack_i__];
     if (__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target__, '__esModule', {

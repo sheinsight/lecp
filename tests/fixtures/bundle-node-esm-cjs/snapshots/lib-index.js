@@ -1,7 +1,7 @@
 (()=>{
     "use strict";
     var __webpack_modules__ = {
-        193: function(__unused_webpack_module, exports1, __webpack_require__) {
+        913: function(__unused_webpack_module, exports1, __webpack_require__) {
             Object.defineProperty(exports1, "__esModule", {
                 value: true
             });
@@ -19,7 +19,7 @@
                     return _utils.sleep;
                 }
             });
-            const _utils = __webpack_require__(745);
+            const _utils = __webpack_require__(328);
             const asyncFn = async ()=>{
                 await (0, _utils.sleep)(1000);
                 console.log("Async function executed");
@@ -36,7 +36,7 @@
                 console.log("Browser environment");
             }
         },
-        745: function(__unused_webpack_module, exports1) {
+        328: function(__unused_webpack_module, exports1) {
             Object.defineProperty(exports1, "__esModule", {
                 value: true
             });
@@ -61,7 +61,7 @@
         __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
         return module.exports;
     }
-    var __webpack_exports__ = __webpack_require__(193);
+    var __webpack_exports__ = __webpack_require__(913);
     var __webpack_export_target__ = exports;
     for(var __webpack_i__ in __webpack_exports__)__webpack_export_target__[__webpack_i__] = __webpack_exports__[__webpack_i__];
     if (__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target__, '__esModule', {
