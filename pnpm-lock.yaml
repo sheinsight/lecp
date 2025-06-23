@@ -59,6 +59,31 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.29
+    optionalDependencies:
+      '@shined/lecp-binding-darwin-arm64':
+        specifier: workspace:*
+        version: link:npm/darwin-arm64
+      '@shined/lecp-binding-darwin-x64':
+        specifier: workspace:*
+        version: link:npm/darwin-x64
+      '@shined/lecp-binding-linux-arm64-gnu':
+        specifier: workspace:*
+        version: link:npm/linux-arm64-gnu
+      '@shined/lecp-binding-linux-arm64-musl':
+        specifier: workspace:*
+        version: link:npm/linux-arm64-musl
+      '@shined/lecp-binding-linux-x64-gnu':
+        specifier: workspace:*
+        version: link:npm/linux-x64-gnu
+      '@shined/lecp-binding-linux-x64-musl':
+        specifier: workspace:*
+        version: link:npm/linux-x64-musl
+      '@shined/lecp-binding-win32-arm64-msvc':
+        specifier: workspace:*
+        version: link:npm/win32-arm64-msvc
+      '@shined/lecp-binding-win32-x64-msvc':
+        specifier: workspace:*
+        version: link:npm/win32-x64-msvc
 
   crates/node_binding/npm/darwin-arm64: {}
 
@@ -145,15 +170,6 @@ importers:
       '@shined/lecp-binding':
         specifier: workspace:*
         version: link:../../crates/node_binding
-      '@shined/swc-plugin-transform-extensions':
-        specifier: workspace:*
-        version: link:../../crates/transform_extensions
-      '@shined/swc-plugin-transform-shims':
-        specifier: workspace:*
-        version: link:../../crates/transform_shims
-      '@shined/swc-plugin-transform-ts2js':
-        specifier: workspace:*
-        version: link:../../crates/transform_ts2js
       '@swc/core':
         specifier: 1.12.5
         version: 1.12.5
@@ -190,9 +206,6 @@ importers:
       source-map-loader:
         specifier: ^5.0.0
         version: 5.0.0(webpack@5.97.1(@swc/core@1.12.5))
-      swc-plugin-css-modules:
-        specifier: 4.0.0
-        version: 4.0.0
       tinyglobby:
         specifier: ^0.2.14
         version: 0.2.14
@@ -2697,9 +2710,6 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  swc-plugin-css-modules@4.0.0:
-    resolution: {integrity: sha512-zirj7QBNju123tvB1CtA6PLFxm/nQ3Vopf/pReX0hd+9di4Dv6s55xEPh+idZaFdEUrPxQhOwA9XgGWYYMBsTw==}
-
   tapable@2.2.2:
     resolution: {integrity: sha512-Re10+NauLTMCudc7T5WLFLAwDhQ0JWdrMK+9B2M8zR5hRExKmsRDCBA7/aV/pNJFltmBFO5BAMlQFi/vq3nKOg==}
     engines: {node: '>=6'}
@@ -5190,8 +5200,6 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
-
-  swc-plugin-css-modules@4.0.0: {}
 
   tapable@2.2.2: {}
 

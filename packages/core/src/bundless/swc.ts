@@ -95,47 +95,6 @@ export const getSwcOptions = (
 
 	const plugins: Array<[string, Record<string, any>]> = [];
 
-	if (mode !== "bundle") {
-		// allowImportingTsExtensions (ts->js), 暂不保留原始后缀,统一为 .js
-		plugins.push([
-			// "@shined/swc-plugin-transform-ts2js", {}
-			require.resolve("@shined/swc-plugin-transform-ts2js"),
-			{},
-		]);
-
-		// 修正 后缀
-		// - 补全 cjs省略的 .js 后缀
-		// - 修正 type:module 省略的 .cjs/.mjs 后缀
-		// - 修正 less 编译导致的 .less -> .css 后缀
-		plugins.push([
-			require.resolve("@shined/swc-plugin-transform-extensions"),
-			{
-				extensions: {
-					js: outJsExt,
-					mjs: outJsExt,
-					cjs: outJsExt,
-					/** lessCompile  */
-					...(css?.lessCompile && { less: "css" }),
-				},
-			},
-		]);
-
-		if (shims) {
-			plugins.push([
-				require.resolve("@shined/swc-plugin-transform-shims"),
-				{ target: format, legacy: shims?.legacy },
-			]);
-		}
-
-		if (css?.cssModules) {
-			// 注意顺序, 在 transform-extensions 之后
-			plugins.push([
-				require.resolve("swc-plugin-css-modules"),
-				{ generate_scoped_name: css.cssModules },
-			]);
-		}
-	}
-
 	const defaultSwcOptions: SwcOptions = {
 		env: {
 			mode: "entry",
