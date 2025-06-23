@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"packageManager": "pnpm@10.12.2",
-	"version": "0.0.1",
+	"version": "0.0.0",
 	"files": [],
 	"scripts": {
 		"test": "vitest",
@@ -11,7 +11,8 @@
 		"lint": "oxlint",
 		"build:rust": "pnpm --filter=\"./crates/**\" build",
 		"build:node": "pnpm --filter=\"./packages/**\" build",
-		"build:demo": "pnpm --filter=\"./examples/**\" build"
+		"build": "pnpm build:rust && pnpm build:node",
+		"release": "bumpp -r --no-push"
 	},
 	"keywords": [],
 	"author": "",
@@ -20,6 +21,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.4",
 		"@shined/lecp": "workspace:*",
+		"bumpp": "^10.2.0",
 		"oxlint": "^1.2.0",
 		"tinyglobby": "^0.2.14",
 		"typescript": "catalog:",

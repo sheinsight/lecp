@@ -1,6 +1,6 @@
 {
 	"name": "@shined/lecp",
-	"version": "0.0.1",
+	"version": "0.0.0",
 	"description": "",
 	"keywords": [],
 	"license": "MIT",
@@ -13,6 +13,10 @@
 	"bin": {
 		"lecp": "bin/cli.js"
 	},
+	"files": [
+		"bin",
+		"es"
+	],
 	"scripts": {
 		"dev": "node --experimental-strip-types ./src/cli.ts -w",
 		"build": "node --experimental-strip-types ./src/cli.ts"
