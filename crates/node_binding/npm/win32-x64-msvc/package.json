@@ -1,6 +1,6 @@
 {
   "name": "@shined/lecp-binding-win32-x64-msvc",
-  "version": "0.0.1-beta.2",
+  "version": "0.0.1-beta.3",
   "cpu": [
     "x64"
   ],
