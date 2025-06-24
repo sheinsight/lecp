@@ -49,15 +49,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # node
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Cache pnpm
-        uses: actions/setup-node@v4
-        with:
           cache: pnpm
       # rust
       # - name: Install Rust
@@ -155,15 +152,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # node
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Cache pnpm
-        uses: actions/setup-node@v4
-        with:
           cache: pnpm
           registry-url: https://registry.npmjs.org
       - name: Install dependencies
@@ -182,8 +176,20 @@ jobs:
       - name: Build other packages
         run: pnpm --filter='./packages/**' build
       # publish
+      - name: Determine npm tag
+        id: npm-tag
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG=$(node -e "
+            const version = '$VERSION';
+            const data = /^v?(?<version>.+)-(?<tag>\w+)\.\d+/.exec(version);
+            const tag = data?.groups?.tag ?? 'latest';
+            console.log(tag);
+          ")
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Detected version: $VERSION, using tag: $TAG"
       - name: Publish
-        run: pnpm -r --filter=!'${{ env.NAPI_DIR }}/npm/**' --filter=!'@shined/swc-plugin-*' publish --no-git-checks --provenance --access public
+        run: pnpm -r --filter=!'${{ env.NAPI_DIR }}/npm/**' --filter=!'@shined/swc-plugin-*' publish --no-git-checks --provenance --access public --tag ${{ steps.npm-tag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
