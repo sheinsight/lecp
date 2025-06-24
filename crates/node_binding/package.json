@@ -12,6 +12,9 @@
 		"index.js",
 		"index.d.ts"
 	],
+	"publishConfig": {
+		"access": "public"
+	},
 	"napi": {
 		"binaryName": "lecp",
 		"packageName": "@shined/lecp-binding",

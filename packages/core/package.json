@@ -13,6 +13,9 @@
 	"bin": {
 		"lecp": "bin/cli.js"
 	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"files": [
 		"bin",
 		"es"
