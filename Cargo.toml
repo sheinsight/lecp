@@ -6,9 +6,9 @@ resolver = "2"
 [workspace.package]
 authors      = []
 edition      = "2024"
-homepage     = ""
+homepage     = "https://github.com/sheinsight/lecp"
 license      = ""
-repository   = ""
+repository   = "https://github.com/sheinsight/lecp.git"
 rust-version = "1.85.0"
 
 [workspace.dependencies]

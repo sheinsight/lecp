@@ -13,7 +13,12 @@
 		"index.d.ts"
 	],
 	"publishConfig": {
-		"access": "public"
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sheinsight/lecp"
 	},
 	"napi": {
 		"binaryName": "lecp",
