@@ -7,7 +7,7 @@
 	"files": [],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/sheinsight/lecp"
+		"url": "git+https://github.com/sheinsight/lecp.git"
 	},
 	"scripts": {
 		"test": "vitest",
