@@ -197,5 +197,5 @@ Cargo.lock
 *.node
 *.wasm
 
-index.js
-index.d.ts
+# index.js
+# index.d.ts
