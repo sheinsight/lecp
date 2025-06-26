@@ -1,4 +1,4 @@
-import external_React_default from "React";
+import React_0 from "React";
 ;
 ;
 const Demo = {
@@ -23,7 +23,7 @@ const src_components_Demo = Demo_Demo;
 ;
 const sleep = (ms)=>new Promise((resolve)=>setTimeout(resolve, ms));
 ;
-const src = ()=>/*#__PURE__*/ external_React_default.createElement(src_components_Demo, null);
+const src = ()=>/*#__PURE__*/ React_0.createElement(src_components_Demo, null);
 const asyncFn = async ()=>{
     await sleep(1000);
     console.log("Async function executed");

@@ -21,8 +21,7 @@ export const pluginScript: PluginFn = (
 	// swc-loader 只需要config，不需要 options
 	delete swcOptions.swcrc;
 	delete swcOptions.configFile;
-	// @ts-expect-error
-	delete swcOptions.module.resolveFully;
+	delete swcOptions.module;
 
 	chain.module
 		.rule("js")
