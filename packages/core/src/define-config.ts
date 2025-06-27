@@ -1,7 +1,6 @@
-import type { TransformOptions as LightningCssTransformOptions } from "lightningcss";
-
 import type { Configuration as RspackConfig } from "@rspack/core";
 import type Less from "less";
+import type { TransformOptions as LightningCssTransformOptions } from "lightningcss";
 import type RspackChain from "rspack-chain";
 
 /** 编译类型 */
@@ -26,7 +25,7 @@ export type LightningCssOptions = Omit<
 	"code" | "filename"
 >;
 
-export interface Format {
+export interface Format extends Omit<UserConfig, "format"> {
 	type: FormatType;
 
 	/**
