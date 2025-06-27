@@ -1,4 +1,4 @@
-import { createRequire } from "node:module";
+// import { createRequire } from "node:module";
 import type {
 	GlobalPassOption,
 	ModuleConfig,
@@ -9,7 +9,7 @@ import type { SystemConfig } from "../build.ts";
 import type { FinalUserConfig } from "../config.ts";
 import type { Format, FormatType } from "../define-config.ts";
 
-const require = createRequire(import.meta.url);
+// const require = createRequire(import.meta.url);
 
 // '@': './src' -> '@/*': ['./src/*'],
 // TODO: 兼容性 config 统一format
@@ -86,11 +86,11 @@ export const getSwcOptions = (
 		alias,
 		define,
 		react,
-		css,
+		// css,
 		minify,
-		shims,
-		outJsExt,
-		mode,
+		// shims,
+		// outJsExt,
+		// mode,
 	} = options;
 
 	const plugins: Array<[string, Record<string, any>]> = [];

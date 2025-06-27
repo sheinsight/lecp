@@ -1,10 +1,10 @@
 import path from "node:path";
 import less from "less";
 import {
-	type Visitor,
 	browserslistToTargets,
 	composeVisitors,
 	transform,
+	type Visitor,
 } from "lightningcss";
 import type {
 	LessOptions,

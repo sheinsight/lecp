@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { bundlessFileAsync, bundlessFilesAsync } from "@shined/lecp-binding";
 import chokidar from "chokidar";
 import colors from "picocolors";
 import { glob } from "tinyglobby";
@@ -14,8 +15,6 @@ import {
 	transformCSS,
 	transformLess,
 } from "./style.ts";
-
-import { bundlessFileAsync, bundlessFilesAsync } from "@shined/lecp-binding";
 
 export interface SourceMap {
 	file?: string;

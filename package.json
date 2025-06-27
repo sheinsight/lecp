@@ -2,7 +2,7 @@
 	"name": "lego-cp-root",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@10.12.2",
+	"packageManager": "pnpm@10.12.4",
 	"version": "0.0.1-beta.8",
 	"files": [],
 	"repository": {
@@ -12,7 +12,7 @@
 	"scripts": {
 		"test": "vitest",
 		"format": "biome format --write",
-		"lint": "oxlint",
+		"lint": "oxlint && biome check && cargo clippy && cargo fmt --all -- --check",
 		"build:rust": "pnpm --filter=\"./crates/**\" build",
 		"build:node": "pnpm --filter=\"./packages/**\" build",
 		"build": "pnpm build:rust && pnpm build:node",

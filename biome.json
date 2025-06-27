@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.0.5/schema.json",
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
@@ -12,7 +12,24 @@
 	"linter": {
 		"enabled": false
 	},
-	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		},
+		"includes": [
+			"**",
+			"!**/crates/**/npm/**",
+			"!**/crates/node_binding/index.*",
+			"!**/target/**",
+			"!**/dist/**",
+			"!**/es/**",
+			"!**/lib/**",
+			"!**/umd/**",
+			"!**/tests/**/snapshots/**"
+		]
+	},
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab",
@@ -20,6 +37,7 @@
 		"includes": [
 			"**",
 			"!**/crates/**/npm/**",
+			"!**/crates/node_binding/index.*",
 			"!**/target/**",
 			"!**/dist/**",
 			"!**/es/**",

@@ -1,9 +1,9 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { type Watcher, build, init } from "./build.ts";
+import { build, init, type Watcher } from "./build.ts";
 import { watchConfig } from "./restart.ts";
-import { logger } from "./util/logger.ts";
 import { measure } from "./util/index.ts";
+import { logger } from "./util/logger.ts";
 
 yargs(hideBin(process.argv))
 	.alias("v", "version")
