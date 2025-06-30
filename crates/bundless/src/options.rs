@@ -368,10 +368,8 @@ impl BundlessOptions {
 
         if let Some(alias) = &self.alias {
             for (name, path) in &alias.paths {
-                paths.insert(
-                    format!("{name}/*"),
-                    json!([format!("{}/*", Self::format_path(path))]),
-                );
+                paths
+                    .insert(format!("{name}/*"), json!([format!("{}/*", Self::format_path(path))]));
             }
         }
 

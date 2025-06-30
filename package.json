@@ -10,12 +10,16 @@
 		"url": "git+https://github.com/sheinsight/lecp.git"
 	},
 	"scripts": {
-		"test": "vitest",
-		"format": "biome format --write",
-		"lint": "oxlint && biome check && cargo clippy && cargo fmt --all -- --check",
+		"test": "pnpm test:js && pnpm test:rust",
+		"test:js": "vitest",
+		"test:rust": "cargo test --all --all-targets --all-features",
+		"format": "biome format --write && cargo fmt --all",
+		"lint": "pnpm lint:js && pnpm lint:rust",
+		"lint:js": "oxlint && biome check",
+		"lint:rust": "cargo clippy --all --all-targets --all-features -- -D warnings && cargo fmt --all -- --check",
+		"build": "pnpm build:rust && pnpm build:node",
 		"build:rust": "pnpm --filter=\"./crates/**\" build",
 		"build:node": "pnpm --filter=\"./packages/**\" build",
-		"build": "pnpm build:rust && pnpm build:node",
 		"release": "bumpp -r --no-push"
 	},
 	"keywords": [],
@@ -23,10 +27,10 @@
 	"license": "MIT",
 	"description": "",
 	"devDependencies": {
-		"@biomejs/biome": "^2.0.5",
+		"@biomejs/biome": "^2.0.6",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.2.0",
-		"oxlint": "^1.3.0",
+		"oxlint": "^1.4.0",
 		"tinyglobby": "^0.2.14",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
