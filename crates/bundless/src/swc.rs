@@ -52,7 +52,7 @@ pub fn transform_file(
     GLOBALS
         .set(&Default::default(), || {
             try_with_handler(cm.clone(), Default::default(), |handler| {
-                debug!("load file {:?}", file);
+                debug!("load file {file:?}");
 
                 let fm = cm.load_file(file).context("swc failed to load file")?;
                 // compiler.process_js_file(fm, handler, options).context("failed to process file")
@@ -229,7 +229,7 @@ mod tests {
         );
         assert!(result.is_err());
         if let Err(err) = result {
-            println!("{:?}", err);
+            println!("{err:?}");
         }
     }
 

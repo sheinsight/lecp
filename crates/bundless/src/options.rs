@@ -78,7 +78,7 @@ impl Display for ModuleType {
             ModuleType::CJS => "commonjs",
             // ModuleType::Umd => "umd",
         };
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 
@@ -369,7 +369,7 @@ impl BundlessOptions {
         if let Some(alias) = &self.alias {
             for (name, path) in &alias.paths {
                 paths.insert(
-                    format!("{}/*", name),
+                    format!("{name}/*"),
                     json!([format!("{}/*", Self::format_path(path))]),
                 );
             }

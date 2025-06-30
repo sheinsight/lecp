@@ -58,7 +58,7 @@ pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
     let rel_path = path.strip_prefix(src_dir)?;
     let out_path = out_dir.join(rel_path.with_extension(out_ext));
 
-    debug!("out_path: {:?}", out_path);
+    debug!("out_path: {out_path:?}");
 
     Ok(out_path)
 }
@@ -98,7 +98,7 @@ pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
         .chain(test_pattern.iter().copied())
         .collect();
 
-    debug!("ignore: {:?}", ignore);
+    debug!("ignore: {ignore:?}");
 
     // println!(
     //     "\nbundless for {} to {} with {} and dts\n",

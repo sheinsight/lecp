@@ -91,7 +91,7 @@ fn main() -> Result<()> {
 
     let res = bundless_files(&options);
     if let Err(e) = res {
-        eprintln!("\n{:?}", e);
+        eprintln!("\n{e:?}");
         std::process::exit(1);
     }
 
