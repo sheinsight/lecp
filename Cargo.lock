@@ -1351,9 +1351,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "3.0.0-beta.10"
+version = "3.0.0-beta.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8a8bf588b2ea96bdf618cac8a81b2b6cb5e0f0f86a1ac4ac62859ab78fd79a8"
+checksum = "ca1763658b41abbdf10caaa63b74e58f4ec62d52b889a558e0af6f3638cc9426"
 dependencies = [
  "anyhow",
  "bitflags",
@@ -1367,15 +1367,15 @@ dependencies = [
 
 [[package]]
 name = "napi-build"
-version = "2.2.1"
+version = "2.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44e0e3177307063d3e7e55b7dd7b648cca9d7f46daa35422c0d98cc2bf48c2c1"
+checksum = "fff539e61c5e3dd4d7d283610662f5d672c2aea0f158df78af694f13dbb3287b"
 
 [[package]]
 name = "napi-derive"
-version = "3.0.0-beta.10"
+version = "3.0.0-beta.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cf56acb0b78c92cba806a559cfe62513f53cc4a7947807e2ff3c4ef865e9b3a"
+checksum = "8b0b4f5fcba16f75c9ceb226c197d023a0df97bfa8aa072aabe7b17c09ff9d43"
 dependencies = [
  "convert_case",
  "ctor",
@@ -1387,9 +1387,9 @@ dependencies = [
 
 [[package]]
 name = "napi-derive-backend"
-version = "2.0.0-beta.10"
+version = "2.0.0-beta.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6862700f1bdfe43767dc2fd3577306cf6342431f078b765c8336454dda382f1d"
+checksum = "cb3f73575dce353797042f8f43ac681937c06b01710e6070cf93fe4d08d93203"
 dependencies = [
  "convert_case",
  "proc-macro2",
@@ -2386,9 +2386,9 @@ dependencies = [
 
 [[package]]
 name = "swc_common"
-version = "13.0.1"
+version = "13.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6865f71f363e63306cedec3f3cf1cb9e80acaa9229261ba2569467a19060c7c8"
+checksum = "fc28daa84b57762ecf28d8fdf6a3204ff04c8b8d98d35b9e8b9f56d4a7fafffa"
 dependencies = [
  "anyhow",
  "ast_node",
@@ -2480,9 +2480,9 @@ dependencies = [
 
 [[package]]
 name = "swc_core"
-version = "29.3.0"
+version = "29.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71ae8a7a328dc17ad94c9132667f41fb4ee459e00c1fd44460fb575cde3a228a"
+checksum = "991fb5308ade9fb838316d0f1790bf2df25b0cafa6ac2515450e8003107201ae"
 dependencies = [
  "once_cell",
  "par-core",
@@ -2776,9 +2776,9 @@ dependencies = [
 
 [[package]]
 name = "swc_ecma_lexer"
-version = "17.0.6"
+version = "17.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8f318a247bc2c4662dc10dccd7a4f64834add015d216e977a58665b0aad9772"
+checksum = "8ff2f560591181601f15316838bd5872b19902e7b4605a08743c6cb3e853b3db"
 dependencies = [
  "arrayvec",
  "ascii",
@@ -2847,9 +2847,9 @@ dependencies = [
 
 [[package]]
 name = "swc_ecma_minifier"
-version = "23.0.4"
+version = "23.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "338cc99771aeb6b364698116333784245de44fa9ddf2cb3ba8d31d6535c534b9"
+checksum = "83acbd779994eff0c3fe70a556969a1c315afe49e4c0f7a928939f812e96c541"
 dependencies = [
  "arrayvec",
  "bitflags",
@@ -2885,9 +2885,9 @@ dependencies = [
 
 [[package]]
 name = "swc_ecma_parser"
-version = "17.2.0"
+version = "17.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e24a33266ba7045b372043f7fc0674f3b3464875463874b85618f9c276bbd654"
+checksum = "821520cc73106140a379ba2614e67e35f9c5dff40f078fa791b16ed92e00053d"
 dependencies = [
  "arrayvec",
  "bitflags",

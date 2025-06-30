@@ -35,9 +35,9 @@ swc_transform_shims      = { path = "./crates/transform_shims/transform" }
 swc_transform_ts2js      = { path = "./crates/transform_ts2js/transform" }
 
 # napi
-napi        = { version = "3.0.0-beta.10", features = ["async", "anyhow"] }
-napi-build  = { version = "2.2.1" }
-napi-derive = { version = "3.0.0-beta.10", default-features = false, features = ["type-def"] }
+napi        = { version = "3.0.0-beta.11", features = ["async", "anyhow"] }
+napi-build  = { version = "2.2.2" }
+napi-derive = { version = "3.0.0-beta.11", default-features = false, features = ["type-def"] }
 
 # .cargo/config defines few alias to build plugin.
 # cargo build-wasi ge1.0.219 wasm-wasi32 binary
