@@ -107,10 +107,10 @@ importers:
         version: link:../../packages/core
       '@swc/cli':
         specifier: ^0.7.7
-        version: 0.7.7(@swc/core@1.12.7)(chokidar@4.0.3)
+        version: 0.7.7(@swc/core@1.12.7(@swc/helpers@0.5.17))(chokidar@4.0.3)
       '@swc/core':
         specifier: 1.12.7
-        version: 1.12.7
+        version: 1.12.7(@swc/helpers@0.5.17)
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.29
@@ -153,19 +153,22 @@ importers:
         version: 7.52.8(@types/node@22.15.29)
       '@rspack/core':
         specifier: 1.4.1
-        version: 1.4.1
+        version: 1.4.1(@swc/helpers@0.5.17)
       '@shined/lecp-binding':
         specifier: workspace:*
         version: link:../../crates/node_binding
       '@swc/core':
         specifier: 1.12.7
-        version: 1.12.7
+        version: 1.12.7(@swc/helpers@0.5.17)
+      '@swc/helpers':
+        specifier: ^0.5.17
+        version: 0.5.17
       chokidar:
         specifier: ^4.0.3
         version: 4.0.3
       css-loader:
         specifier: ^7.1.2
-        version: 7.1.2(@rspack/core@1.4.1)(webpack@5.97.1(@swc/core@1.12.7))
+        version: 7.1.2(@rspack/core@1.4.1(@swc/helpers@0.5.17))(webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17)))
       deepmerge:
         specifier: ^4.3.1
         version: 4.3.1
@@ -177,7 +180,7 @@ importers:
         version: 4.3.0
       less-loader:
         specifier: ^12.3.0
-        version: 12.3.0(@rspack/core@1.4.1)(less@4.3.0)(webpack@5.97.1(@swc/core@1.12.7))
+        version: 12.3.0(@rspack/core@1.4.1(@swc/helpers@0.5.17))(less@4.3.0)(webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17)))
       lightningcss:
         specifier: ^1.30.1
         version: 1.30.1
@@ -192,7 +195,7 @@ importers:
         version: 1.2.6
       source-map-loader:
         specifier: ^5.0.0
-        version: 5.0.0(webpack@5.97.1(@swc/core@1.12.7))
+        version: 5.0.0(webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17)))
       tinyglobby:
         specifier: ^0.2.14
         version: 0.2.14
@@ -1413,6 +1416,9 @@ packages:
 
   '@swc/counter@0.1.3':
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
+
+  '@swc/helpers@0.5.17':
+    resolution: {integrity: sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==}
 
   '@swc/types@0.1.23':
     resolution: {integrity: sha512-u1iIVZV9Q0jxY+yM2vw/hZGDNudsN85bBpTqzAQ9rzkxW9D+e3aEM4Han+ow518gSewkXgjmEK0BD79ZcNVgPw==}
@@ -3920,11 +3926,13 @@ snapshots:
       '@rspack/binding-win32-ia32-msvc': 1.4.1
       '@rspack/binding-win32-x64-msvc': 1.4.1
 
-  '@rspack/core@1.4.1':
+  '@rspack/core@1.4.1(@swc/helpers@0.5.17)':
     dependencies:
       '@module-federation/runtime-tools': 0.15.0
       '@rspack/binding': 1.4.1
       '@rspack/lite-tapable': 1.0.1
+    optionalDependencies:
+      '@swc/helpers': 0.5.17
 
   '@rspack/lite-tapable@1.0.1': {}
 
@@ -3966,9 +3974,9 @@ snapshots:
 
   '@sindresorhus/is@5.6.0': {}
 
-  '@swc/cli@0.7.7(@swc/core@1.12.7)(chokidar@4.0.3)':
+  '@swc/cli@0.7.7(@swc/core@1.12.7(@swc/helpers@0.5.17))(chokidar@4.0.3)':
     dependencies:
-      '@swc/core': 1.12.7
+      '@swc/core': 1.12.7(@swc/helpers@0.5.17)
       '@swc/counter': 0.1.3
       '@xhmikosr/bin-wrapper': 13.0.5
       commander: 8.3.0
@@ -4011,7 +4019,7 @@ snapshots:
   '@swc/core-win32-x64-msvc@1.12.7':
     optional: true
 
-  '@swc/core@1.12.7':
+  '@swc/core@1.12.7(@swc/helpers@0.5.17)':
     dependencies:
       '@swc/counter': 0.1.3
       '@swc/types': 0.1.23
@@ -4026,8 +4034,13 @@ snapshots:
       '@swc/core-win32-arm64-msvc': 1.12.7
       '@swc/core-win32-ia32-msvc': 1.12.7
       '@swc/core-win32-x64-msvc': 1.12.7
+      '@swc/helpers': 0.5.17
 
   '@swc/counter@0.1.3': {}
+
+  '@swc/helpers@0.5.17':
+    dependencies:
+      tslib: 2.8.1
 
   '@swc/types@0.1.23':
     dependencies:
@@ -4527,7 +4540,7 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  css-loader@7.1.2(@rspack/core@1.4.1)(webpack@5.97.1(@swc/core@1.12.7)):
+  css-loader@7.1.2(@rspack/core@1.4.1(@swc/helpers@0.5.17))(webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17))):
     dependencies:
       icss-utils: 5.1.0(postcss@8.5.3)
       postcss: 8.5.3
@@ -4538,8 +4551,8 @@ snapshots:
       postcss-value-parser: 4.2.0
       semver: 7.5.4
     optionalDependencies:
-      '@rspack/core': 1.4.1
-      webpack: 5.97.1(@swc/core@1.12.7)
+      '@rspack/core': 1.4.1(@swc/helpers@0.5.17)
+      webpack: 5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17))
 
   cssesc@3.0.0: {}
 
@@ -4887,12 +4900,12 @@ snapshots:
 
   kind-of@6.0.3: {}
 
-  less-loader@12.3.0(@rspack/core@1.4.1)(less@4.3.0)(webpack@5.97.1(@swc/core@1.12.7)):
+  less-loader@12.3.0(@rspack/core@1.4.1(@swc/helpers@0.5.17))(less@4.3.0)(webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17))):
     dependencies:
       less: 4.3.0
     optionalDependencies:
-      '@rspack/core': 1.4.1
-      webpack: 5.97.1(@swc/core@1.12.7)
+      '@rspack/core': 1.4.1(@swc/helpers@0.5.17)
+      webpack: 5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17))
 
   less@4.3.0:
     dependencies:
@@ -5328,11 +5341,11 @@ snapshots:
 
   source-map-js@1.2.1: {}
 
-  source-map-loader@5.0.0(webpack@5.97.1(@swc/core@1.12.7)):
+  source-map-loader@5.0.0(webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17))):
     dependencies:
       iconv-lite: 0.6.3
       source-map-js: 1.2.1
-      webpack: 5.97.1(@swc/core@1.12.7)
+      webpack: 5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17))
 
   source-map-support@0.5.21:
     dependencies:
@@ -5414,16 +5427,16 @@ snapshots:
       fast-fifo: 1.3.2
       streamx: 2.22.0
 
-  terser-webpack-plugin@5.3.14(@swc/core@1.12.7)(webpack@5.97.1(@swc/core@1.12.7)):
+  terser-webpack-plugin@5.3.14(@swc/core@1.12.7(@swc/helpers@0.5.17))(webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17))):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.27
       jest-worker: 27.5.1
       schema-utils: 4.3.2
       serialize-javascript: 6.0.2
       terser: 5.43.1
-      webpack: 5.97.1(@swc/core@1.12.7)
+      webpack: 5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17))
     optionalDependencies:
-      '@swc/core': 1.12.7
+      '@swc/core': 1.12.7(@swc/helpers@0.5.17)
 
   terser@5.43.1:
     dependencies:
@@ -5607,7 +5620,7 @@ snapshots:
 
   webpack-sources@3.3.3: {}
 
-  webpack@5.97.1(@swc/core@1.12.7):
+  webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17)):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.8
@@ -5629,7 +5642,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.2
-      terser-webpack-plugin: 5.3.14(@swc/core@1.12.7)(webpack@5.97.1(@swc/core@1.12.7))
+      terser-webpack-plugin: 5.3.14(@swc/core@1.12.7(@swc/helpers@0.5.17))(webpack@5.97.1(@swc/core@1.12.7(@swc/helpers@0.5.17)))
       watchpack: 2.4.4
       webpack-sources: 3.3.3
     transitivePeerDependencies:

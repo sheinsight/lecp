@@ -53,5 +53,13 @@
 		"@types/node": "catalog:",
 		"@types/yargs": "^17.0.33",
 		"typescript": "catalog:"
+	},
+	"peerDependencies": {
+		"@swc/helpers": "^0.5.17"
+	},
+	"peerDependenciesMeta": {
+		"@swc/helpers": {
+			"optional": true
+		}
 	}
 }
