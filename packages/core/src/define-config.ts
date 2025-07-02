@@ -249,6 +249,12 @@ export interface UserConfig {
 		 */
 		lightningCssOptions?: LightningCssOptions;
 	};
+
+	/**
+	 * 清理输出目录
+	 * @default true
+	 */
+	clean?: boolean;
 }
 
 export type UserConfigFn = () => UserConfig | Promise<UserConfig>;

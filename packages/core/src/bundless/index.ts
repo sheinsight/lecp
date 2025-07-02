@@ -103,12 +103,14 @@ export const bundlessFiles = async (
 	config: SystemConfig,
 ): Promise<Watcher[] | undefined> => {
 	const { cwd, watch } = config;
-	const { exclude, entry: srcDir, outDir, css, type: format } = options;
+	const { exclude, entry: srcDir, outDir, css, type: format, clean } = options;
 	const { sourcemap, targets, minify } = options;
 
 	// 清除文件
-	logger.info(`clear directory: ${outDir.replace(cwd, ".")}`);
-	await fs.rm(outDir, { recursive: true, force: true });
+	if (clean) {
+		logger.info(`clear directory: ${outDir.replace(cwd, ".")}`);
+		await fs.rm(outDir, { recursive: true, force: true });
+	}
 
 	const outJsExt = getOutJsExt(
 		!!targets.node,

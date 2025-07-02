@@ -83,6 +83,7 @@ const defaultConfig: Partial<UserConfig> = {
 	css: {
 		lessCompile: true,
 	},
+	clean: true,
 };
 
 const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {

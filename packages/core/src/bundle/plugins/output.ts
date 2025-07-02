@@ -8,7 +8,7 @@ const rspackModuleMap = {
 } as const;
 
 export const pluginOutput: PluginFn = (chain, { options, config: { pkg } }) => {
-	const { type: format, outDir, name, sourcemap, targets } = options;
+	const { type: format, outDir, name, sourcemap, targets, clean } = options;
 
 	const outJsExt = getOutJsExt(!!targets.node, pkg.type === "module", format);
 
@@ -22,6 +22,8 @@ export const pluginOutput: PluginFn = (chain, { options, config: { pkg } }) => {
 		});
 
 	chain.devtool(sourcemap ? "source-map" : false);
+
+	chain.output.clean(clean);
 
 	chain.module.when(sourcemap, module => {
 		module
