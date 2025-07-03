@@ -1,4 +1,3 @@
-// eslint-disable no-await-in-loop
 import fs from "node:fs/promises";
 import path from "path";
 import colors from "picocolors";
@@ -37,8 +36,6 @@ export const build = async (
 ): Promise<Watcher[]> => {
 	logger.info("LECP start build");
 
-	let watchers: Watcher[] = [];
-
 	const systemConfig = {
 		...inputSystemConfig,
 		pkg: await readPackage({
@@ -54,9 +51,11 @@ export const build = async (
 	const { format, ...others } = options;
 	const { cwd } = systemConfig;
 
-	for (const task of format) {
+	const taskPromises = format.map(async task => {
 		const { mode, outDir, dts } = task;
 		logger.info(`\n${colors.white(`${mode} ${task.type}`)}`);
+
+		let taskWatchers: Watcher[] = [];
 
 		if (mode === "bundless") {
 			// @ts-expect-error
@@ -65,12 +64,12 @@ export const build = async (
 			}
 
 			const watcher = await bundlessFiles({ ...others, ...task }, systemConfig);
-			watchers = watchers.concat(watcher ?? []);
+			taskWatchers = taskWatchers.concat(watcher ?? []);
 		}
 
 		if (mode === "bundle") {
 			const watcher = await bundleFiles({ ...others, ...task }, systemConfig);
-			watchers = watchers.concat(watcher ?? []);
+			taskWatchers = taskWatchers.concat(watcher ?? []);
 		}
 
 		if (dts) {
@@ -82,7 +81,7 @@ export const build = async (
 						{ ...others, ...task },
 						systemConfig,
 					);
-					if (watcher) watchers.push(watcher);
+					if (watcher) taskWatchers.push(watcher);
 				}
 
 				if (dts.mode === "bundle") {
@@ -98,15 +97,18 @@ export const build = async (
 						systemConfig,
 						() => bundleDts({ srcDir: tempOutDir, outDir, cwd }),
 					);
-					if (watcher) watchers.push(watcher);
+					if (watcher) taskWatchers.push(watcher);
 				}
 			});
 
 			logger.info(`dts generated in ${duration}ms`);
 		}
-	}
 
-	return watchers ?? [];
+		return taskWatchers;
+	});
+
+	const allTaskWatchers = await Promise.all(taskPromises);
+	return allTaskWatchers.flat();
 };
 
 const CONFIG_FILE = "lecp.config.ts";
