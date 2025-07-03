@@ -10,9 +10,11 @@ import { glob } from "tinyglobby";
 import ts, { type CompilerOptions } from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
 import type { SystemConfig, Watcher } from "../build.ts";
-import type { FinalUserConfig } from "../config.ts";
 import { testPattern, testPatternForTs } from "../constant.ts";
-import type { BundleFormat, BundlessFormat } from "../define-config.ts";
+import type {
+	FinalBundleFormat,
+	FinalBundlessFormat,
+} from "../define-config.ts";
 import { getOutJsExt, isJsx } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
 import type { TransformResult } from "./index.ts";
@@ -305,8 +307,7 @@ export const swcTransformDeclaration = async (
 	}
 };
 
-type BundlessOptions = Omit<FinalUserConfig, "format"> &
-	Required<BundlessFormat | BundleFormat>;
+type BundlessOptions = FinalBundleFormat | FinalBundlessFormat;
 
 export async function bundlessTransformDts(
 	options: BundlessOptions,

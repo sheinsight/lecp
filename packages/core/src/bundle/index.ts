@@ -1,13 +1,10 @@
 import rspack, { type Compiler } from "@rspack/core";
 import type { SystemConfig, Watcher } from "../build.ts";
-import type { FinalUserConfig } from "../config.ts";
-import type { BundleFormat } from "../define-config.ts";
+import type { FinalBundleFormat } from "../define-config.ts";
 import { logger } from "../util/logger.ts";
 import { getRspackConfig } from "./chain.ts";
-// import { stringify } from "./util.ts";
 
-export type BundleOptions = Omit<FinalUserConfig, "format"> &
-	Required<BundleFormat>;
+// import { stringify } from "./util.ts";
 
 type CallbackFunction = Parameters<Compiler["run"]>[0];
 const compilerHandler: CallbackFunction = (err, stats) => {
@@ -22,7 +19,7 @@ const compilerHandler: CallbackFunction = (err, stats) => {
 };
 
 export const bundleFiles = async (
-	options: BundleOptions,
+	options: FinalBundleFormat,
 	config: SystemConfig,
 ): Promise<Watcher | undefined> => {
 	const { watch } = config;

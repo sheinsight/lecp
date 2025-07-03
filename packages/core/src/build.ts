@@ -7,7 +7,11 @@ import { bundleDts } from "./bundle/dts.ts";
 import { bundleFiles } from "./bundle/index.ts";
 import { bundlessDts, getTsConfigFileContent } from "./bundless/dts.ts";
 import { bundlessFiles } from "./bundless/index.ts";
-import { getConfig, getFinalUserOptions } from "./config.ts";
+import {
+	getConfig,
+	getFinalFormatOptions,
+	getFinalUserOptions,
+} from "./config.ts";
 import type { UserConfig } from "./define-config.ts";
 import { measure, pathExists } from "./util/index.ts";
 import { type LogLevel, logger } from "./util/logger.ts";
@@ -38,37 +42,44 @@ export const build = async (
 
 	const systemConfig = {
 		...inputSystemConfig,
-		pkg: await readPackage({
-			normalize: true,
-			cwd: inputSystemConfig.cwd,
-		}),
-		tsconfig: getTsConfigFileContent({
-			cwd: inputSystemConfig.cwd,
-		}).options,
+		pkg: await readPackage({ normalize: true, cwd: inputSystemConfig.cwd }),
+		tsconfig: getTsConfigFileContent({ cwd: inputSystemConfig.cwd }).options,
 	} as SystemConfig;
 
 	const options = getFinalUserOptions(userConfig, systemConfig);
-	const { format, ...others } = options;
+	const { format } = options;
 	const { cwd } = systemConfig;
 
-	const taskPromises = format.map(async task => {
-		const { mode, outDir, dts } = task;
-		logger.info(`\n${colors.white(`${mode} ${task.type}`)}`);
-
+	const taskPromises = format.map(async formatOptions => {
 		let taskWatchers: Watcher[] = [];
 
+		const { mode } = formatOptions;
+
+		const finalOptions = getFinalFormatOptions(
+			options,
+			formatOptions,
+			systemConfig,
+		);
+
+		// console.log(`build options: ${JSON.stringify(finalOptions, null, 2)}`);
+
+		const { outDir, dts } = finalOptions;
+
+		logger.info(`\n${colors.white(`${mode} ${formatOptions.type}`)}`);
+
 		if (mode === "bundless") {
-			// @ts-expect-error
-			if (task.type === "umd") {
+			if (finalOptions.type === "umd") {
 				throw new Error("umd format is not supported in bundless mode");
 			}
 
-			const watcher = await bundlessFiles({ ...others, ...task }, systemConfig);
+			// @ts-expect-error ts-guard
+			const watcher = await bundlessFiles(finalOptions, systemConfig);
 			taskWatchers = taskWatchers.concat(watcher ?? []);
 		}
 
 		if (mode === "bundle") {
-			const watcher = await bundleFiles({ ...others, ...task }, systemConfig);
+			// @ts-expect-error ts-guard
+			const watcher = await bundleFiles(finalOptions, systemConfig);
 			taskWatchers = taskWatchers.concat(watcher ?? []);
 		}
 
@@ -77,10 +88,7 @@ export const build = async (
 
 			const { duration } = await measure(async () => {
 				if (dts.mode === "bundless") {
-					const watcher = await bundlessDts(
-						{ ...others, ...task },
-						systemConfig,
-					);
+					const watcher = await bundlessDts(finalOptions, systemConfig);
 					if (watcher) taskWatchers.push(watcher);
 				}
 
@@ -93,7 +101,7 @@ export const build = async (
 
 					const tempOutDir = path.join(tempDir, path.relative(cwd, outDir));
 					const watcher = await bundlessDts(
-						{ ...others, ...task, outDir: tempOutDir },
+						{ ...finalOptions, outDir: tempOutDir },
 						systemConfig,
 						() => bundleDts({ srcDir: tempOutDir, outDir, cwd }),
 					);

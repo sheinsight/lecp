@@ -5,9 +5,8 @@ import chokidar from "chokidar";
 import colors from "picocolors";
 import { glob } from "tinyglobby";
 import type { SystemConfig, Watcher } from "../build.ts";
-import type { FinalUserConfig } from "../config.ts";
 import { testPattern } from "../constant.ts";
-import type { BundlessFormat } from "../define-config.ts";
+import type { FinalBundlessFormat } from "../define-config.ts";
 import { getOutJsExt, isCss, isDts, isLess, isScript } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
 import {
@@ -29,9 +28,9 @@ export interface TransformResult {
 interface CompileStyleOptions {
 	outFilePath: string;
 	sourcemap: boolean;
-	targets: BundlessOptions["targets"];
-	cssModules: Exclude<BundlessOptions["css"], undefined>["cssModules"];
-	minify: BundlessOptions["minify"];
+	targets: FinalBundlessFormat["targets"];
+	cssModules: Exclude<FinalBundlessFormat["css"]["cssModules"], boolean>;
+	minify: FinalBundlessFormat["minify"];
 }
 
 const compileStyle = async (
@@ -93,13 +92,10 @@ const copyAsset = async (
 	await fs.copyFile(file, outFilePath);
 };
 
-type BundlessOptions = Omit<FinalUserConfig, "format"> &
-	Required<BundlessFormat>;
-
 const TITLE_WIDTH = 13;
 
 export const bundlessFiles = async (
-	options: BundlessOptions,
+	options: FinalBundlessFormat,
 	config: SystemConfig,
 ): Promise<Watcher[] | undefined> => {
 	const { cwd, watch } = config;

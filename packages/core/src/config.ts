@@ -5,6 +5,8 @@ import { DEFAULT_NODE_TARGET, DEFAULT_WEB_TARGET } from "./constant.ts";
 import type {
 	BundleFormat,
 	BundlessFormat,
+	FinalBundleFormat,
+	FinalBundlessFormat,
 	FormatType,
 	UserConfig,
 } from "./define-config.ts";
@@ -114,22 +116,16 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 	} as BundleFormat,
 };
 
+const defaultDtsConfig = {
+	mode: "bundless",
+	builder: "swc",
+};
+
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
-export interface FinalUserConfig
-	extends Required<Omit<UserConfig, "extend" | "dts" | "css" | "shims">> {
-	format: Required<
-		| (Omit<BundlessFormat, "dts"> & {
-				dts?: Required<Exclude<UserConfig["dts"], boolean>>;
-		  })
-		| (Omit<BundleFormat, "dts"> & {
-				dts?: Required<Exclude<UserConfig["dts"], boolean>>;
-		  })
-	>[];
-	name: string;
-	dts?: Required<Exclude<UserConfig["dts"], boolean>>;
-	css?: Prettify<UserConfig["css"] & { cssModules?: string }>;
-	shims?: Exclude<UserConfig["shims"], boolean>;
+export interface FinalUserConfig extends Required<Omit<UserConfig, "extend">> {
+	format: Required<BundleFormat | BundlessFormat>[];
+	name?: string;
 }
 
 export const getFinalUserOptions = (
@@ -139,22 +135,6 @@ export const getFinalUserOptions = (
 	const { cwd, pkg } = systemConfig;
 
 	const buildOptions = merge<UserConfig>(defaultConfig, userConfig);
-
-	if (!userConfig.targets) {
-		const isCjsOnly = userConfig.format.every(item => item.type === "cjs");
-		buildOptions.targets = isCjsOnly
-			? { node: DEFAULT_NODE_TARGET }
-			: { chrome: DEFAULT_WEB_TARGET };
-	}
-
-	if (buildOptions.dts) {
-		buildOptions.dts = {
-			mode: "bundless",
-			builder: "swc",
-			// @ts-expect-error ...true ok
-			...buildOptions.dts,
-		};
-	}
 
 	buildOptions.format = userConfig.format.map(item => {
 		const data = {
@@ -167,31 +147,60 @@ export const getFinalUserOptions = (
 			data.fileName ??= "index";
 		}
 
-		if (data.dts === undefined) {
-			data.dts = buildOptions.dts;
-		} else if (data.dts) {
-			data.dts = {
-				// @ts-expect-error ...true ok
-				...buildOptions.dts,
-				// @ts-expect-error ...true ok
-				...data.dts,
-			};
-		}
-
 		if (data.outDir) data.outDir = path.resolve(cwd, data.outDir);
 		if (data.entry) data.entry = path.resolve(cwd, data.entry);
+
 		return data as FinalUserConfig["format"][0];
 	});
 
-	buildOptions.shims ??= false;
-	if (buildOptions.shims === true) {
-		buildOptions.shims = { legacy: false };
-	}
-
-	if (buildOptions.css?.cssModules === true) {
-		const pkgName = systemConfig.pkg.name;
-		buildOptions.css.cssModules = `${pkgName.replace("@", "").replace("/", "__")}__[local]`;
-	}
-
 	return buildOptions as FinalUserConfig;
 };
+
+// export function getFinalFormatOptions(
+// 	userConfig: FinalUserConfig,
+// 	formatOptions: Required<BundlessFormat>,
+// 	systemConfig: SystemConfig,
+// ): FinalBundlessFormat;
+// export function getFinalFormatOptions(
+// 	userConfig: FinalUserConfig,
+// 	formatOptions: Required<BundleFormat>,
+// 	systemConfig: SystemConfig,
+// ): FinalBundleFormat;
+export function getFinalFormatOptions(
+	userConfig: FinalUserConfig,
+	formatOptions: Required<BundlessFormat | BundleFormat>,
+	systemConfig: SystemConfig,
+): FinalBundleFormat | FinalBundlessFormat {
+	const { format, ...commonOptions } = userConfig;
+
+	const options = merge<Required<BundlessFormat | BundleFormat>>(
+		commonOptions,
+		formatOptions,
+	);
+
+	options.shims ??= false;
+	if (options.shims === true) {
+		options.shims = { legacy: false };
+	}
+
+	if (options.css?.cssModules === true) {
+		options.css.cssModules = `${systemConfig.pkg.name.replace("@", "").replace("/", "__")}__[local]`;
+	}
+
+	if (options.dts) {
+		options.dts = {
+			...defaultDtsConfig,
+			// @ts-expect-error ...true ok
+			...options.dts,
+		};
+	}
+
+	if (!options.targets) {
+		const isCjsOnly = format.every(item => item.type === "cjs");
+		options.targets = isCjsOnly
+			? { node: DEFAULT_NODE_TARGET }
+			: { chrome: DEFAULT_WEB_TARGET };
+	}
+
+	return options as FinalBundleFormat | FinalBundlessFormat;
+}
