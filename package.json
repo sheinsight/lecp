@@ -11,7 +11,7 @@
 	},
 	"scripts": {
 		"test": "pnpm test:js && pnpm test:rust",
-		"test:js": "vitest",
+		"test:js": "vitest --run",
 		"test:rust": "cargo test --all --all-targets --all-features",
 		"format": "biome format --write && cargo fmt --all",
 		"lint": "pnpm lint:js && pnpm lint:rust",
@@ -20,6 +20,7 @@
 		"build": "pnpm build:rust && pnpm build:node",
 		"build:rust": "pnpm --filter=\"./crates/**\" build",
 		"build:node": "pnpm --filter=\"./packages/**\" build",
+		"prerelease": "pnpm run test",
 		"release": "bumpp -r --no-push"
 	},
 	"keywords": [],

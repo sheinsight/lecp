@@ -9,6 +9,7 @@ export default defineConfig({
 				react: "React",
 				"react-dom": "ReactDOM",
 			},
+			clean: false,
 		},
 		{
 			type: "umd",
@@ -17,6 +18,7 @@ export default defineConfig({
 				react: "React",
 				"react-dom": "ReactDOM",
 			},
+			clean: false,
 		},
 	],
 	define: {
