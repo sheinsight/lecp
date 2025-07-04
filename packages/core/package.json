@@ -30,7 +30,7 @@
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.52.8",
-		"@rspack/core": "1.4.2",
+		"@rspack/core": "1.4.4",
 		"@shined/lecp-binding": "workspace:*",
 		"@swc/core": "1.12.9",
 		"chokidar": "^4.0.3",
