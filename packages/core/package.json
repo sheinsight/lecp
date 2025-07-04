@@ -30,9 +30,9 @@
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.52.8",
-		"@rspack/core": "1.4.1",
+		"@rspack/core": "1.4.2",
 		"@shined/lecp-binding": "workspace:*",
-		"@swc/core": "1.12.7",
+		"@swc/core": "1.12.9",
 		"chokidar": "^4.0.3",
 		"css-loader": "^7.1.2",
 		"deepmerge": "^4.3.1",
@@ -46,13 +46,13 @@
 		"source-map-loader": "^5.0.0",
 		"tinyglobby": "^0.2.14",
 		"typescript-transform-paths": "^3.5.5",
-		"yargs": "^17.7.2"
+		"yargs": "^17.7.2",
+		"typescript": "catalog:"
 	},
 	"devDependencies": {
 		"@types/less": "^3.0.8",
 		"@types/node": "catalog:",
-		"@types/yargs": "^17.0.33",
-		"typescript": "catalog:"
+		"@types/yargs": "^17.0.33"
 	},
 	"peerDependencies": {
 		"@swc/helpers": "^0.5.17"
