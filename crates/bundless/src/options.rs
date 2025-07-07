@@ -113,14 +113,21 @@ impl CSS {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum AliasPath {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Alias {
     #[serde(flatten)]
-    pub paths: HashMap<String, String>,
+    pub paths: HashMap<String, AliasPath>,
 }
 
 impl Default for Alias {
     fn default() -> Self {
-        Self { paths: [("@".to_string(), "./src".to_string())].into() }
+        Self { paths: [("@".to_string(), AliasPath::Single("./src".to_string()))].into() }
     }
 }
 
@@ -305,7 +312,7 @@ impl BundlessOptions {
                     "decorators": true
                 },
                 "baseUrl": self.cwd,
-                "paths": self.alias_to_ts_path(),
+                "paths": self.alias_to_ts_paths(),
                 "transform": {
                     "legacyDecorator": true,
                     "decoratorMetadata": true,
@@ -361,15 +368,22 @@ impl BundlessOptions {
     }
 
     // '@': './src'  -> '@/*': ['./src/*'],
-    // '@': 'src'    -> '@/*': ['./src/*'],
-    // '@': './src/' -> '@/*': ['./src/*'],
-    fn alias_to_ts_path(&self) -> serde_json::Value {
+    // "@alias": ["./src/alias-1", "./src/alias-2"] -> "@alias/*": ["./src/alias-1/*", "./src/alias-2/*"]
+    fn alias_to_ts_paths(&self) -> serde_json::Value {
         let mut paths = serde_json::Map::new();
 
         if let Some(alias) = &self.alias {
-            for (name, path) in &alias.paths {
-                paths
-                    .insert(format!("{name}/*"), json!([format!("{}/*", Self::format_path(path))]));
+            for (name, alias_path) in &alias.paths {
+                let path_values = match alias_path {
+                    AliasPath::Single(path) => {
+                        vec![format!("{}/*", Self::format_path(path))]
+                    }
+                    AliasPath::Multiple(paths) => {
+                        paths.iter().map(|path| format!("{}/*", Self::format_path(path))).collect()
+                    }
+                };
+
+                paths.insert(format!("{name}/*"), json!(path_values));
             }
         }
 

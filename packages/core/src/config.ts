@@ -1,6 +1,7 @@
 import path from "node:path";
 import { createJiti } from "jiti";
 import type { SystemConfig } from "./build.ts";
+import { tsPathsToAlias } from "./bundless/swc.ts";
 import { DEFAULT_NODE_TARGET, DEFAULT_WEB_TARGET } from "./constant.ts";
 import type {
 	BundleFormat,
@@ -80,7 +81,7 @@ const defaultConfig: Partial<UserConfig> = {
 	react: {
 		jsxRuntime: "classic",
 	},
-	alias: { "@": "./src" },
+	// alias: {},
 	define: {},
 	css: {
 		lessCompile: true,
@@ -192,6 +193,14 @@ export function getFinalFormatOptions(
 			...defaultDtsConfig,
 			// @ts-expect-error ...true ok
 			...options.dts,
+		};
+	}
+
+	// 从 tsconfig 中 追加 alias
+	if (systemConfig.tsconfig?.paths) {
+		options.alias = {
+			...tsPathsToAlias(systemConfig.tsconfig.paths),
+			...options.alias,
 		};
 	}
 

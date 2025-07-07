@@ -123,7 +123,7 @@ export interface BundleFormat extends Format {
 
 type ProcessDtsAndCss<T extends Format> = Omit<T, "dts" | "css"> & {
 	// omit dts boolean
-	dts?: NonNullable<Exclude<T["dts"], boolean>>;
+	dts?: Required<NonNullable<Exclude<T["dts"], boolean>>>;
 	// omit cssModules boolean
 	css?: Omit<NonNullable<T["css"]>, "cssModules"> & {
 		cssModules?: Exclude<NonNullable<T["css"]>["cssModules"], boolean>;
@@ -134,6 +134,8 @@ type FinalFormat<T extends Format> = Required<ProcessDtsAndCss<T>>;
 
 export type FinalBundlessFormat = FinalFormat<BundlessFormat>;
 export type FinalBundleFormat = FinalFormat<BundleFormat>;
+
+export type Alias = Record<string, string | string[]>;
 
 export interface UserConfig {
 	/**
@@ -189,7 +191,7 @@ export interface UserConfig {
 	 * 设置别名
 	 * @default { '@': './src' }
 	 */
-	alias?: Record<string, string>;
+	alias?: Alias;
 
 	/**
 	 * 设置代码中的可用变量

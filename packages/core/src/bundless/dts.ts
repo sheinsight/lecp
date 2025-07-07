@@ -371,7 +371,7 @@ export async function bundlessTransformDts(
 		const outFileRelPath = outFilePath.replace(`${cwd}/`, "");
 
 		logger.info(
-			colors.white(`bundless(dts)`),
+			`bundless(dts)`,
 			`${colors.yellow(fileRelPath)} to ${colors.blackBright(outFileRelPath)}`,
 		);
 

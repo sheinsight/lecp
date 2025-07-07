@@ -205,7 +205,7 @@ export const bundlessFiles = async (
 		});
 
 		const handleChange = async (event: string, file: string) => {
-			console.log(`🔄 ${colors.white(event)}: ${colors.yellow(file)}`);
+			console.log(`file ${event}: ${colors.yellow(file)}`);
 
 			if (event === "add" || event === "change") {
 				let filePath = path.join(srcDir, file);

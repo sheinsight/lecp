@@ -1,8 +1,8 @@
 import type { RspackOptions } from "@rspack/core";
 import RspackChain from "rspack-chain";
 import type { SystemConfig } from "../build.ts";
+import type { FinalBundleFormat } from "../define-config.ts";
 import { getBrowsersList } from "../util/index.ts";
-import type { BundleOptions } from "./index.ts";
 import { pluginAsset } from "./plugins/asset.ts";
 import { pluginCjs } from "./plugins/cjs.ts";
 import { pluginCss } from "./plugins/css.ts";
@@ -16,11 +16,11 @@ import { pluginScript } from "./plugins/script.ts";
 
 export type PluginFn = (
 	chain: RspackChain,
-	options: { options: BundleOptions; config: SystemConfig },
+	options: { options: FinalBundleFormat; config: SystemConfig },
 ) => void;
 
 export function getRspackConfig(
-	options: BundleOptions,
+	options: FinalBundleFormat,
 	config: SystemConfig,
 ): RspackOptions {
 	const chain = new RspackChain();

@@ -5,25 +5,44 @@ import type {
 	Options as SwcOptions,
 } from "@swc/core";
 import deepmerge from "deepmerge";
+import type ts from "typescript";
 import type { SystemConfig } from "../build.ts";
 import type { FinalUserConfig } from "../config.ts";
-import type { Format, FormatType } from "../define-config.ts";
+import type { Alias, Format, FormatType } from "../define-config.ts";
 
 // const require = createRequire(import.meta.url);
 
 // '@': './src' -> '@/*': ['./src/*'],
+// "@alias": ["./src/alias-1", "./src/alias-2"] -> "@alias/*": ["./src/alias-1/*", "./src/alias-2/*"]
 // TODO: 兼容性 config 统一format
 // '@': 'src' -> '@/*': ['./src/*'],
 // '@': './src/' -> '@/*': ['./src/*'],
 // 绝对路径处理 ??
-const aliasToTsPath = (alias: Record<string, string> = {}) => {
-	return Object.entries(alias).reduce(
-		(acc, [name, value]) => {
+
+type TsPaths = NonNullable<ts.CompilerOptions["paths"]>;
+
+const aliasToTsPaths = (alias: Alias = {}) => {
+	return Object.entries(alias).reduce((acc, [name, value]) => {
+		if (Array.isArray(value)) {
+			acc[`${name}/*`] = value.map(v => `${v}/*`);
+		} else {
 			acc[`${name}/*`] = [`${value}/*`];
-			return acc;
-		},
-		{} as Record<string, [string]>,
-	);
+		}
+		return acc;
+	}, {} as TsPaths);
+};
+
+// https://rspack.rs/zh/config/resolve#resolvealias
+// https://webpack.js.org/configuration/resolve/#resolvealias
+// https://www.typescriptlang.org/tsconfig/#paths
+
+// '@/*': ['./src/*'] -> '@': './src'
+// "@alias/*": ["./src/alias-1/*", "./src/alias-2/*"] -> "@alias": ["./src/alias-1", "./src/alias-2"]
+export const tsPathsToAlias = (paths: TsPaths = {}): Alias => {
+	return Object.entries(paths).reduce((acc, [name, value]) => {
+		acc[name.replace("/*", "")] = value.map(v => v.replace("/*", ""));
+		return acc;
+	}, {} as Alias);
 };
 
 interface GetOptions {
@@ -124,7 +143,7 @@ export const getSwcOptions = (
 			},
 			baseUrl: cwd,
 			// 暂不支持替换 require 和 require.resolve @see https://github.com/swc-project/swc/issues/3614
-			paths: aliasToTsPath(alias),
+			paths: aliasToTsPaths(alias),
 
 			// @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
 			minify: minify
