@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
-use swc_core::base::config::Options;
+use swc_core::base::config::Options as SwcOptions;
 
 use crate::{get_out_ext, serde_error_to_miette};
 
@@ -278,7 +278,7 @@ impl BundlessOptions {
 }
 
 impl BundlessOptions {
-    pub fn build_for_swc(&self) -> Result<Options> {
+    pub fn build_for_swc(&self) -> Result<SwcOptions> {
         let minify_options = if self.minify {
             // @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
             Some(serde_json::json!({
@@ -341,7 +341,7 @@ impl BundlessOptions {
         });
 
         let config_str = config_json.to_string();
-        serde_json::from_str::<Options>(&config_str).map_err(|e| {
+        serde_json::from_str::<SwcOptions>(&config_str).map_err(|e| {
             let miette_err = serde_error_to_miette(e, &config_str, "Could not parse swc config");
             anyhow::anyhow!("{:?}", miette_err)
         })

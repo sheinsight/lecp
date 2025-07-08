@@ -32,7 +32,7 @@
 		"@biomejs/biome": "^2.0.6",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.2.0",
-		"oxlint": "^1.5.0",
+		"oxlint": "^1.6.0",
 		"tinyglobby": "^0.2.14",
 		"typescript": "catalog:",
 		"vitest": "catalog:"

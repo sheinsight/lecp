@@ -24,9 +24,9 @@ thiserror  = { workspace = true }
 wax        = { workspace = true }
 
 swc_core = { workspace = true, features = [
-    "base",
+    "base_concurrent",
+    "common_concurrent",
     "ecma_ast",
-    "common",
     "ecma_utils",
     "ecma_visit",
     # "plugin_transform_host_native",

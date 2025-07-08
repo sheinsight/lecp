@@ -32,7 +32,7 @@
 		"@microsoft/api-extractor": "^7.52.8",
 		"@rspack/core": "1.4.4",
 		"@shined/lecp-binding": "workspace:*",
-		"@swc/core": "1.12.9",
+		"@swc/core": "1.12.11",
 		"chokidar": "^4.0.3",
 		"css-loader": "^7.1.2",
 		"deepmerge": "^4.3.1",
