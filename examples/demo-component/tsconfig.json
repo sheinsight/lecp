@@ -7,7 +7,7 @@
 		"esModuleInterop": true,
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
-		"isolatedDeclarations": true, // perf
+		// "isolatedDeclarations": true, // perf
 		"isolatedModules": true,
 		"resolveJsonModule": true,
 		// lint

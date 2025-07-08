@@ -31,5 +31,5 @@
 		"declaration": true,
 		"declarationMap": true
 	},
-	"exclude": ["**/dist", "**/es", "**/lib"]
+	"exclude": ["**/dist", "**/es", "**/lib", "tests/**"]
 }
