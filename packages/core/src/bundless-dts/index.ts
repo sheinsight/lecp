@@ -7,9 +7,11 @@ import chokidar from "chokidar";
 import fs from "fs/promises";
 import colors from "picocolors";
 import { glob } from "tinyglobby";
-import ts, { type CompilerOptions } from "typescript";
+import ts from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
 import type { SystemConfig, Watcher } from "../build.ts";
+import type { TransformResult } from "../bundless/index.ts";
+import { getSwcOptions } from "../bundless/swc.ts";
 import { testPattern, testPatternForTs } from "../constant.ts";
 import type {
 	FinalBundleFormat,
@@ -17,8 +19,6 @@ import type {
 } from "../define-config.ts";
 import { getOutJsExt, isJsx } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
-import type { TransformResult } from "./index.ts";
-import { getSwcOptions } from "./swc.ts";
 
 /**
  * 参考配置 @see https://github.com/Swatinem/rollup-plugin-dts/blob/master/src/program.ts
@@ -71,13 +71,13 @@ export const getTsConfigFileContent = (options: {
 	exclude?: string[];
 }): ts.ParsedCommandLine => {
 	const { cwd, exclude = [] } = options;
-	const configFileName = ts.findConfigFile(cwd, ts.sys.fileExists);
-	if (!configFileName) {
+	const configFile = ts.findConfigFile(cwd, ts.sys.fileExists);
+	if (!configFile) {
 		logger.error(`cannot find tsconfig.json in ${cwd}`);
 		return {} as never;
 	}
 
-	const { config, error } = ts.readConfigFile(configFileName, ts.sys.readFile);
+	const { config, error } = ts.readConfigFile(configFile, ts.sys.readFile);
 	if (error) {
 		logger.error(getDiagnosticsLog([error]));
 		return {} as never;
@@ -135,9 +135,9 @@ const bundlessEmitDts = async (
 /**
  * 编译 ts 到 dts (tsc --emitDeclarationOnly --declaration)
  */
-export const emitDeclaration = (
+const emitDeclaration = (
 	files: string[],
-	compilerOptions: CompilerOptions,
+	compilerOptions: ts.CompilerOptions,
 	onSuccess?: () => void,
 ): void => {
 	const program = ts.createProgram({
@@ -163,9 +163,9 @@ export const emitDeclaration = (
 /**
  * 编译 ts 到 dts (tsc --watch --emitDeclarationOnly --declaration)
  */
-export const watchDeclaration = (
+const watchDeclaration = (
 	files: string[],
-	compilerOptions: CompilerOptions,
+	compilerOptions: ts.CompilerOptions,
 	onSuccess?: () => void,
 ): ts.WatchOfConfigFile<ts.BuilderProgram> => {
 	logger.verbose("watching dts...");
@@ -228,7 +228,7 @@ export const watchDeclaration = (
  */
 export const tsTransformDeclaration = async (
 	fileName: string,
-	compilerOptions: CompilerOptions,
+	compilerOptions: ts.CompilerOptions,
 ): Promise<TransformResult | undefined> => {
 	const code = ts.sys.readFile(fileName);
 	if (code === undefined) {
@@ -274,7 +274,7 @@ export const tsTransformDeclaration = async (
  * swc@1.6.4 支持 (`jsc.experimental.emitIsolatedDts:true`)
  * @description 暂不支持生成 d.ts.map
  */
-export const swcTransformDeclaration = async (
+const swcTransformDeclaration = async (
 	fileName: string,
 	swcOptions: SwcOptions,
 ): Promise<TransformResult | undefined> => {
@@ -309,7 +309,7 @@ export const swcTransformDeclaration = async (
 
 type BundlessOptions = FinalBundleFormat | FinalBundlessFormat;
 
-export async function bundlessTransformDts(
+async function bundlessTransformDts(
 	options: BundlessOptions,
 	config: SystemConfig,
 	onSuccess?: () => void,

@@ -3,10 +3,10 @@ import path from "path";
 import colors from "picocolors";
 import { type NormalizedPackageJson, readPackage } from "read-pkg";
 import type { CompilerOptions } from "typescript";
-import { bundleDts } from "./bundle/dts.ts";
 import { bundleFiles } from "./bundle/index.ts";
-import { bundlessDts, getTsConfigFileContent } from "./bundless/dts.ts";
+import { bundleDts } from "./bundle-dts/index.ts";
 import { bundlessFiles } from "./bundless/index.ts";
+import { bundlessDts, getTsConfigFileContent } from "./bundless-dts/index.ts";
 import {
 	getConfig,
 	getFinalFormatOptions,

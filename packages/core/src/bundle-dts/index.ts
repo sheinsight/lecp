@@ -5,7 +5,7 @@ import {
 	type ExtractorLogLevel,
 } from "@microsoft/api-extractor";
 import ts from "typescript";
-import { OVERRIDE_TS_OPTIONS } from "../bundless/dts.ts";
+import { OVERRIDE_TS_OPTIONS } from "../bundless-dts/index.ts";
 import { logger } from "../util/logger.ts";
 
 interface BundleDtsOptions {
@@ -20,11 +20,11 @@ interface BundleDtsOptions {
  */
 export const bundleDts = (options: BundleDtsOptions): void => {
 	const { srcDir, outDir, cwd } = options;
-	const configFileName = ts.findConfigFile(cwd, ts.sys.fileExists);
+	const configFile = ts.findConfigFile(cwd, ts.sys.fileExists);
 	const extractorConfig = ExtractorConfig.prepare({
 		configObject: {
 			compiler: {
-				tsconfigFilePath: configFileName,
+				tsconfigFilePath: configFile,
 				skipLibCheck: true,
 				overrideTsconfig: {
 					compilerOptions: OVERRIDE_TS_OPTIONS,
