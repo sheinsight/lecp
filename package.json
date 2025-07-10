@@ -29,7 +29,7 @@
 	"license": "MIT",
 	"description": "",
 	"devDependencies": {
-		"@biomejs/biome": "^2.0.6",
+		"@biomejs/biome": "^2.1.1",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.2.0",
 		"oxlint": "^1.6.0",
