@@ -2,7 +2,7 @@
 	"name": "lego-cp-root",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@10.12.4",
+	"packageManager": "pnpm@10.13.1",
 	"version": "0.0.1-beta.11",
 	"files": [],
 	"repository": {
