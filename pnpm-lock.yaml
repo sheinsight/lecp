@@ -157,6 +157,9 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.17
         version: 0.5.17
+      '@swc/types':
+        specifier: ^0.1.23
+        version: 0.1.23
       chokidar:
         specifier: ^4.0.3
         version: 4.0.3

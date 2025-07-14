@@ -37,6 +37,12 @@ export const bundleFiles = async (
 
 	// node@22.0.0
 	// const { promise, resolve } = Promise.withResolvers<undefined>();
+	// compiler.run((err, stats) => {
+	// 	compilerHandler(err, stats);
+	// 	compiler.close(() => resolve(undefined));
+	// });
+	// return promise;
+
 	return new Promise(resolve => {
 		compiler.run((err, stats) => {
 			// const fullConfig = compiler.options;

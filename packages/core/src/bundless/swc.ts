@@ -3,7 +3,7 @@ import type {
 	GlobalPassOption,
 	ModuleConfig,
 	Options as SwcOptions,
-} from "@swc/core";
+} from "@swc/types";
 import deepmerge from "deepmerge";
 import type ts from "typescript";
 import type { SystemConfig } from "../build.ts";

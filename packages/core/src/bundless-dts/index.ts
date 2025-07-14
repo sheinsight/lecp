@@ -1,8 +1,6 @@
 import path from "node:path";
-import {
-	type Options as SwcOptions,
-	transformFile as swcTransformFile,
-} from "@swc/core";
+import { transformFile as swcTransformFile } from "@swc/core";
+import { type Options as SwcOptions } from "@swc/types";
 import chokidar from "chokidar";
 import fs from "fs/promises";
 import colors from "picocolors";
@@ -340,7 +338,7 @@ async function bundlessTransformDts(
 			const swcOptions = getSwcOptions(
 				{
 					...options,
-					outJsExt: isJsx.test(file) ? ".js" : outJsExt,
+					outJsExt: isJsx.test(file) ? "js" : outJsExt,
 					swcOptions: {
 						// ...options.swcOptions,
 						jsc: { experimental: { emitIsolatedDts: true } },
