@@ -29,6 +29,7 @@ swc_core = { workspace = true, features = [
     "ecma_ast",
     "ecma_utils",
     "ecma_visit",
+    "ecma_plugin_transform",
     # "plugin_transform_host_native",
     # "plugin_transform_host_native_filesystem_cache",
 ] }

@@ -21,23 +21,23 @@ path-clean = "1.0.1"
 pathdiff   = "0.2.3"
 rayon      = "1.10.0"
 serde      = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
-swc_core   = { version = "32.0.0", default-features = false, features = ["parallel_rayon"] }
+serde_json = "1.0.141"
+swc_core   = { version = "33.0.4", default-features = false, features = ["parallel_rayon"] }
 thiserror  = "2.0.12"
 tokio      = { version = "1.46.1", features = ["fs"] }
 wax        = "0.6.0"
 
 lecp_bundless            = { path = "./crates/bundless" }
-swc-plugin-css-modules   = { git = "https://github.com/dr2009/swc-plugin-css-modules", tag = "swc_core@v32" }
+swc-plugin-css-modules   = { git = "https://github.com/dr2009/swc-plugin-css-modules", tag = "swc_core@v33" }
 swc_transform_define     = { path = "./crates/transform_define/transform" }
 swc_transform_extensions = { path = "./crates/transform_extensions/transform" }
 swc_transform_shims      = { path = "./crates/transform_shims/transform" }
 swc_transform_ts2js      = { path = "./crates/transform_ts2js/transform" }
 
 # napi
-napi        = { version = "3.0.0-beta.12", features = ["async", "anyhow"] }
-napi-build  = { version = "2.2.2" }
-napi-derive = { version = "3.0.0-beta.12", default-features = false, features = ["type-def"] }
+napi        = { version = "3", features = ["async", "anyhow"] }
+napi-build  = { version = "2" }
+napi-derive = { version = "3", default-features = false, features = ["type-def"] }
 
 # .cargo/config defines few alias to build plugin.
 # cargo build-wasi ge1.0.219 wasm-wasi32 binary

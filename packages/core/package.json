@@ -30,15 +30,15 @@
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.52.8",
-		"@rspack/core": "1.4.5",
+		"@rspack/core": "1.4.8",
 		"@shined/lecp-binding": "workspace:*",
-		"@swc/core": "1.12.11",
+		"@swc/core": "1.12.14",
 		"@swc/types": "^0.1.23",
 		"chokidar": "^4.0.3",
 		"css-loader": "^7.1.2",
 		"deepmerge": "^4.3.1",
 		"jiti": "^2.4.2",
-		"less": "^4.3.0",
+		"less": "^4.4.0",
 		"less-loader": "^12.3.0",
 		"lightningcss": "^1.30.1",
 		"picocolors": "^1.1.1",
@@ -46,9 +46,9 @@
 		"rspack-chain": "^1.2.6",
 		"source-map-loader": "^5.0.0",
 		"tinyglobby": "^0.2.14",
+		"typescript": "catalog:",
 		"typescript-transform-paths": "^3.5.5",
-		"yargs": "^17.7.2",
-		"typescript": "catalog:"
+		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
 		"@types/less": "^3.0.8",
