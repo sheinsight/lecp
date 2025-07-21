@@ -64,19 +64,24 @@ pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
 }
 
 use std::io::Write;
+use std::sync::Once;
+
+// 多次调用会保存
+static INIT_LOGGER: Once = Once::new();
 
 pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
-    env_logger::builder()
-        .parse_env("LECP_LOG")
-        .format(|buf, record| {
-            if record.level() == log::Level::Info {
-                writeln!(buf, "{}", record.args())
-            } else {
-                writeln!(buf, "{} {}", record.level(), record.args())
-            }
-        })
-        .init();
-
+    INIT_LOGGER.call_once(|| {
+        env_logger::builder()
+            .parse_env("LECP_LOG")
+            .format(|buf, record| {
+                if record.level() == log::Level::Info {
+                    writeln!(buf, "{}", record.args())
+                } else {
+                    writeln!(buf, "{} {}", record.level(), record.args())
+                }
+            })
+            .init();
+    });
     // let cwd = &options.cwd;
     // println!("Bundless CLI: {:?}", cwd);
 
