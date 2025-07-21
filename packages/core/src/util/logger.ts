@@ -2,10 +2,10 @@ import colors from "picocolors";
 import randomColor from "./random-color.ts";
 
 /** 显示log级别: 默认 info(包含 error,info),  warn(包含 error), error, none 不显示 */
-export type LogLevel = "verbose" | "info" | "warn" | "error" | "none";
+export type LogLevel = "debug" | "info" | "warn" | "error" | "none";
 
 // level权重
-const logLevelWeight = { verbose: 0, info: 1, warn: 2, error: 3, none: 4 };
+const logLevelWeight = { debug: 0, info: 1, warn: 2, error: 3, none: 4 };
 
 export type Logger = Record<
 	Exclude<LogLevel, "none">,
@@ -23,12 +23,16 @@ export const createLogger = (
 
 	const log = (type: LogLevel, ...msg: string[]) => {
 		if ((logLevelWeight[logger.level] ?? 0) > logLevelWeight[type]) return;
-		const namespace = name ? `${randomColor(`${name}`)}: ` : "";
-		console.log(namespace, ...msg);
+
+		if (name) {
+			console.log(`${randomColor(`${name}`)}: `, ...msg);
+		} else {
+			console.log(...msg);
+		}
 	};
 
 	const logger = {
-		verbose: (...msg: any[]) => log("verbose", ...msg),
+		debug: (...msg: any[]) => log("debug", ...msg),
 		info: (...msg: any[]) => log("info", ...msg),
 		warn: (...msg: string[]) =>
 			log(
@@ -47,6 +51,9 @@ export const createLogger = (
 	Object.defineProperty(logger, "level", {
 		get: () => maxLevel,
 		set(val: LogLevel) {
+			// 同步设置 RUST env_logger 的环境变量(error,warn,info,debug,off)
+			if (!process.env.LECP_LOG)
+				process.env.LECP_LOG = val === "none" ? "off" : val;
 			maxLevel = val;
 		},
 	});

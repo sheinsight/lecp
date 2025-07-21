@@ -38,8 +38,6 @@ export const build = async (
 	userConfig: UserConfig,
 	inputSystemConfig: InputSystemConfig,
 ): Promise<Watcher[]> => {
-	logger.info("LECP start build");
-
 	const systemConfig = {
 		...inputSystemConfig,
 		pkg: await readPackage({ normalize: true, cwd: inputSystemConfig.cwd }),
@@ -65,23 +63,27 @@ export const build = async (
 
 		const { outDir, dts } = finalOptions;
 
-		logger.info(`\n${colors.white(`${mode} ${formatOptions.type}`)}`);
+		logger.info(`${colors.white(`${mode} ${formatOptions.type}`)}\n`);
 
-		if (mode === "bundless") {
-			if (finalOptions.type === "umd") {
-				throw new Error("umd format is not supported in bundless mode");
+		const { duration } = await measure(async () => {
+			if (mode === "bundless") {
+				if (finalOptions.type === "umd") {
+					throw new Error("umd format is not supported in bundless mode");
+				}
+
+				// @ts-expect-error ts-guard
+				const watcher = await bundlessFiles(finalOptions, systemConfig);
+				taskWatchers = taskWatchers.concat(watcher ?? []);
 			}
 
-			// @ts-expect-error ts-guard
-			const watcher = await bundlessFiles(finalOptions, systemConfig);
-			taskWatchers = taskWatchers.concat(watcher ?? []);
-		}
+			if (mode === "bundle") {
+				// @ts-expect-error ts-guard
+				const watcher = await bundleFiles(finalOptions, systemConfig);
+				taskWatchers = taskWatchers.concat(watcher ?? []);
+			}
+		});
 
-		if (mode === "bundle") {
-			// @ts-expect-error ts-guard
-			const watcher = await bundleFiles(finalOptions, systemConfig);
-			taskWatchers = taskWatchers.concat(watcher ?? []);
-		}
+		logger.info(`${mode} ${formatOptions.type} in ${duration}ms`);
 
 		if (dts) {
 			logger.info(`generate dts (${dts.mode})`);

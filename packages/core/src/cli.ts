@@ -1,3 +1,4 @@
+import colors from "picocolors";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { build, init, type Watcher } from "./build.ts";
@@ -17,7 +18,7 @@ yargs(hideBin(process.argv))
 			logLevel: {
 				type: "string",
 				default: "info",
-				choices: ["verbose", "info", "warn", "error", "none"],
+				choices: ["debug", "info", "warn", "error", "none"],
 			},
 		},
 		async argv => {
@@ -35,10 +36,11 @@ yargs(hideBin(process.argv))
 				const { config, files } = await init(systemConfig);
 
 				const { duration } = await measure(async () => {
+					console.log(`\n${colors.white("LECP start build")}\n`);
 					watchers = await build(config, systemConfig);
 				});
 
-				logger.info(`\nbuild success in ${duration}ms`);
+				console.log(`\n🌈 build success in ${duration}ms`);
 
 				if (argv.watch) {
 					watchConfig(Array.from(files), handler);

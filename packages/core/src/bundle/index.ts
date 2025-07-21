@@ -13,9 +13,9 @@ const compilerHandler: CallbackFunction = (err, stats) => {
 		return;
 	}
 
-	if (stats?.startTime && stats?.endTime) {
-		console.log(`${(stats.endTime - stats.startTime) / 1000}s`);
-	}
+	// if (stats?.startTime && stats?.endTime) {
+	// 	console.log(`${(stats.endTime - stats.startTime) / 1000}s`);
+	// }
 };
 
 export const bundleFiles = async (

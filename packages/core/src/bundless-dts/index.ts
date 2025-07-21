@@ -101,11 +101,11 @@ const bundlessEmitDts = async (
 	const { cwd, watch } = config;
 
 	const { fileNames, options } = getTsConfigFileContent({ cwd, exclude: [] });
-	logger.verbose("dts 编译文件: ", fileNames);
+	logger.debug("dts 编译文件: ", fileNames);
 
 	// 没有文件提前退出
 	if (!fileNames?.length && !watch) return;
-	logger.verbose("user tsconfig options: ", options);
+	logger.debug("user tsconfig options: ", options);
 
 	const overrideTsconfig = {
 		...OVERRIDE_TS_OPTIONS,
@@ -121,7 +121,7 @@ const bundlessEmitDts = async (
 		...overrideTsconfig,
 	};
 
-	logger.verbose("final tsconfig options: ", compilerOptions);
+	logger.debug("final tsconfig options: ", compilerOptions);
 
 	if (watch) {
 		return watchDeclaration(fileNames, compilerOptions, onSuccess);
@@ -166,7 +166,7 @@ const watchDeclaration = (
 	compilerOptions: ts.CompilerOptions,
 	onSuccess?: () => void,
 ): ts.WatchOfConfigFile<ts.BuilderProgram> => {
-	logger.verbose("watching dts...");
+	logger.debug("watching dts...");
 	const host = ts.createWatchCompilerHost(
 		files,
 		compilerOptions,
@@ -415,7 +415,7 @@ async function bundlessTransformDts(
 					// }
 				}
 			} catch (error) {
-				logger.verbose(error);
+				logger.debug(error);
 			}
 		});
 

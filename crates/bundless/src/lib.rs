@@ -5,7 +5,7 @@ pub use crate::options::{BundlessOptions, CSS, Define, JsxRuntime, ModuleType, R
 pub use crate::util::serde_error_to_miette;
 
 use anyhow::Result;
-use log::debug;
+use log::{debug, info};
 use owo_colors::OwoColorize;
 use rayon::prelude::*;
 use std::path::Path;
@@ -63,15 +63,26 @@ pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
     Ok(out_path)
 }
 
+use std::io::Write;
+
 pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
+    env_logger::builder()
+        .parse_env("LECP_LOG")
+        .format(|buf, record| {
+            if record.level() == log::Level::Info {
+                writeln!(buf, "{}", record.args())
+            } else {
+                writeln!(buf, "{} {}", record.level(), record.args())
+            }
+        })
+        .init();
+
     // let cwd = &options.cwd;
     // println!("Bundless CLI: {:?}", cwd);
 
     let src_dir = options.src_dir();
-    let swc_options = options.build_for_swc()?;
 
     debug!("bundless options: {:#?}", &options);
-    debug!("swc options: {:#?}", &swc_options);
 
     // 测试相关文件(glob格式)
     // wax crate 不支持某些高级的 glob 语法，特别是 {,/**} 这种大括号扩展和 **/*.+(test|e2e|spec).* 这种扩展模式。
@@ -138,12 +149,13 @@ pub fn bundless_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Resu
 
     let output = transform_file(file, &swc_options, options)?;
 
-    println!(
-        " bundless({}) {} to {}",
+    info!(
+        "bundless({}) {} to {}",
         options.format.get_type(),
         &file.strip_prefix(cwd)?.display().yellow(),
         &out_path.strip_prefix(cwd)?.display().bright_black()
     );
+
     write_file_and_sourcemap(output, &out_path)?;
 
     Ok(())

@@ -185,6 +185,7 @@ export const bundlessFiles = async (
 		cwd,
 	};
 
+	// 是否可以收到 @shined/lecp-binding 内部??
 	let res = bundlessFilesAsync(Buffer.from(JSON.stringify(bundlessOptions)));
 
 	const files = await glob("**/*", {
@@ -247,7 +248,7 @@ export const bundlessFiles = async (
 			try {
 				await handleChange(event, file);
 			} catch (error) {
-				logger.verbose(error);
+				logger.debug(error);
 			}
 		});
 
