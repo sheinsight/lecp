@@ -23,6 +23,7 @@ serde_json = { workspace = true }
 thiserror  = { workspace = true }
 wax        = { workspace = true }
 
+swc = { version = "32.0.1", default-features = false, features = ["isolated-dts"] }
 swc_core = { workspace = true, features = [
     "base_concurrent",
     "common_concurrent",
@@ -30,6 +31,7 @@ swc_core = { workspace = true, features = [
     "ecma_utils",
     "ecma_visit",
     "ecma_plugin_transform",
+    "typescript",
     # "plugin_transform_host_native",
     # "plugin_transform_host_native_filesystem_cache",
 ] }

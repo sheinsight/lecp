@@ -1,5 +1,5 @@
 use anyhow::Result;
-use lecp_bundless::{BundlessOptions, bundless_files, serde_error_to_miette};
+use lecp_bundless::{BundlessOptions, bundless_dts, bundless_files, serde_error_to_miette};
 use log::debug;
 use serde_json::json;
 
@@ -10,7 +10,7 @@ fn main() -> Result<()> {
         )
     }))?;
 
-    env_logger::init();
+    // env_logger::init();
 
     let start_time = std::time::Instant::now();
     // let cwd = std::env::current_dir()?.join("./examples/demo-sdk").canonicalize()?;
@@ -89,7 +89,7 @@ fn main() -> Result<()> {
         anyhow::anyhow!("{:?}", miette_err)
     })?;
 
-    let res = bundless_files(&options);
+    let res = bundless_dts(&options);
     if let Err(e) = res {
         eprintln!("\n{e:?}");
         std::process::exit(1);

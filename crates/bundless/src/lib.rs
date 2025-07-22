@@ -4,6 +4,7 @@ mod util;
 pub use crate::options::{BundlessOptions, CSS, Define, JsxRuntime, ModuleType, React, Shims};
 pub use crate::util::serde_error_to_miette;
 
+use crate::util::write_file;
 use anyhow::Result;
 use log::{debug, info};
 use owo_colors::OwoColorize;
@@ -69,9 +70,10 @@ use std::sync::Once;
 // 多次调用会报错
 static INIT_LOGGER: Once = Once::new();
 
-pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
+fn init_logger() {
     INIT_LOGGER.call_once(|| {
         env_logger::builder()
+            .filter_level(log::LevelFilter::Info)
             .parse_env("LECP_LOG")
             .format(|buf, record| {
                 if record.level() == log::Level::Info {
@@ -82,6 +84,10 @@ pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
             })
             .init();
     });
+}
+
+pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
+    init_logger();
     // let cwd = &options.cwd;
     // println!("Bundless CLI: {:?}", cwd);
 
@@ -162,6 +168,91 @@ pub fn bundless_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Resu
     );
 
     write_file_and_sourcemap(output, &out_path)?;
+
+    Ok(())
+}
+
+pub fn bundless_dts(options: &BundlessOptions) -> Result<()> {
+    init_logger();
+
+    let src_dir = options.src_dir();
+
+    debug!("bundless options: {:#?}", &options);
+
+    // 测试相关文件(glob格式)
+    // wax crate 不支持某些高级的 glob 语法，特别是 {,/**} 这种大括号扩展和 **/*.+(test|e2e|spec).* 这种扩展模式。
+    let test_pattern = vec![
+        "**/fixtures",
+        "**/fixtures/**",
+        "**/demos",
+        "**/demos/**",
+        "**/mocks",
+        "**/mocks/**",
+        "**/__test__",
+        "**/__test__/**",
+        "**/__snapshots__",
+        "**/__snapshots__/**",
+        "**/*.test.*",
+        "**/*.e2e.*",
+        "**/*.spec.*",
+    ];
+
+    let ignore: Vec<&str> = ["**/*.d.ts"]
+        .iter()
+        .copied()
+        .chain(options.exclude.iter().map(|s| s.as_str()))
+        .chain(test_pattern.iter().copied())
+        .collect();
+
+    debug!("ignore: {ignore:?}");
+
+    let glob: Glob<'_> = Glob::new("**/*.{ts,tsx,cts,mts,js,jsx,cjs,mjs}")?;
+    glob.walk(&src_dir)
+        .not(ignore)?
+        .par_bridge()
+        .filter_map(Result::ok)
+        .map(|entry| entry.path().to_owned())
+        .try_for_each(|path| bundless_dts_file(path, options))?;
+
+    Ok(())
+}
+
+pub fn bundless_dts_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Result<()> {
+    let file = file.as_ref();
+    let cwd = &options.cwd;
+
+    if !file.exists() {
+        return Err(anyhow::anyhow!("File does not exist: {:?}", file));
+    }
+
+    let mut swc_options = options.build_for_swc()?;
+
+    let src_dir = options.src_dir();
+    let out_dir = options.out_dir();
+    let out_ext = options.out_ext();
+
+    let out_path = get_out_file_path(file, &src_dir, &out_dir, &out_ext)?;
+
+    swc_options.output_path = Some(out_path.to_owned());
+    swc_options.config.jsc.experimental.emit_isolated_dts = true.into();
+
+    let output = transform_file(file, &swc_options, options)?;
+
+    if let Some(extra) = &output.output {
+        let mut extra: serde_json::Map<String, serde_json::Value> = serde_json::from_str(extra)?;
+
+        if let Some(dts_code) = extra.remove("__swc_isolated_declarations__") {
+            let dts_file_path = out_path.with_extension("d.ts");
+            let dts_code = dts_code.as_str().expect("dts code should be string");
+
+            info!(
+                "bundless(dts) {} to {}",
+                &file.strip_prefix(cwd)?.display().yellow(),
+                &dts_file_path.strip_prefix(cwd)?.display().bright_black()
+            );
+            write_file(&dts_file_path, dts_code)?;
+        }
+    }
 
     Ok(())
 }
