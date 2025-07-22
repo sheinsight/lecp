@@ -66,7 +66,7 @@ pub fn get_out_file_path<P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>>(
 use std::io::Write;
 use std::sync::Once;
 
-// 多次调用会保存
+// 多次调用会报错
 static INIT_LOGGER: Once = Once::new();
 
 pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
