@@ -23,7 +23,7 @@ serde_json = { workspace = true }
 thiserror  = { workspace = true }
 wax        = { workspace = true }
 
-swc = { version = "32.0.1", default-features = false, features = ["isolated-dts"] }
+swc = { workspace = true, features = ["isolated-dts"] }
 swc_core = { workspace = true, features = [
     "base_concurrent",
     "common_concurrent",
