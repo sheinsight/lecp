@@ -1,6 +1,5 @@
 import path from "node:path";
-import { transformFile as swcTransformFile } from "@swc/core";
-import { type Options as SwcOptions } from "@swc/types";
+import { transformDtsAsync } from "@shined/lecp-binding";
 import chokidar from "chokidar";
 import fs from "fs/promises";
 import colors from "picocolors";
@@ -9,13 +8,11 @@ import ts from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
 import type { SystemConfig, Watcher } from "../build.ts";
 import type { TransformResult } from "../bundless/index.ts";
-import { getSwcOptions } from "../bundless/swc.ts";
 import { testPattern, testPatternForTs } from "../constant.ts";
 import type {
 	FinalBundleFormat,
 	FinalBundlessFormat,
 } from "../define-config.ts";
-import { getOutJsExt, isJsx } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
 
 /**
@@ -267,44 +264,6 @@ export const tsTransformDeclaration = async (
 	};
 };
 
-/**
- * 编译 ts 到 dts (emitIsolatedDts, swc)
- * swc@1.6.4 支持 (`jsc.experimental.emitIsolatedDts:true`)
- * @description 暂不支持生成 d.ts.map
- */
-const swcTransformDeclaration = async (
-	fileName: string,
-	swcOptions: SwcOptions,
-): Promise<TransformResult | undefined> => {
-	try {
-		const defaultSwcOptions = {
-			filename: fileName,
-			jsc: {
-				parser: {
-					syntax: "typescript",
-					tsx: false,
-				},
-				experimental: {
-					emitIsolatedDts: true,
-				},
-			},
-		};
-
-		const result = await swcTransformFile(
-			fileName,
-			swcOptions ?? defaultSwcOptions,
-		);
-
-		// @ts-expect-error output exists
-		const output = JSON.parse(result.output);
-		return {
-			code: output.__swc_isolated_declarations__,
-		};
-	} catch (error: any) {
-		logger.error(error);
-	}
-};
-
 type BundlessOptions = FinalBundleFormat | FinalBundlessFormat;
 
 async function bundlessTransformDts(
@@ -312,7 +271,7 @@ async function bundlessTransformDts(
 	config: SystemConfig,
 	onSuccess?: () => void,
 ): Promise<void | Watcher> {
-	const { entry: srcDir, outDir, targets, type: format, dts } = options;
+	const { entry: srcDir, outDir, type: format, dts } = options;
 	const { pkg, cwd, tsconfig, watch } = config;
 
 	const excludePatterns = testPattern.concat(
@@ -327,27 +286,24 @@ async function bundlessTransformDts(
 	});
 
 	const dtsBuilders = {
-		swc: (file: string) => {
-			const outJsExt = getOutJsExt(
-				!!targets.node,
-				pkg.type === "module",
-				format,
-			);
-
-			// baseUrl + paths
-			const swcOptions = getSwcOptions(
-				{
-					...options,
-					outJsExt: isJsx.test(file) ? "js" : outJsExt,
-					swcOptions: {
-						// ...options.swcOptions,
-						jsc: { experimental: { emitIsolatedDts: true } },
-					},
-				},
-				config,
-			);
-
-			return swcTransformDeclaration(file, swcOptions);
+		swc: async (file: string) => {
+			try {
+				const code = await transformDtsAsync(
+					file,
+					Buffer.from(
+						JSON.stringify({
+							...options,
+							cwd,
+							format,
+							isModule: pkg.type === "module",
+							targets: {}, // -> !node, 不转换 cjs，mjs 后缀。 等后面统一处理
+						}),
+					),
+				);
+				return { code } as TransformResult;
+			} catch (error: any) {
+				logger.error(error);
+			}
 		},
 		ts: (file: string) =>
 			tsTransformDeclaration(file, {

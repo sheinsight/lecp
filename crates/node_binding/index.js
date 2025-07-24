@@ -393,5 +393,7 @@ if (!nativeBinding) {
 }
 
 module.exports = nativeBinding
+module.exports.bundlessDtsAsync = nativeBinding.bundlessDtsAsync
 module.exports.bundlessFileAsync = nativeBinding.bundlessFileAsync
 module.exports.bundlessFilesAsync = nativeBinding.bundlessFilesAsync
+module.exports.transformDtsAsync = nativeBinding.transformDtsAsync

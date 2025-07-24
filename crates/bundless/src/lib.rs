@@ -225,15 +225,35 @@ pub fn bundless_dts_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> 
         return Err(anyhow::anyhow!("File does not exist: {:?}", file));
     }
 
-    let mut swc_options = options.build_for_swc()?;
-
     let src_dir = options.src_dir();
     let out_dir = options.out_dir();
     let out_ext = options.out_ext();
 
     let out_path = get_out_file_path(file, &src_dir, &out_dir, &out_ext)?;
 
-    swc_options.output_path = Some(out_path.to_owned());
+    let dts_file_path = out_path.with_extension("d.ts");
+
+    info!(
+        "bundless(dts) {} to {}",
+        &file.strip_prefix(cwd)?.display().yellow(),
+        &dts_file_path.strip_prefix(cwd)?.display().bright_black()
+    );
+
+    let dts_code = transform_dts_file(file, options)?;
+    write_file(&dts_file_path, dts_code)?;
+
+    Ok(())
+}
+
+pub fn transform_dts_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> Result<String> {
+    let file = file.as_ref();
+
+    if !file.exists() {
+        return Err(anyhow::anyhow!("File does not exist: {:?}", file));
+    }
+
+    let mut swc_options = options.build_for_swc()?;
+
     swc_options.config.jsc.experimental.emit_isolated_dts = true.into();
 
     let output = transform_file(file, &swc_options, options)?;
@@ -242,17 +262,10 @@ pub fn bundless_dts_file<P: AsRef<Path>>(file: P, options: &BundlessOptions) -> 
         let mut extra: serde_json::Map<String, serde_json::Value> = serde_json::from_str(extra)?;
 
         if let Some(dts_code) = extra.remove("__swc_isolated_declarations__") {
-            let dts_file_path = out_path.with_extension("d.ts");
             let dts_code = dts_code.as_str().expect("dts code should be string");
-
-            info!(
-                "bundless(dts) {} to {}",
-                &file.strip_prefix(cwd)?.display().yellow(),
-                &dts_file_path.strip_prefix(cwd)?.display().bright_black()
-            );
-            write_file(&dts_file_path, dts_code)?;
+            return Ok(dts_code.into());
         }
     }
 
-    Ok(())
+    Ok(Default::default())
 }
