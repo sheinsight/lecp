@@ -70,9 +70,9 @@
         (()=>{
             __webpack_require__.r(__webpack_exports__);
             __webpack_require__.d(__webpack_exports__, {
-                "default": ()=>src,
                 asyncFn: ()=>asyncFn,
-                sleep: ()=>sleep
+                sleep: ()=>sleep,
+                "default": ()=>src
             });
             var external_React_ = __webpack_require__(24);
             var external_React_default = /*#__PURE__*/ __webpack_require__.n(external_React_);

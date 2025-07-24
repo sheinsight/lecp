@@ -31,8 +31,8 @@
     var __webpack_exports__ = {};
     __webpack_require__.r(__webpack_exports__);
     __webpack_require__.d(__webpack_exports__, {
-        sleep: ()=>sleep,
-        asyncFn: ()=>asyncFn
+        asyncFn: ()=>asyncFn,
+        sleep: ()=>sleep
     });
     ;
     const sleep = (ms)=>new Promise((resolve)=>setTimeout(resolve, ms));

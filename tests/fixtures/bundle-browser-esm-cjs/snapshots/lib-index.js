@@ -40,9 +40,9 @@
     var __webpack_exports__ = {};
     __webpack_require__.r(__webpack_exports__);
     __webpack_require__.d(__webpack_exports__, {
-        "default": ()=>src,
         asyncFn: ()=>asyncFn,
-        sleep: ()=>sleep
+        sleep: ()=>sleep,
+        "default": ()=>src
     });
     ;
     const external_React_namespaceObject = require("React");
