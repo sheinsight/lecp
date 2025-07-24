@@ -35,7 +35,9 @@ export function getRspackConfig(
 		.target(`browserslist:${getBrowsersList({ targets })}`);
 
 	chain.externals(externals);
+
 	chain.cache(watch).experiments({ cache: watch });
+	chain.experiments({ nativeWatcher: true });
 
 	[
 		pluginOutput,
