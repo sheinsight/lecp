@@ -46,6 +46,8 @@ pub fn transform_file(
     let cm = Arc::<SourceMap>::default(); // cm -> code map
     let compiler = Compiler::new(cm.clone());
 
+    debug!("swc options: {:#?}", options);
+
     // 计算 SyntaxContext
     GLOBALS
         .set(&Default::default(), || {

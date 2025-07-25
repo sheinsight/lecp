@@ -1,5 +1,5 @@
 use anyhow::Result;
-use lecp_bundless::{BundlessOptions, bundless_dts, bundless_files, serde_error_to_miette};
+use lecp_bundless::{BundlessOptions, bundless_dts, serde_error_to_miette};
 use log::debug;
 use serde_json::json;
 
