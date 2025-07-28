@@ -11,7 +11,9 @@ describe("bundless dts ok", async () => {
 		const fileMap = await getOutputMap(path.join(import.meta.dirname, "es"));
 
 		// content
-		expect(fileMap["index.d.ts"]).toContain(`export { a } from "./util";`);
+		expect(fileMap["index.d.ts"]).toContain(
+			`export { a } from "./util/index.js";`,
+		);
 		expect(fileMap["util/index.d.ts"]).toContain("export declare const a = 1;");
 
 		// sourcemap
@@ -34,18 +36,22 @@ describe("bundless dts ok", async () => {
 		const fileMap = await getOutputMap(path.join(import.meta.dirname, "lib"));
 
 		// content
-		expect(fileMap["index.d.ts"]).toContain(`export { a } from "./util";`);
-		expect(fileMap["util/index.d.ts"]).toContain("export declare const a = 1;");
+		expect(fileMap["index.d.cts"]).toContain(
+			`export { a } from "./util/index.cjs";`,
+		);
+		expect(fileMap["util/index.d.cts"]).toContain(
+			"export declare const a = 1;",
+		);
 
 		// sourcemap
-		expect(fileMap["index.d.ts.map"]).toContain(`"../src/index.ts"`);
-		expect(fileMap["index.d.ts"]).toContain(
+		expect(fileMap["index.d.cts.map"]).toContain(`"../src/index.ts"`);
+		expect(fileMap["index.d.cts"]).toContain(
 			"//# sourceMappingURL=index.d.ts.map",
 		);
-		expect(fileMap["util/index.d.ts.map"]).toContain(
+		expect(fileMap["util/index.d.cts.map"]).toContain(
 			`"../../src/util/index.ts"`,
 		);
-		expect(fileMap["util/index.d.ts"]).toContain(
+		expect(fileMap["util/index.d.cts"]).toContain(
 			"//# sourceMappingURL=index.d.ts.map",
 		);
 

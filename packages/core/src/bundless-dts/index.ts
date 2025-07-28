@@ -13,7 +13,9 @@ import type {
 	FinalBundleFormat,
 	FinalBundlessFormat,
 } from "../define-config.ts";
+import { getOutJsExt } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
+import { createExtensionRewriteTransformer } from "./tx-extension-rewrite.ts";
 
 /**
  * 参考配置 @see https://github.com/Swatinem/rollup-plugin-dts/blob/master/src/program.ts
@@ -91,11 +93,18 @@ export const getTsConfigFileContent = (options: {
  * 编译 ts 到 dts
  */
 const bundlessEmitDts = async (
+	bundlessOptions: BundlessOptions,
 	config: SystemConfig,
-	typesDir: string,
 	onSuccess?: () => void,
 ): Promise<Watcher | void> => {
 	const { cwd, watch } = config;
+	const { outDir: typesDir, type: format, targets } = bundlessOptions;
+
+	const outJsExt = getOutJsExt(
+		!!targets.node,
+		config.pkg.type === "module",
+		format,
+	);
 
 	const { fileNames, options } = getTsConfigFileContent({ cwd, exclude: [] });
 	logger.debug("dts 编译文件: ", fileNames);
@@ -121,10 +130,33 @@ const bundlessEmitDts = async (
 	logger.debug("final tsconfig options: ", compilerOptions);
 
 	if (watch) {
-		return watchDeclaration(fileNames, compilerOptions, onSuccess);
+		return watchDeclaration(fileNames, compilerOptions, outJsExt, onSuccess);
 	}
 
-	emitDeclaration(fileNames, compilerOptions, onSuccess);
+	emitDeclaration(fileNames, compilerOptions, outJsExt, onSuccess);
+};
+
+const createCustomWriteFile = (
+	outJsExt: string,
+	writeFile = ts.sys.writeFile,
+): ts.WriteFileCallback => {
+	return (fileName, data, writeByteOrderMark, onError) => {
+		// cjs, mjs -> cts, mts
+		let outDtsExt = outJsExt.replace(/^(c|m)?js$/, "$1ts");
+
+		const isMapFile = fileName.endsWith(".map");
+
+		let outputFileName = isMapFile
+			? fileName.replace(/\.(c|m)?(t|j)s.map$/, `.${outDtsExt}.map`)
+			: fileName.replace(/\.(c|m)?(t|j)s$/, `.${outDtsExt}`);
+
+		try {
+			writeFile(outputFileName, data, writeByteOrderMark);
+		} catch (error) {
+			// @ts-expect-error
+			onError?.(error.message);
+		}
+	};
 };
 
 /**
@@ -133,6 +165,7 @@ const bundlessEmitDts = async (
 const emitDeclaration = (
 	files: string[],
 	compilerOptions: ts.CompilerOptions,
+	outJsExt: string,
 	onSuccess?: () => void,
 ): void => {
 	const program = ts.createProgram({
@@ -140,10 +173,15 @@ const emitDeclaration = (
 		options: compilerOptions,
 	});
 
-	const { diagnostics } = program.emit(undefined, undefined, undefined, true, {
+	// d.ts.map, d.ts
+	const writeFile = createCustomWriteFile(outJsExt);
+
+	const { diagnostics } = program.emit(undefined, writeFile, undefined, true, {
 		afterDeclarations: [
 			// @ts-expect-error 兼容 cjs,esm 加载
 			(tsPathsTransformer?.default ?? tsPathsTransformer)(program),
+			// .cjs, .mjs 后缀转换
+			createExtensionRewriteTransformer({ ext: "." + outJsExt }),
 		],
 	});
 
@@ -161,6 +199,7 @@ const emitDeclaration = (
 const watchDeclaration = (
 	files: string[],
 	compilerOptions: ts.CompilerOptions,
+	outJsExt: string,
 	onSuccess?: () => void,
 ): ts.WatchOfConfigFile<ts.BuilderProgram> => {
 	logger.debug("watching dts...");
@@ -194,16 +233,18 @@ const watchDeclaration = (
 		): ts.EmitResult => {
 			const transformers = customTransformers ?? {};
 			transformers.afterDeclarations ??= [];
-			transformers.afterDeclarations.push(
+			transformers.afterDeclarations.concat(
 				// @ts-expect-error 兼容 cjs,esm 加载
 				(tsPathsTransformer?.default ?? tsPathsTransformer)(
 					program.getProgram(),
 				),
+				// .cjs, .mjs 后缀转换
+				createExtensionRewriteTransformer({ ext: "." + outJsExt }),
 			);
 
 			return originalEmit(
 				targetSourceFile,
-				writeFile,
+				createCustomWriteFile(outJsExt, writeFile),
 				cancellationToken,
 				emitOnlyDtsFiles,
 				transformers,
@@ -224,6 +265,7 @@ const watchDeclaration = (
 export const tsTransformDeclaration = async (
 	fileName: string,
 	compilerOptions: ts.CompilerOptions,
+	outJsExt: string,
 ): Promise<TransformResult | undefined> => {
 	const code = ts.sys.readFile(fileName);
 	if (code === undefined) {
@@ -247,8 +289,11 @@ export const tsTransformDeclaration = async (
 						undefined,
 						undefined,
 						undefined,
+						// transpileDeclaration 无 program, 需要手动设置
 						{ fileNames: [fileName], compilerOptions: compilerOptions },
 					),
+					// .cjs, .mjs 后缀转换
+					createExtensionRewriteTransformer({ ext: "." + outJsExt }),
 				].filter(Boolean),
 			},
 			// jsDocParsingMode?: JSDocParsingMode;
@@ -271,7 +316,7 @@ async function bundlessTransformDts(
 	config: SystemConfig,
 	onSuccess?: () => void,
 ): Promise<void | Watcher> {
-	const { entry: srcDir, outDir, type: format, dts } = options;
+	const { entry: srcDir, outDir, type: format, dts, targets } = options;
 	const { pkg, cwd, tsconfig, watch } = config;
 
 	const excludePatterns = testPattern.concat(
@@ -285,6 +330,13 @@ async function bundlessTransformDts(
 		ignore: excludePatterns,
 	});
 
+	const outJsExt = getOutJsExt(
+		!!targets.node,
+		config.pkg.type === "module",
+		format,
+	);
+	const outDtsExt = outJsExt.replace(/^(c|m)?js$/, "$1ts");
+
 	const dtsBuilders = {
 		swc: async (file: string) => {
 			try {
@@ -296,7 +348,7 @@ async function bundlessTransformDts(
 							cwd,
 							format,
 							isModule: pkg.type === "module",
-							targets: {}, // -> !node, 不转换 cjs，mjs 后缀。 等后面统一处理
+							// targets: {}, // -> !node, 不转换 cjs，mjs 后缀。
 						}),
 					),
 				);
@@ -305,22 +357,26 @@ async function bundlessTransformDts(
 				logger.error(error);
 			}
 		},
-		ts: (file: string) =>
-			tsTransformDeclaration(file, {
-				...tsconfig,
-				outDir,
-				declarationDir: outDir,
-				rootDir: srcDir,
-			}),
+		ts: (file: string) => {
+			return tsTransformDeclaration(
+				file,
+				{ ...tsconfig, outDir, declarationDir: outDir, rootDir: srcDir },
+				outJsExt,
+			);
+		},
 	};
 
 	const compileFile = async (file: string) => {
 		const filePath = file.replace(srcDir, "");
 		const fileRelPath = file.replace(`${cwd}/`, "");
 
+		// outJsExt .cjs, .mjs -> .d.cts, .d.mts
 		const outFilePath = path.join(
 			outDir,
-			filePath.replace(/\.(t|j)sx?$/, ".d.ts").replace(/\.(c|m)ts$/, ".d.$1ts"),
+			// tsx -> .d.ts
+			filePath
+				.replace(/\.(t|j)sx?$/, ".d.ts")
+				.replace(/\.(c|m)?(t|j)s$/, `.${outDtsExt}`),
 		);
 		const outFileRelPath = outFilePath.replace(`${cwd}/`, "");
 
@@ -388,6 +444,6 @@ export async function bundlessDts(
 	if (tsconfig?.isolatedDeclarations) {
 		return bundlessTransformDts(options, config, onSuccess);
 	} else {
-		return bundlessEmitDts(config, options.outDir, onSuccess);
+		return bundlessEmitDts(options, config, onSuccess);
 	}
 }
