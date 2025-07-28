@@ -36,7 +36,7 @@
 		"chokidar": "^4.0.3",
 		"css-loader": "^7.1.2",
 		"deepmerge": "^4.3.1",
-		"jiti": "^2.5.0",
+		"jiti": "^2.5.1",
 		"less": "^4.4.0",
 		"less-loader": "^12.3.0",
 		"lightningcss": "^1.30.1",
