@@ -18,12 +18,14 @@ describe("bundless dts ok", async () => {
 
 		// sourcemap
 		expect(fileMap["index.d.ts.map"]).toContain(`"../src/index.ts"`);
+		expect(fileMap["index.d.ts.map"]).toContain(`"file":"index.d.ts"`);
 		expect(fileMap["index.d.ts"]).toContain(
 			"//# sourceMappingURL=index.d.ts.map",
 		);
 		expect(fileMap["util/index.d.ts.map"]).toContain(
 			`"../../src/util/index.ts"`,
 		);
+		expect(fileMap["index.d.ts.map"]).toContain(`"file":"index.d.ts"`);
 		expect(fileMap["util/index.d.ts"]).toContain(
 			"//# sourceMappingURL=index.d.ts.map",
 		);
@@ -45,14 +47,16 @@ describe("bundless dts ok", async () => {
 
 		// sourcemap
 		expect(fileMap["index.d.cts.map"]).toContain(`"../src/index.ts"`);
+		expect(fileMap["index.d.cts.map"]).toContain(`"file":"index.d.cts"`);
 		expect(fileMap["index.d.cts"]).toContain(
-			"//# sourceMappingURL=index.d.ts.map",
+			"//# sourceMappingURL=index.d.cts.map",
 		);
 		expect(fileMap["util/index.d.cts.map"]).toContain(
 			`"../../src/util/index.ts"`,
 		);
+		expect(fileMap["index.d.cts.map"]).toContain(`"file":"index.d.cts"`);
 		expect(fileMap["util/index.d.cts"]).toContain(
-			"//# sourceMappingURL=index.d.ts.map",
+			"//# sourceMappingURL=index.d.cts.map",
 		);
 
 		// copy global.d.ts

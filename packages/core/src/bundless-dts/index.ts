@@ -136,6 +136,10 @@ const bundlessEmitDts = async (
 	emitDeclaration(fileNames, compilerOptions, outJsExt, onSuccess);
 };
 
+/**
+ *  - 修正 d.ts 的文件名 和 # sourceMappingURL文件名
+ *  - 修正 d.ts.map 的 file 字段
+ */
 const createCustomWriteFile = (
 	outJsExt: string,
 	writeFile = ts.sys.writeFile,
@@ -146,9 +150,22 @@ const createCustomWriteFile = (
 
 		const isMapFile = fileName.endsWith(".map");
 
-		let outputFileName = isMapFile
+		const outputFileName = isMapFile
 			? fileName.replace(/\.(c|m)?(t|j)s.map$/, `.${outDtsExt}.map`)
 			: fileName.replace(/\.(c|m)?(t|j)s$/, `.${outDtsExt}`);
+
+		// source.file: "index.d.ts" -> "file":"index.d.cts"
+		if (isMapFile) {
+			const sourceMap = JSON.parse(data);
+			sourceMap.file = path.basename(outputFileName).replace(/\.map$/, "");
+			data = JSON.stringify(sourceMap);
+		} else {
+			//# sourceMappingURL=index.d.ts.map -> index.d.cts.map
+			const lines = data.split("\n").slice(0, -1);
+			data = lines
+				.concat(`//# sourceMappingURL=${path.basename(outputFileName)}.map`)
+				.join("\n");
+		}
 
 		try {
 			writeFile(outputFileName, data, writeByteOrderMark);
@@ -387,7 +404,20 @@ async function bundlessTransformDts(
 
 		const result = await dtsBuilders[dts.builder](file);
 		if (!result) return;
-		const { code, map } = result;
+		let { code, map } = result;
+
+		if (map) {
+			const outFilename = path.basename(outFilePath);
+
+			// 修正 sourcemap.file
+			const sourceMap = JSON.parse(map);
+			sourceMap.file = outFilename;
+			map = JSON.stringify(sourceMap);
+
+			// 修正 sourceMappingURL
+			const lines = code.split("\n").slice(0, -1);
+			code = lines.concat(`//# sourceMappingURL=${outFilename}.map`).join("\n");
+		}
 
 		await fs.mkdir(path.dirname(outFilePath), { recursive: true });
 
