@@ -1,7 +1,7 @@
-import type { Rule } from "rspack-chain";
+import type RspackChain from "rspack-chain";
 import type { PluginFn } from "../chain.ts";
 
-function addAssetRule(type: string, rule: Rule) {
+function addAssetRule(type: string, rule: RspackChain.Rule) {
 	rule.oneOf(`asset-${type}-raw`).type("asset/source").resourceQuery(/raw/);
 	rule.oneOf(`asset-${type}-url`).type("asset/resource").resourceQuery(/url/);
 	rule
