@@ -25,8 +25,8 @@
 		"es"
 	],
 	"scripts": {
-		"dev": "node --experimental-strip-types ./src/cli.ts -w",
-		"build": "node --experimental-strip-types ./src/cli.ts"
+		"dev": "node ./src/cli.ts -w",
+		"build": "node ./src/cli.ts"
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.52.9",
