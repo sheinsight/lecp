@@ -43,7 +43,7 @@
 		"demo": "node --experimental-strip-types demo.mts"
 	},
 	"devDependencies": {
-		"@napi-rs/cli": "3.0.3",
+		"@napi-rs/cli": "3.0.4",
 		"@types/node": "catalog:"
 	},
 	"optionalDependencies": {
