@@ -26,6 +26,7 @@ export const testPatternForTs: string[] = [
 ];
 
 // node v18 EOL -> 2025-04-30
+// require(esm) -> node v20.19.0, v22.12.0.
 export const DEFAULT_NODE_TARGET = "20.11.0";
 
 // chrome 55

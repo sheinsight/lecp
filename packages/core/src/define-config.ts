@@ -52,7 +52,7 @@ export interface Format extends Omit<UserConfig, "format"> {
 	 * 输出目录
 	 * @default {type}
 	 * - esm -> es
-	 * - cjs -> lib,
+	 * - cjs -> lib
 	 * - umd -> umd
 	 */
 	outDir?: string;
@@ -61,12 +61,6 @@ export interface Format extends Omit<UserConfig, "format"> {
 	 * 是否开启压缩
 	 */
 	minify?: boolean;
-
-	/**
-	 * 是否生成声明文件
-	 * @default true (mode:"bundless" + builder: "ts")
-	 */
-	dts?: UserConfig["dts"];
 }
 
 export interface BundlessFormat extends Format {
@@ -77,15 +71,14 @@ export interface BundlessFormat extends Format {
 
 export interface BundleFormat extends Format {
 	mode?: "bundle";
-
 	builder?: "rspack";
 
 	/**
 	 * 包名称
-	 * @description 默认从package.json的name字段获取
+	 * @description 默认从 package.json 的 name 字段获取
 	 * - umd:
 	 *  命名转化 蛇形 -> 驼峰, 如 react-dom -> ReactDOM
-	 *  对应 rspack的 output.library.name,rollup 的 output.name
+	 *  对应 rspack的 output.library.name
 	 *
 	 */
 	name?: string;
@@ -95,16 +88,6 @@ export interface BundleFormat extends Format {
 	 * @default 'index'
 	 */
 	fileName?: string;
-
-	/**
-	 * @private
-	 */
-	modifyRspackConfig?: (config: RspackConfig) => RspackConfig;
-
-	/**
-	 * @private
-	 */
-	modifyRspackChain?: (chain: RspackChain) => void;
 
 	/**
 	 * 打包排除的 package
@@ -119,6 +102,16 @@ export interface BundleFormat extends Format {
 	 * 当包的默认产物不满足当前编译target,可以选择手动加入编译
 	 */
 	extraCompile?: string[];
+
+	/**
+	 * @private
+	 */
+	modifyRspackConfig?: (config: RspackConfig) => RspackConfig;
+
+	/**
+	 * @private
+	 */
+	modifyRspackChain?: (chain: RspackChain) => void;
 }
 
 type ProcessDtsAndCss<T extends Format> = Omit<T, "dts" | "css"> & {
@@ -180,16 +173,7 @@ export interface UserConfig {
 	shims?: boolean | { legacy?: boolean };
 
 	/**
-	 * 编译时，忽略的目录或文件
-	 * @description bundless 模式下需要
-	 * 内置忽略列表
-	 * @see constant.ts
-	 */
-	exclude?: string[];
-
-	/**
 	 * 设置别名
-	 * @default { '@': './src' }
 	 */
 	alias?: Alias;
 
@@ -208,7 +192,8 @@ export interface UserConfig {
 		| boolean
 		| {
 				/**
-				 * bundle 使用 @microsoft/api-extractor 生成单个文件
+				 * - "bundle"   使用 @microsoft/api-extractor 生成单个文件
+				 * - "bundless" 使用 ts/swc 编译成多个文件
 				 * @default "bundless"
 				 */
 				mode: FormatMode;
@@ -257,14 +242,24 @@ export interface UserConfig {
 
 		/**
 		 * less options
+		 * @see https://lesscss.org/usage/#less-options
 		 */
 		lessOptions?: LessOptions;
 
 		/**
 		 * lightning css options
+		 * @see https://lightningcss.dev/transpilation.html
 		 */
 		lightningCssOptions?: LightningCssOptions;
 	};
+
+	/**
+	 * 编译时，忽略的目录或文件
+	 * @description bundless 模式下需要
+	 * 内置忽略列表(默认忽略测试相关文件)
+	 * 支持 [glob](https://github.com/SuperchupuDev/tinyglobby)
+	 */
+	exclude?: string[];
 
 	/**
 	 * 清理输出目录

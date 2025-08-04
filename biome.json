@@ -43,7 +43,8 @@
 			"!**/es/**",
 			"!**/lib/**",
 			"!**/umd/**",
-			"!**/tests/**/snapshots/**"
+			"!**/tests/**/snapshots/**",
+			"!**/doc_build/**"
 		]
 	},
 	"javascript": {

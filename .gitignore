@@ -16,3 +16,5 @@ target
 
 # os
 .DS_Store
+
+/doc_build

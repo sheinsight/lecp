@@ -21,6 +21,9 @@
 		"build": "pnpm build:rust && pnpm build:node",
 		"build:rust": "pnpm --filter=\"./crates/**\" build",
 		"build:node": "pnpm --filter=\"./packages/**\" build",
+		"doc:build": "rspress build",
+		"doc:dev": "rspress dev",
+		"doc:preview": "rspress preview",
 		"prerelease": "pnpm run test",
 		"release": "bumpp -r --no-push"
 	},
@@ -29,10 +32,11 @@
 	"license": "MIT",
 	"description": "",
 	"devDependencies": {
-		"@biomejs/biome": "^2.1.3",
+		"@biomejs/biome": "^2.1.4",
+		"@rspress/core": "2.0.0-beta.26",
 		"@shined/lecp": "workspace:*",
-		"bumpp": "^10.2.2",
-		"oxlint": "^1.9.0",
+		"bumpp": "^10.2.3",
+		"oxlint": "^1.11.1",
 		"tinyglobby": "^0.2.14",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
