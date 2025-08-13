@@ -33,14 +33,17 @@ export const pluginResolve: PluginFn = (chain, { options, config }) => {
 	chain.resolve.extensions.merge([
 		".ts",
 		".tsx",
+		".mts",
+		".cts",
 		".js",
 		".jsx",
 		".mjs",
 		".cjs",
 	]);
 	chain.resolve.extensionAlias.merge({
-		".js": [".js", ".ts", ".tsx"],
-		".mjs": [".mjs", ".mts"],
-		".cjs": [".cjs", ".cts"],
+		".js": [".ts", ".tsx", ".js", ".jsx"],
+		".jsx": [".tsx", ".jsx"],
+		".mjs": [".mts", ".mjs"],
+		".cjs": [".cts", ".cjs"],
 	});
 };
