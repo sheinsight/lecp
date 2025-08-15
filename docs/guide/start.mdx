@@ -1,0 +1,311 @@
+# 快速开始
+
+import { PackageManagerTabs } from '@theme'
+
+## 安装
+
+<PackageManagerTabs
+  command="install @shined/lecp -D"
+/>
+
+安装完成后，你可以在项目中使用 `lecp` 命令或通过配置文件进行构建。
+
+:::tip
+lecp 需要在 **node@20.19.0+** 环境下运行, 支持 require(esm)
+:::
+
+### tsconfig.json
+
+typescript 几乎是 npm 包的标配。自动生成 dts 文件是必不可少的。
+
+我们需要配置 面向 esm + bundler 友好的 tsconfig.json。
+
+```json
+{
+  "compilerOptions": {
+    /* modules */
+    "target": "ESNext",
+    "module": "Preserve",
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+
+    /* lint */
+    "strict": true,
+    "noUncheckedSideEffectImports": true,
+
+    /* perf */
+    "skipLibCheck": true,
+    // "isolatedDeclarations": true,
+
+    /* dts */
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true
+  }
+}
+```
+
+LECP 使用 SWC 生成 js，为了获得最佳性能和兼容性，建议使用以上配置。
+
+:::details tsconfig 配置说明
+
+**模块系统配置：**
+- `"module": "Preserve"`: 保留原始模块语法，让构建工具处理模块转换
+- `"verbatimModuleSyntax": true`: 确保类型导入/导出语法的准确性
+- `"allowImportingTsExtensions": true`: 允许导入 `.ts` 扩展名文件
+
+**严格模式配置：**
+- `"strict": true`: 启用所有严格类型检查
+- `"noUncheckedSideEffectImports": true`: 检查副作用导入
+
+**性能优化：**
+- `"skipLibCheck": true`: 跳过库文件类型检查以提升性能
+- `"isolatedDeclarations": true`: (可选) 启用独立声明模式
+
+**声明文件配置：**
+- `"noEmit": true`: TypeScript 不生成文件，由 LECP 处理
+- `"declaration": true`: 生成 `.d.ts` 文件
+- `"declarationMap": true`: 生成声明文件映射,便于调试。
+
+> 💡 **注意**: 这些配置遵循 [SWC 迁移指南](https://swc.rs/docs/migrating-from-tsc) 的要求，确保与 SWC 编译器的兼容性。
+
+:::
+
+
+## Node 包
+
+对于 Node 平台包（如 SDK、工具库等），推荐以下配置
+
+### 创建配置文件
+
+在项目根目录创建 `lecp.config.ts` 文件：
+
+```typescript
+import { defineConfig } from "@shined/lecp";
+
+export default defineConfig({
+  // 输出格式：支持 ES Module 和 CommonJS
+  format: [
+    { type: "esm" },
+    { type: "cjs" }, // 可选：目前环境是 node 20.19.0+ (require(esm)), 可以关闭
+  ],
+
+  // 目标环境
+  targets: {
+    node: "20.11.0",
+  },
+
+  // 生成 TypeScript 声明文件
+  dts: true,
+
+  // 启用 shims 以提供更好的兼容性
+  shims: true,
+});
+```
+
+### 输出结构
+
+- package.json 的 type: "module"
+
+```
+dist/
+├── es/          # ES Module 格式
+│   ├── index.js
+│   ├── index.d.ts
+│   ├── **/*.js
+│   └── **/*.d.ts
+└── lib/          # CommonJS 格式
+    ├── index.cjs
+    ├── index.d.cts
+    ├── **/*.cjs
+    └── **/*.d.cts
+```
+
+- package.json 的 type: "commonjs"
+
+```
+dist/
+├── es/          # ES Module 格式
+│   ├── index.mjs
+│   ├── index.d.mts
+│   ├── **/*.mjs
+│   └── **/*.d.mts
+└── lib/          # CommonJS 格式
+    ├── index.js
+    ├── index.d.ts
+    ├── **/*.js
+    └── **/*.d.ts
+```
+
+### package.json
+
+建议在 `package.json` 中添加 `exports` 和 `files` 字段：
+
+**type: "module"**
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": "./es/index.js",
+      "require": "./lib/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "es",
+    "lib"
+  ]
+}
+```
+
+**type: "commonjs"**
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": "./es/index.mjs",
+      "require": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "es",
+    "lib"
+  ]
+}
+```
+
+:::tip
+
+- `exports` 无需设置 `types` 值 ，typescript 会自动根据 import 和 require 的值推断 `types`的值。
+- 没有设置 `main/module/types` 字段, 因为这些字段已经被 `exports` 字段取代, 基本无需考虑该兼容性。
+- 需要暴露子路径，可以继续添加 `exports` 字段,例如:
+
+```json
+{
+  "exports": {
+    "./lib/*": "./lib/*.js",
+    "./lib/*.js": "./lib/*.js",
+    "./lib/*.cjs": "./lib/*.cjs",
+    "./es/*": "./es/*.js",
+    "./es/*.js": "./es/*.js",
+    "./es/*.mjs": "./es/*.mjs",
+  }
+}
+```
+
+:::
+
+
+## Web 包配置
+
+对于 Web 平台包（如 React 组件库等），推荐以下配置：
+
+### 创建配置文件
+
+在项目根目录创建 `lecp.config.ts` 文件：
+
+```typescript
+import { defineConfig } from "@shined/lecp";
+
+export default defineConfig({
+  // 输出格式：主要支持 ES Module，可选 UMD
+  format: [
+    { type: "esm" },
+    { type: "umd" }, // 可选：用于 CDN 引用
+  ],
+
+  // 目标浏览器
+  targets: {
+    chrome: 55,
+    safari: 12,
+  },
+
+  // 生成 TypeScript 声明文件
+  dts: true,
+
+  // 需要支持 React 16.x 版本，需要设置为 "classic"
+  // react: {
+  //   jsxRuntime: "classic",
+  // },
+
+  // CSS 处理
+  css: {
+    cssModules: true,    // 启用 CSS Modules(不推荐)
+  },
+});
+```
+
+:::tip
+面向浏览器的包，在今天已经无需设置 cjs 格式。
+:::
+
+
+### 输出结构
+
+```
+dist/
+├── es/              # ES Module 格式
+│   ├── index.js
+│   ├── index.d.ts
+│   ├── Button/
+│   │   ├── index.js
+│   │   ├── index.d.ts
+│   │   └── index.css
+│   └── ...
+└── umd/              # UMD 格式
+    └── index.js
+
+```
+
+### package.json
+
+建议在 `package.json` 中添加 `exports` 和 `files` 字段：
+
+```json
+{
+  "exports": {
+    ".": "./es/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "es",
+    "umd"
+  ]
+}
+```
+
+## 构建
+
+设置完 `lecp.config.ts` 文件后，可以使用以下命令进行构建。
+
+### 常用命令
+
+```bash
+# 开发模式构建（监听文件变化）
+npx lecp -w
+
+# 生产模式构建
+npx lecp
+
+```
+
+### package.json
+
+建议在 `package.json` 中添加以下脚本：
+
+```json
+{
+  "scripts": {
+    "build": "lecp",
+    "dev": "lecp -w"
+  }
+}
+```
+
+:::tip
+
+开发模式下，lecp 支持 `lecp.config.ts` 变动后自动重启
+:::

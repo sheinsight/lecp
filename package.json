@@ -1,5 +1,5 @@
 {
-	"name": "lego-cp-root",
+	"name": "lecp-root",
 	"private": true,
 	"type": "module",
 	"packageManager": "pnpm@10.15.1",
@@ -33,7 +33,7 @@
 	"description": "",
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.3",
-		"@rspress/core": "2.0.0-beta.26",
+		"@rspress/core": "^2.0.0-beta.32",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.2.3",
 		"oxlint": "^1.14.0",

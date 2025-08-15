@@ -14,22 +14,36 @@ const config: UserConfig = defineConfig({
 		enableAppearanceAnimation: true,
 
 		nav: [
-			{
-				text: "Guide",
-				link: "/guide/",
-				activeMatch: "/guide/",
-			},
-			{
-				text: "Hello world",
-				link: "/hello/",
-				activeMatch: "/hello/",
-			},
+			{ text: "首页", link: "/" },
+			{ text: "配置", link: "/config" },
+			{ text: "常见问题", link: "/faq" },
+			{ text: "更新日志", link: "/changelog" },
 		],
 		sidebar: {
 			"/": [
 				{ text: "介绍", link: "/guide/intro" },
 				{ text: "快速开始", link: "/guide/start" },
+				{
+					text: "功能",
+					items: [
+						{ text: "构建模式", link: "/features/build-mode" },
+						{ text: "Targets", link: "/features/targets" },
+						{ text: "DTS", link: "/features/dts" },
+						{ text: "Shims", link: "/features/shims" },
+						{ text: "React", link: "/features/react" },
+						{ text: "Workspace", link: "/features/workspace" },
+					],
+				},
 				{ text: "配置", link: "/config" },
+				{ text: "CLI & API", link: "/cli-api" },
+				{
+					text: "其它",
+					items: [
+						{ text: "常见问题", link: "/faq" },
+						{ text: "更新日志", link: "/changelog" },
+						// { text: "升级指南", link: "/upgrade" },
+					],
+				},
 			],
 		},
 		socialLinks: [

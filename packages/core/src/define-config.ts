@@ -121,9 +121,9 @@ export interface BundleFormat extends Format {
 	 * @description 当第三方包的产物不满足当前编译目标时使用
 	 * 默认不编译 node_modules 下的文件
 	 * @example
-	 *    ["immer"]: 忽略某个包 "immer"
-	 *    [/node_modules[\\/]immer[\\/]/]: 忽略某个包 "immer"
-	 *    [/[\\/]node_modules[\\/]/]: 忽略所有 node_modules
+	 *    ["immer"]: 编译 "immer"
+	 *    [/node_modules[\\/]immer[\\/]/]: 编译 "immer"
+	 *    [/[\\/]node_modules[\\/]/]: 编译 node_modules 下的所有包
 	 */
 	extraCompile?: (string | RegExp)[];
 
@@ -198,6 +198,7 @@ export interface UserConfig {
 
 	/**
 	 * 设置别名
+	 * @default  tsconfig.json 的 `paths` 字段获取
 	 */
 	alias?: Alias;
 

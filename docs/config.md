@@ -103,8 +103,12 @@ interface BundleFormat {
    * @default []
    * @description 当第三方包的产物不满足当前编译目标时使用
    * 默认不编译 node_modules 下的文件
+   * @example
+   *    ["immer"]: 编译 "immer"
+	 *    [/node_modules[\\/]immer[\\/]/]: 编译 "immer"
+	 *    [/[\\/]node_modules[\\/]/]: 编译 node_modules 下的所有包
    */
-  extraCompile?: string[];
+  extraCompile?: (string | RegExp)[];
 
   /** 自定义 Rspack 配置 */
   modifyRspackConfig?: (config: RspackConfig) => RspackConfig;
@@ -136,6 +140,13 @@ export default defineConfig({
   },
 });
 ```
+
+:::tips 注意事项
+lecp 只做语法降级，不会自动引入 polyfill。通常业务系统会自动引入 polyfill。
+
+如果希望进一步减少体积，可以参考 [externalHelpers](#externalHelpers)  选项。
+
+:::
 
 :::warning 注意事项
 UMD 模式下同时设置 `targets.chrome` 和 `targets.node` 会导致构建失败，因为 `output.chunkFormat` 无法同时满足两个目标的要求。
@@ -203,7 +214,7 @@ export default defineConfig({
 
 **类型：** `Record<string, string>`
 
-**默认值：** `{}`
+**默认值：**  tsconfig.json 的 `paths` 字段获取
 
 设置路径别名映射
 
@@ -414,6 +425,24 @@ export default defineConfig({
 **默认值：** `true`
 
 是否清理输出目录。
+
+当多个 `format` 同时生成到一个目录时，需要关闭此选项。
+
+**示例：**
+
+```ts
+import { defineConfig } from '@shined/lecp';
+
+export default defineConfig({
+  format: [
+    { type: "umd", fileName: "index", minify: false },
+    { type: "umd", fileName: "index.min" }
+  ],
+  clean: false
+});
+
+```
+
 
 ## exclude
 

@@ -28,6 +28,7 @@ export default defineConfig({
 	dts: { mode: "bundless", builder: "swc" },
 	targets: {
 		chrome: 55,
+		// node: "22.18.0",
 	},
 
 	// from tsconfig.json ??

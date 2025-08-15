@@ -16,4 +16,5 @@ catalog:
 onlyBuiltDependencies:
   - '@biomejs/biome'
   - '@swc/core'
+  - core-js
   - esbuild
