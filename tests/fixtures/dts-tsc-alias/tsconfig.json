@@ -25,9 +25,8 @@
 		// "isolatedDeclarations": true,
 
 		// alias
-		"baseUrl": "./",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		}
 	}
 }

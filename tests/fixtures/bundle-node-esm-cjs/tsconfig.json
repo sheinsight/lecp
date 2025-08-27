@@ -23,9 +23,8 @@
 		"jsx": "preserve",
 
 		// alias
-		"baseUrl": "./",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		}
 
 		// "isolatedDeclarations": true, // perf

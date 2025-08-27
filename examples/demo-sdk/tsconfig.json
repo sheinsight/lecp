@@ -31,9 +31,8 @@
 		"declarationMap": true,
 
 		// alias
-		"baseUrl": "./",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		},
 
 		"plugins": [
