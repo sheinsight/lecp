@@ -30,7 +30,7 @@ export const pluginOutput: PluginFn = (chain, { options, config: { pkg } }) => {
 			.rule("source-map")
 			.test(/\.(js|mjs|jsx|ts|tsx|css)$/)
 			.enforce("pre")
-			.use("sourcemap")
+			.use("source-map-loader")
 			.loader(requireResolve("source-map-loader"))
 			.end();
 	});

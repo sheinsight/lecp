@@ -38,7 +38,7 @@ export const pluginScript: PluginFn = (
 			],
 		})
 		.end()
-		.use("swc")
+		.use("swc-loader")
 		.loader("builtin:swc-loader")
 		.options(swcOptions);
 };

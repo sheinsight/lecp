@@ -1,7 +1,11 @@
 import type RspackChain from "rspack-chain";
+import { requireResolve } from "../../util/index.ts";
 import type { PluginFn } from "../chain.ts";
 
-function addAssetRule(type: string, rule: RspackChain.Rule) {
+function addAssetRule(
+	type: string,
+	rule: RspackChain.Rule | RspackChain.Rule<RspackChain.Rule>,
+) {
 	rule.oneOf(`asset-${type}-raw`).type("asset/source").resourceQuery(/raw/);
 	rule.oneOf(`asset-${type}-url`).type("asset/resource").resourceQuery(/url/);
 	rule
@@ -18,7 +22,7 @@ function addAssetRule(type: string, rule: RspackChain.Rule) {
 		});
 }
 
-export const pluginAsset: PluginFn = chain => {
+export const pluginAsset: PluginFn = (chain, { options }) => {
 	addAssetRule(
 		"image",
 		chain.module.rule("asset-image").test(/\.(png|jpe?g|gif|webp)$/i),
@@ -28,4 +32,29 @@ export const pluginAsset: PluginFn = chain => {
 		"font",
 		chain.module.rule("asset-font").test(/\.(woff|woff2|eot|ttf|otf)$/i),
 	);
+
+	const svgRule = chain.module.rule("asset-svg").test(/\.svg$/i);
+
+	const swcOptions = chain.module
+		.rule("js")
+		.uses.get("swc-loader")
+		?.get("options");
+
+	svgRule
+		.oneOf("svg-react")
+		.resourceQuery(/react|svgr/)
+		.issuer(/\.[jt]sx?$/)
+		.use("swc-loader")
+		.loader("builtin:swc-loader")
+		.options(swcOptions)
+		.end()
+		.use("svgr-loader")
+		.loader(requireResolve("@svgr-rs/svgrs-plugin/webpack"))
+		.options({
+			jsxRuntime: options.react?.jsxRuntime,
+			exportType: "named",
+			namedExport: "ReactComponent",
+		});
+
+	addAssetRule("svg", svgRule.oneOf("svg-asset"));
 };
