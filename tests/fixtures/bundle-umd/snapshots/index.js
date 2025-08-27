@@ -10,12 +10,12 @@
     } else {
         root["DemoComponent"] = factory(root["React"]);
     }
-})(self, (__WEBPACK_EXTERNAL_MODULE__24__)=>{
+})(self, (__WEBPACK_EXTERNAL_MODULE__883__)=>{
     return (()=>{
         "use strict";
         var __webpack_modules__ = {
-            24: function(module1) {
-                module1.exports = __WEBPACK_EXTERNAL_MODULE__24__;
+            883: function(module1) {
+                module1.exports = __WEBPACK_EXTERNAL_MODULE__883__;
             }
         };
         var __webpack_module_cache__ = {};
@@ -74,7 +74,7 @@
                 sleep: ()=>sleep,
                 "default": ()=>src
             });
-            var external_React_ = __webpack_require__(24);
+            var external_React_ = __webpack_require__(883);
             var external_React_default = /*#__PURE__*/ __webpack_require__.n(external_React_);
             ;
             const Demo = {
