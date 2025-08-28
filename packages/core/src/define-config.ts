@@ -13,6 +13,25 @@ export type BuilderType = "swc" | "rspack";
 export type CssBuilderType = "lightningcss";
 export type DtsBuilderType = "ts" | "swc";
 
+export type DtsOptions = {
+	/**
+	 * 生成模式
+	 * - "bundle": 使用 @microsoft/api-extractor 生成单个声明文件
+	 * - "bundless": 保持源文件结构，生成多个声明文件
+	 * @default "bundless"
+	 */
+	mode: FormatMode;
+
+	/**
+	 * 构建引擎
+	 * - "ts": TypeScript 编译器（功能完整，支持 d.ts.map）
+	 * - "swc": SWC 编译器（速度更快，但不支持 d.ts.map）
+	 * @default "ts"
+	 * @description 仅在 bundless + isolatedDeclarations 模式下可选择 swc
+	 */
+	builder?: DtsBuilderType;
+};
+
 export type FormatMode = "bundless" | "bundle";
 
 /** 兼容目标环境 */
@@ -188,23 +207,7 @@ export interface UserConfig {
 	 * 是否生成声明文件
 	 * @default true (mode:"bundless" + builder: "ts")
 	 */
-	dts?:
-		| boolean
-		| {
-				/**
-				 * - "bundle"   使用 @microsoft/api-extractor 生成单个文件
-				 * - "bundless" 使用 ts/swc 编译成多个文件
-				 * @default "bundless"
-				 */
-				mode: FormatMode;
-
-				/**
-				 * bundless + isolatedDeclaration 模式下的可选择的构建引擎
-				 * @default "ts"
-				 * 注: swc 速度更快, 但暂不支持生成 d.ts.map
-				 */
-				builder?: DtsBuilderType;
-		  };
+	dts?: boolean | DtsOptions;
 
 	react?: {
 		/**

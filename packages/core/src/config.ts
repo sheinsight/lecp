@@ -6,6 +6,7 @@ import { DEFAULT_NODE_TARGET, DEFAULT_WEB_TARGET } from "./constant.ts";
 import type {
 	BundleFormat,
 	BundlessFormat,
+	DtsOptions,
 	FinalBundleFormat,
 	FinalBundlessFormat,
 	FormatType,
@@ -117,9 +118,9 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 	} as BundleFormat,
 };
 
-const defaultDtsConfig = {
+const defaultDtsConfig: DtsOptions = {
 	mode: "bundless",
-	builder: "swc",
+	builder: "ts",
 };
 
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
