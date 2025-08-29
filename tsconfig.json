@@ -3,6 +3,7 @@
 		// Modules
 		"target": "ESNext",
 		"module": "Preserve",
+		"moduleDetection": "force",
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 
