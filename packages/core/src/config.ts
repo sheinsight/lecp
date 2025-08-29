@@ -80,7 +80,7 @@ const defaultConfig: Partial<UserConfig> = {
 	exclude: [],
 	externalHelpers: false,
 	react: {
-		jsxRuntime: "classic",
+		jsxRuntime: "automatic",
 	},
 	// alias: {},
 	define: {},

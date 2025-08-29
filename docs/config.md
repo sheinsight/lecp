@@ -295,7 +295,7 @@ React 相关的编译配置。
 
 **类型：** `"classic" | "automatic"`
 
-**默认值：** `"classic"`
+**默认值：** `"automatic"`
 
 **JSX 转换模式：**
 - `"automatic"`：使用 `react/jsx-runtime`（React 17+ 推荐）
@@ -307,15 +307,15 @@ import { defineConfig } from '@shined/lecp';
 
 export default defineConfig({
   react: {
-    jsxRuntime: "automatic"  // 使用新的 JSX 转换
+    jsxRuntime: "classic"  // 使用新的 JSX 转换
   }
 });
 ```
 
 :::tip 选择建议
-- **新项目**：推荐使用 `"automatic"` 模式
-- **老项目**：可继续使用 `"classic"` 模式
-- `"automatic"` 模式无需在组件中导入 `React`
+推荐使用 `"automatic"` 模式，无需在组件中导入 `React`
+
+如果需要兼容React 16.x 版本，请选择 `"classic"` 模式。
 
 :::
 
