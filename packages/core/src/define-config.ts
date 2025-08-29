@@ -116,11 +116,16 @@ export interface BundleFormat extends Format {
 	externals?: RspackConfig["externals"];
 
 	/**
-	 * 默认不编译 node_modules下的文件
-	 * @default: `[]`
-	 * 当包的默认产物不满足当前编译target,可以选择手动加入编译
+	 * 需要额外编译的 node_modules 包
+	 * @default []
+	 * @description 当第三方包的产物不满足当前编译目标时使用
+	 * 默认不编译 node_modules 下的文件
+	 * @example
+	 *    ["immer"]: 忽略某个包 "immer"
+	 *    [/node_modules[\\/]immer[\\/]/]: 忽略某个包 "immer"
+	 *    [/[\\/]node_modules[\\/]/]: 忽略所有 node_modules
 	 */
-	extraCompile?: string[];
+	extraCompile?: (string | RegExp)[];
 
 	/**
 	 * @private

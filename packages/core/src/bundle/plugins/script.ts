@@ -31,8 +31,10 @@ export const pluginScript: PluginFn = (
 			and: [
 				/[\\/]node_modules[\\/]/,
 				{
-					not: extraCompile?.map(
-						pkg => new RegExp(`node_modules[\\\\/]${pkg}[\\\\/]`),
+					not: extraCompile?.map(pkg =>
+						typeof pkg === "string"
+							? new RegExp(`node_modules[\\\\/]${pkg}[\\\\/]`)
+							: pkg,
 					),
 				},
 			],
