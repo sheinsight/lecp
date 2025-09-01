@@ -6,6 +6,7 @@ export default defineConfig({
 		"process.env.NODE_ENV": JSON.stringify("production"),
 		"typeof window": JSON.stringify("object"),
 		PRODUCTION: JSON.stringify(true),
+		HOST: JSON.stringify("localhost"),
 	},
 	dts: false,
 	sourcemap: false,

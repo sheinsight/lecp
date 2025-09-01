@@ -16,6 +16,8 @@ describe("bundless define ok", async () => {
 		expect(content).not.toContain("PRODUCTION");
 		expect(content).toContain('"object"');
 		expect(content).not.toContain("typeof window");
+		expect(content).toContain('"localhost"');
+		expect(content).not.toContain("HOST");
 	});
 
 	it("bundless cjs define ok", async () => {
@@ -27,6 +29,8 @@ describe("bundless define ok", async () => {
 		expect(content).not.toContain("PRODUCTION");
 		expect(content).toContain('"object"');
 		expect(content).not.toContain("typeof window");
+		expect(content).toContain('"localhost"');
+		expect(content).not.toContain("HOST");
 	});
 
 	it("bundle umd define ok", async () => {
@@ -38,6 +42,8 @@ describe("bundless define ok", async () => {
 		expect(content).not.toContain("PRODUCTION");
 		expect(content).toContain('"object"');
 		expect(content).not.toContain("typeof window");
+		expect(content).toContain('"localhost"');
+		expect(content).not.toContain("HOST");
 	});
 
 	// TODO: minify 后会删除部分代码
