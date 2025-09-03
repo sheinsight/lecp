@@ -147,6 +147,17 @@ export const getFinalUserOptions = (
 		if (data.mode === "bundle") {
 			data.name ??= pkg.name;
 			data.fileName ??= "index";
+
+			// bundle 模式下，默认从package.json 自动获取 externals
+			if (["esm", "cjs"].includes(data.type)) {
+				data.externals =
+					data.externals ??
+					Object.keys({
+						...pkg.dependencies,
+						...pkg.optionalDependencies,
+						...pkg.peerDependencies,
+					});
+			}
 		}
 
 		if (data.outDir) data.outDir = path.resolve(cwd, data.outDir);

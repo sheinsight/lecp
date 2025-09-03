@@ -24,12 +24,4 @@ export const pluginEsm: PluginFn = chain => {
 
 	// chain.optimization.concatenateModules(true); // production 默认启用
 	// chain.optimization.avoidEntryIife(true); // production 默认启用 5.95.0+
-
-	// umd  自动externals  (peerDependencies) ??
-	// cjs, esm 自动externals  (dependencies. peerDependencies ) ??
-
-	// 注意: external { 'react': 'React' }  -> Object.keys(external) -> ['react']
-	// chain.externals(
-	// 	Array.isArray(externals) ? externals : Object.keys(externals),
-	// );
 };

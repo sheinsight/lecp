@@ -110,8 +110,8 @@ export interface BundleFormat extends Format {
 
 	/**
 	 * 打包排除的 package
-	 * @description 'auto' 自动排除 peerDependencies
-	 * - esm,cjs: 排除 dependencies,devDependencies
+	 * @default  esm,cjs: 排除 dependencies, peerDependencies, optionalDependencies,  umd: undefined
+	 * umd 无法自动获取 root， 只能手动设置。否则可以排除 peerDependencies
 	 */
 	externals?: RspackConfig["externals"];
 
