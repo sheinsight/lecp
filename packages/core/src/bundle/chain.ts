@@ -37,7 +37,9 @@ export function getRspackConfig(
 	chain.externals(externals);
 
 	chain.cache(watch).experiments({ cache: watch });
-	chain.experiments({ nativeWatcher: true });
+
+	// perf
+	chain.experiments({ nativeWatcher: true, lazyBarrel: true });
 
 	[
 		pluginOutput,
