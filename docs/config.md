@@ -91,12 +91,12 @@ interface BundleFormat {
    */
   fileName?: string;
 
-  /**
-   * 外部依赖配置
-   * @description "auto" 自动排除 peerDependencies
-   * ESM/CJS 模式下还会排除 dependencies 和 devDependencies
-   */
-  externals?: RspackConfig["externals"];
+ /**
+	 * 打包排除的 package
+	 * @default  esm,cjs: 排除 dependencies, peerDependencies, optionalDependencies,  umd: undefined
+	 * umd 无法自动获取 root， 只能手动设置。否则可以排除 peerDependencies
+	 */
+	externals?: RspackConfig["externals"];
 
   /**
    * 需要额外编译的 node_modules 包
