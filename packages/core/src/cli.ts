@@ -27,12 +27,7 @@ yargs(hideBin(process.argv))
 			const handler = async () => {
 				watchers?.forEach(watcher => watcher.close());
 
-				const systemConfig = {
-					cwd: process.cwd(),
-					watch: argv.watch,
-					logLevel: argv.logLevel,
-				};
-
+				const systemConfig = { watch: argv.watch, logLevel: argv.logLevel };
 				const { config, files } = await init(systemConfig);
 
 				const { duration } = await measure(async () => {

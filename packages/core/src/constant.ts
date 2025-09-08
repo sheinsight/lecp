@@ -1,3 +1,5 @@
+export const CONFIG_FILE = "lecp.config.ts";
+
 /** 测试相关文件(glob格式) */
 export const testPattern: string[] = [
 	"**/fixtures{,/**}",

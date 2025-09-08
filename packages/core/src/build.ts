@@ -12,12 +12,13 @@ import {
 	getFinalFormatOptions,
 	getFinalUserOptions,
 } from "./config.ts";
+import { CONFIG_FILE } from "./constant.ts";
 import type { UserConfig } from "./define-config.ts";
 import { measure, pathExists } from "./util/index.ts";
 import { type LogLevel, logger } from "./util/logger.ts";
 
 export interface InputSystemConfig {
-	cwd: string;
+	cwd?: string;
 	watch?: boolean;
 	logLevel?: string;
 }
@@ -36,17 +37,18 @@ export interface Watcher {
 
 export const build = async (
 	userConfig: UserConfig,
-	inputSystemConfig: InputSystemConfig,
+	inputSystemConfig: InputSystemConfig = {},
 ): Promise<Watcher[]> => {
+	const cwd = inputSystemConfig.cwd ?? process.cwd();
 	const systemConfig = {
 		...inputSystemConfig,
-		pkg: await readPackage({ normalize: true, cwd: inputSystemConfig.cwd }),
-		tsconfig: getTsConfigFileContent({ cwd: inputSystemConfig.cwd }).options,
+		cwd,
+		pkg: await readPackage({ normalize: true, cwd }),
+		tsconfig: getTsConfigFileContent({ cwd }).options,
 	} as SystemConfig;
 
 	const options = getFinalUserOptions(userConfig, systemConfig);
 	const { format } = options;
-	const { cwd } = systemConfig;
 
 	const taskPromises = format.map(async formatOptions => {
 		let taskWatchers: Watcher[] = [];
@@ -121,13 +123,11 @@ export const build = async (
 	return allTaskWatchers.flat();
 };
 
-const CONFIG_FILE = "lecp.config.ts";
-
 // cwd -> configFiles, config
 export const init = async (
 	options: InputSystemConfig,
 ): Promise<ReturnType<typeof getConfig>> => {
-	const { cwd, logLevel } = options;
+	const { cwd = process.cwd(), logLevel } = options;
 	if (logLevel) logger.level = logLevel as LogLevel;
 
 	const configFile = path.resolve(cwd, CONFIG_FILE);
