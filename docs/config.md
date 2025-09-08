@@ -293,13 +293,14 @@ React 相关的编译配置。
 
 ### react.jsxRuntime
 
-**类型：** `"classic" | "automatic"`
+**类型：** `"classic" | "automatic" | "preserve"`
 
 **默认值：** `"automatic"`
 
 **JSX 转换模式：**
 - `"automatic"`：使用 `react/jsx-runtime`（React 17+ 推荐）
 - `"classic"`：使用 `React.createElement`（传统方式）
+- `"preserve"`：不对 JSX 语法进行任何转换
 
 **示例：**
 ```ts

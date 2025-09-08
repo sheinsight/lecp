@@ -8,6 +8,6 @@ export default defineConfig({
 		chrome: 55,
 	},
 	react: {
-		jsxRuntime: "automatic", // "classic" | "automatic"
+		jsxRuntime: "automatic", // "classic" | "automatic" | "preserve"
 	},
 }) as unknown;

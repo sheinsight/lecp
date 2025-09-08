@@ -221,9 +221,9 @@ export interface UserConfig {
 		 *  @see https://www.typescriptlang.org/tsconfig/#jsx
 		 * - "react" -> "classic"
 		 * - "react-jsx", "react-jsxdev" -> "automatic"
-		 * - "preserve","react-native" -> unchanged
+		 * - "preserve","react-native" -> "preserve"
 		 */
-		jsxRuntime?: "automatic" | "classic";
+		jsxRuntime?: "automatic" | "classic" | "preserve";
 	};
 
 	css?: {
