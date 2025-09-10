@@ -24,6 +24,9 @@
 		"bin",
 		"es"
 	],
+	"engines": {
+		"node": ">=20.19.0"
+	},
 	"scripts": {
 		"dev": "node ./src/cli.ts -w",
 		"build": "node ./src/cli.ts"
