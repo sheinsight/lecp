@@ -2,7 +2,7 @@
 	"name": "lego-cp-root",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@10.15.0",
+	"packageManager": "pnpm@10.15.1",
 	"version": "0.0.1-beta.14",
 	"files": [],
 	"repository": {
@@ -32,12 +32,12 @@
 	"license": "MIT",
 	"description": "",
 	"devDependencies": {
-		"@biomejs/biome": "^2.2.2",
+		"@biomejs/biome": "^2.2.3",
 		"@rspress/core": "2.0.0-beta.26",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.2.3",
 		"oxlint": "^1.14.0",
-		"tinyglobby": "^0.2.14",
+		"tinyglobby": "^0.2.15",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	}

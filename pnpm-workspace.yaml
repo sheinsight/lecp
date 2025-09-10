@@ -4,7 +4,7 @@ packages:
   - examples/*
 
 catalog:
-  '@types/node': ^22.18.0
+  '@types/node': ^22.18.1
   '@types/react': ^19.1.12
   '@types/react-dom': ^19.1.9
   '@vitest/coverage-v8': ^3.2.4
@@ -17,6 +17,3 @@ onlyBuiltDependencies:
   - '@biomejs/biome'
   - '@swc/core'
   - esbuild
-
-patchedDependencies:
-  rspack-chain: patches/rspack-chain.patch
