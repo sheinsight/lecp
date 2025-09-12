@@ -45,8 +45,8 @@
         "default": ()=>src
     });
     ;
-    const external_React_namespaceObject = require("React");
-    var external_React_default = /*#__PURE__*/ __webpack_require__.n(external_React_namespaceObject);
+    const external_react_namespaceObject = require("react");
+    var external_react_default = /*#__PURE__*/ __webpack_require__.n(external_react_namespaceObject);
     ;
     const Demo = {
         "title": "demo-component__title",
@@ -70,7 +70,9 @@
     ;
     const sleep = (ms)=>new Promise((resolve)=>setTimeout(resolve, ms));
     ;
-    const src = ()=>/*#__PURE__*/ external_React_default().createElement(src_components_Demo, null);
+    const external_immer_namespaceObject = require("immer");
+    ;
+    const src = ()=>/*#__PURE__*/ external_react_default().createElement(src_components_Demo, null);
     const asyncFn = async ()=>{
         await sleep(1000);
         console.log("Async function executed");
@@ -86,6 +88,7 @@
     if (typeof window !== "undefined") {
         console.log("Browser environment");
     }
+    console.log(external_immer_namespaceObject.produce);
     var __webpack_export_target__ = exports;
     for(var __webpack_i__ in __webpack_exports__)__webpack_export_target__[__webpack_i__] = __webpack_exports__[__webpack_i__];
     if (__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target__, '__esModule', {
