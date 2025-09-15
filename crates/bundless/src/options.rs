@@ -44,9 +44,10 @@ impl Shims {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub enum JsxRuntime {
-    Automatic,
     #[default]
+    Automatic,
     Classic,
+    Preserve,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

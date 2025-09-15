@@ -20,7 +20,8 @@
 		"declaration": true,
 		"declarationMap": true,
 		// react
-		"jsx": "preserve",
+		"jsx": "react-jsx",
+		// "jsxImportSource": "preact",
 
 		// alias
 		"paths": {

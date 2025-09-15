@@ -22,7 +22,7 @@ export default defineConfig({
 		lessCompile: true,
 	},
 	react: {
-		jsxRuntime: "automatic", // "classic" | "automatic" | "preserve"
+		// jsxRuntime: "preserve", // "classic" | "automatic" | "preserve"
 	},
 	// dts: { builder: "ts", mode: "bundless" },
 	dts: { mode: "bundless", builder: "swc" },
