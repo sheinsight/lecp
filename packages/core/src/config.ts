@@ -81,6 +81,7 @@ const defaultConfig: Partial<UserConfig> = {
 	externalHelpers: false,
 	react: {
 		jsxRuntime: "automatic",
+		jsxImportSource: "react",
 	},
 	// alias: {},
 	define: {},
@@ -208,12 +209,31 @@ export function getFinalFormatOptions(
 		};
 	}
 
-	// 从 tsconfig 中 追加 alias
-	if (systemConfig.tsconfig?.paths) {
-		options.alias = {
-			...tsPathsToAlias(systemConfig.tsconfig.paths),
-			...options.alias,
-		};
+	// 从 tsconfig 中 追加配置
+	if (systemConfig.tsconfig) {
+		const { paths, jsx, jsxImportSource } = systemConfig.tsconfig;
+
+		if (paths) {
+			options.alias = { ...tsPathsToAlias(paths), ...options.alias };
+		}
+
+		// swc jsc.transform.react.runtime <-> tsconfig jsx
+		const jsxValue = [
+			undefined,
+			"preserve",
+			"classic",
+			"preserve",
+			"automatic",
+			"automatic",
+		] as const;
+
+		if (jsx && jsxValue[jsx]) {
+			options.react = { ...options.react, jsxRuntime: jsxValue[jsx] };
+		}
+
+		if (jsxImportSource) {
+			options.react = { ...options.react, jsxImportSource };
+		}
 	}
 
 	if (!options.targets) {

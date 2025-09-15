@@ -296,6 +296,7 @@ React 相关的编译配置。
 **类型：** `"classic" | "automatic" | "preserve"`
 
 **默认值：** `"automatic"`
+> 会自动读取 tsconfig.json 中的 jsx 配置，优先级更高
 
 **JSX 转换模式：**
 - `"automatic"`：使用 `react/jsx-runtime`（React 17+ 推荐）
@@ -308,7 +309,7 @@ import { defineConfig } from '@shined/lecp';
 
 export default defineConfig({
   react: {
-    jsxRuntime: "classic"  // 使用新的 JSX 转换
+    jsxRuntime: "classic"
   }
 });
 ```
@@ -319,6 +320,36 @@ export default defineConfig({
 如果需要兼容React 16.x 版本，请选择 `"classic"` 模式。
 
 :::
+
+### react.jsxImportSource
+
+jsx 函数使用的模块名称。
+> tsconfig.json 中的 `jsxImportSource`
+
+**类型：** `string`
+
+如 "react", "preact", "solid-js", "@emotion/react", ...
+
+**默认值：** `"react"`
+> 会自动读取 tsconfig.json 中的 jsxImportSource 配置，优先级更高
+
+**示例：**
+```ts
+import { defineConfig } from '@shined/lecp';
+export default defineConfig({
+  react: {
+    jsxRuntime: "automatic",
+    jsxImportSource: "preact"
+  }
+});
+
+export default defineConfig({
+  react: {
+    jsxRuntime: "preserve",
+    jsxImportSource: "solid-js"
+  }
+});
+```
 
 
 ## css

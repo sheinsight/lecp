@@ -216,14 +216,26 @@ export interface UserConfig {
 
 	react?: {
 		/**
-		 * @default "classic"
-		 * TODO: 自动读取 tsconfig.json 中的 jsx 配置
+		 * @default "automatic"
+		 * 自动读取 tsconfig.json 中的 jsx 配置
 		 *  @see https://www.typescriptlang.org/tsconfig/#jsx
 		 * - "react" -> "classic"
 		 * - "react-jsx", "react-jsxdev" -> "automatic"
-		 * - "preserve","react-native" -> "preserve"
+		 * - "preserve", "react-native" -> "preserve"
 		 */
 		jsxRuntime?: "automatic" | "classic" | "preserve";
+
+		/**
+		 * @default "react"
+		 * 自动读取 tsconfig.json 中的 jsxImportSource 配置
+		 * @example
+		 *   - "react" (默认)
+		 *   - "@emotion/react"
+		 *   - "preact"
+		 *   - "solid-js"
+		 *   - "vue"
+		 */
+		jsxImportSource?: string;
 	};
 
 	css?: {
