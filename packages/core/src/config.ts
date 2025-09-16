@@ -80,8 +80,8 @@ const defaultConfig: Partial<UserConfig> = {
 	exclude: [],
 	externalHelpers: false,
 	react: {
-		// jsxRuntime: "automatic",
-		// jsxImportSource: "react",
+		// runtime: "automatic",
+		// importSource: "react",
 	},
 	// alias: {},
 	define: {},
@@ -228,8 +228,8 @@ export function getFinalFormatOptions(
 		] as const;
 
 		options.react = {
-			jsxRuntime: jsx && jsxValue[jsx] ? jsxValue[jsx] : "automatic",
-			jsxImportSource: jsxImportSource ?? "react",
+			runtime: jsx && jsxValue[jsx] ? jsxValue[jsx] : "automatic",
+			importSource: jsxImportSource ?? "react",
 			...options.react,
 		};
 	}

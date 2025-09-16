@@ -12,7 +12,7 @@ export default defineConfig({
 		},
 	],
 	react: {
-		jsxRuntime: "classic", // 规避 test 文件夹 无需安装 react
+		runtime: "classic", // 规避 test 文件夹 无需安装 react
 	},
 	targets: {
 		chrome: "55",

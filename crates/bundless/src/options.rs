@@ -54,12 +54,15 @@ pub enum JsxRuntime {
 #[serde(rename_all = "camelCase")]
 pub struct React {
     #[serde(default = "default_jsx_runtime")]
-    pub jsx_runtime: Option<JsxRuntime>,
+    pub runtime: Option<JsxRuntime>,
+
+    #[serde(default = "default_import_source")]
+    pub import_source: Option<String>,
 }
 
 impl Default for React {
     fn default() -> Self {
-        Self { jsx_runtime: Some(JsxRuntime::default()) }
+        Self { runtime: Some(JsxRuntime::default()), import_source: Some("react".to_string()) }
     }
 }
 
@@ -173,6 +176,10 @@ fn default_alias() -> Option<Alias> {
 
 fn default_jsx_runtime() -> Option<JsxRuntime> {
     Some(JsxRuntime::default())
+}
+
+fn default_import_source() -> Option<String> {
+    Some("react".to_string())
 }
 
 impl Default for BundlessOptions {
@@ -318,7 +325,8 @@ impl BundlessOptions {
                     "legacyDecorator": true,
                     "decoratorMetadata": true,
                     "react": {
-                        "runtime": self.react.jsx_runtime
+                        "runtime": self.react.runtime,
+                        "importSource": self.react.import_source
                     },
                     "optimizer": {
                         // @swc/core@1.2.101+ 支持无需插件实现 @see https://swc.rs/docs/configuration/compilation#jsctransformoptimizerglobals

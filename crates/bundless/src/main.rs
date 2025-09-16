@@ -36,7 +36,7 @@ fn main() -> Result<()> {
     //     .shims(Shims::Object { legacy: Some(true) })
     //     .source_map(true)
     //     .minify(true)
-    //     .react(React { jsx_runtime: Some(JsxRuntime::Automatic) })
+    //     .react(React { runtime: Some(JsxRuntime::Automatic) })
     //     .css(CSS::default().css_modules("[name]_[local]_[hash:base64:5]").less_compile(true));
 
     // way2: json
@@ -61,7 +61,7 @@ fn main() -> Result<()> {
     //     // "sourcemap": true,
     //     // "minify": false,
     //     "react": {
-    //         "jsxRuntime": "automatic"
+    //         "runtime": "automatic"
     //     },
     //     "css": {
     //         "cssModules": "demo-component__[name]_[local]",

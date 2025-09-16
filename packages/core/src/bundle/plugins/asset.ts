@@ -51,7 +51,7 @@ export const pluginAsset: PluginFn = (chain, { options }) => {
 		.use("svgr-loader")
 		.loader(requireResolve("@svgr-rs/svgrs-plugin/webpack"))
 		.options({
-			jsxRuntime: options.react?.jsxRuntime,
+			runtime: options.react?.runtime,
 			exportType: "named",
 			namedExport: "ReactComponent",
 		});

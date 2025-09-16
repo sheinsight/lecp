@@ -29,7 +29,7 @@ export default defineConfig({
 		lessCompile: true,
 	},
 	react: {
-		jsxRuntime: "classic",
+		runtime: "classic",
 	},
 	targets: {
 		chrome: 55,

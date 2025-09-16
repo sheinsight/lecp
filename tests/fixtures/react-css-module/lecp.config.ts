@@ -8,7 +8,7 @@ export default defineConfig({
 		chrome: 55,
 	},
 	react: {
-		jsxRuntime: "classic",
+		runtime: "classic",
 	},
 	css: {
 		cssModules: true,

@@ -223,7 +223,7 @@ export interface UserConfig {
 		 * - "react-jsx", "react-jsxdev" -> "automatic"
 		 * - "preserve", "react-native" -> "preserve"
 		 */
-		jsxRuntime?: "automatic" | "classic" | "preserve";
+		runtime?: "automatic" | "classic" | "preserve";
 
 		/**
 		 * @default "react"
@@ -235,7 +235,7 @@ export interface UserConfig {
 		 *   - "solid-js"
 		 *   - "vue"
 		 */
-		jsxImportSource?: string;
+		importSource?: string;
 	};
 
 	css?: {

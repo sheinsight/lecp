@@ -291,7 +291,7 @@ SWC 编译时默认通过内联方式引入 helper 函数。开启此功能后�
 
 React 相关的编译配置。
 
-### react.jsxRuntime
+### react.runtime
 
 **类型：** `"classic" | "automatic" | "preserve"`
 
@@ -309,7 +309,7 @@ import { defineConfig } from '@shined/lecp';
 
 export default defineConfig({
   react: {
-    jsxRuntime: "classic"
+    runtime: "classic"
   }
 });
 ```
@@ -321,7 +321,7 @@ export default defineConfig({
 
 :::
 
-### react.jsxImportSource
+### react.importSource
 
 jsx 函数使用的模块名称。
 > tsconfig.json 中的 `jsxImportSource`
@@ -338,15 +338,15 @@ jsx 函数使用的模块名称。
 import { defineConfig } from '@shined/lecp';
 export default defineConfig({
   react: {
-    jsxRuntime: "automatic",
-    jsxImportSource: "preact"
+    runtime: "automatic",
+    importSource: "preact"
   }
 });
 
 export default defineConfig({
   react: {
-    jsxRuntime: "preserve",
-    jsxImportSource: "solid-js"
+    runtime: "preserve",
+    importSource: "solid-js"
   }
 });
 ```

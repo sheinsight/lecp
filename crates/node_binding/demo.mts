@@ -32,7 +32,7 @@ import { bundlessFilesAsync } from "./index.js";
 			sourceMap: true,
 			minify: false,
 			react: {
-				jsxRuntime: "automatic",
+				runtime: "automatic",
 			},
 			css: {
 				cssModules: "demo-component__[name]_[local]",
