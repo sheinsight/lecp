@@ -20,7 +20,7 @@
 		"declaration": true,
 		"declarationMap": true,
 		// react
-		"jsx": "preserve"
+		"jsx": "react-jsx"
 		// perf
 		// "isolatedDeclarations": true,
 	}
