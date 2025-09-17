@@ -86,9 +86,19 @@
     if (typeof window !== "undefined") {
         console.log("Browser environment");
     }
-    var __webpack_export_target__ = exports;
-    for(var __webpack_i__ in __webpack_exports__)__webpack_export_target__[__webpack_i__] = __webpack_exports__[__webpack_i__];
-    if (__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target__, '__esModule', {
+    exports.asyncFn = __webpack_exports__.asyncFn;
+    exports["default"] = __webpack_exports__["default"];
+    exports.sleep = __webpack_exports__.sleep;
+    for(var __webpack_i__ in __webpack_exports__){
+        if ([
+            "asyncFn",
+            "default",
+            "sleep"
+        ].indexOf(__webpack_i__) === -1) {
+            exports[__webpack_i__] = __webpack_exports__[__webpack_i__];
+        }
+    }
+    Object.defineProperty(exports, '__esModule', {
         value: true
     });
 })();

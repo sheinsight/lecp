@@ -3,7 +3,7 @@ import type { PluginFn } from "../chain.ts";
 
 const rspackModuleMap = {
 	esm: "modern-module", // webpack@5.93+
-	cjs: "commonjs",
+	cjs: "commonjs-static",
 	umd: "umd",
 } as const;
 

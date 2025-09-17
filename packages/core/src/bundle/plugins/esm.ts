@@ -23,5 +23,5 @@ export const pluginEsm: PluginFn = chain => {
 	});
 
 	// chain.optimization.concatenateModules(true); // production 默认启用
-	// chain.optimization.avoidEntryIife(true); // production 默认启用 5.95.0+
+	chain.optimization.avoidEntryIife(true); // production (rspack 默认不启用，webpack 默认启用 5.95.0+)
 };
