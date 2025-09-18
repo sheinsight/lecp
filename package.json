@@ -2,7 +2,7 @@
 	"name": "lecp-root",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@10.15.1",
+	"packageManager": "pnpm@10.17.0",
 	"version": "0.0.1-beta.14",
 	"files": [],
 	"repository": {
@@ -32,11 +32,11 @@
 	"license": "MIT",
 	"description": "",
 	"devDependencies": {
-		"@biomejs/biome": "^2.2.3",
-		"@rspress/core": "^2.0.0-beta.32",
+		"@biomejs/biome": "^2.2.4",
+		"@rspress/core": "^2.0.0-beta.33",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.2.3",
-		"oxlint": "^1.14.0",
+		"oxlint": "^1.16.0",
 		"tinyglobby": "^0.2.15",
 		"typescript": "catalog:",
 		"vitest": "catalog:"

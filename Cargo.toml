@@ -14,22 +14,22 @@ rust-version = "1.85.0"
 [workspace.dependencies]
 anyhow     = "1.0.99"
 env_logger = "0.11.8"
-log        = "0.4.27"
+log        = "0.4.28"
 miette     = { version = "7.6.0", features = ["fancy"] }
 owo-colors = { version = "4.2.2", features = ["supports-colors"] }
 path-clean = "1.0.1"
 pathdiff   = "0.2.3"
 rayon      = "1.11.0"
-serde      = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.143"
-swc        = { version = "39.0.0", default-features = false }
-swc_core   = { version = "40.0.0", default-features = false, features = ["parallel_rayon"] }
+serde      = { version = "1.0.225", features = ["derive"] }
+serde_json = "1.0.145"
+swc        = { version = "40.0.0", default-features = false }
+swc_core   = { version = "42.0.2", default-features = false, features = ["parallel_rayon"] }
 thiserror  = "2.0.16"
 tokio      = { version = "1.47.1", features = ["fs"] }
 wax        = "0.6.0"
 
 lecp_bundless            = { path = "./crates/bundless" }
-swc-plugin-css-modules   = { git = "https://github.com/dr2009/swc-plugin-css-modules", tag = "swc_core@v40" }
+swc-plugin-css-modules   = { git = "https://github.com/dr2009/swc-plugin-css-modules", tag = "swc_core@v42" }
 swc_transform_define     = { path = "./crates/transform_define/transform" }
 swc_transform_extensions = { path = "./crates/transform_extensions/transform" }
 swc_transform_shims      = { path = "./crates/transform_shims/transform" }
