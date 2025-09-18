@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"packageManager": "pnpm@10.17.0",
-	"version": "0.1.0-beta.1",
+	"version": "0.1.0",
 	"files": [],
 	"repository": {
 		"type": "git",

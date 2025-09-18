@@ -1,6 +1,6 @@
 {
 	"name": "@shined/swc-plugin-transform-ts2js",
-	"version": "0.1.0-beta.1",
+	"version": "0.1.0",
 	"description": "",
 	"keywords": [
 		"swc-plugin"
