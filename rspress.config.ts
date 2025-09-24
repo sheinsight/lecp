@@ -9,6 +9,7 @@ const config: UserConfig = defineConfig({
 	// light: "/rspress-light-logo.png",
 	// dark: "/rspress-dark-logo.png",
 	// },
+	base: "/lecp/",
 	themeConfig: {
 		enableContentAnimation: true,
 		enableAppearanceAnimation: true,
@@ -54,7 +55,7 @@ const config: UserConfig = defineConfig({
 			},
 		],
 	},
-	ssg: false,
+	// ssg: false,
 });
 
 export default config;
