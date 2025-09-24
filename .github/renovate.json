@@ -1,0 +1,79 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		":dependencyDashboard",
+		":semanticCommits",
+		":automergeDisabled"
+	],
+	"timezone": "Asia/Shanghai",
+	"schedule": ["before 4am on Monday"],
+	"prConcurrentLimit": 3,
+	"prHourlyLimit": 2,
+	"platformAutomerge": false,
+	"rangeStrategy": "bump",
+	"packageRules": [
+		{
+			"description": "Rust dependencies",
+			"matchManagers": ["cargo"],
+			"semanticCommitType": "chore",
+			"semanticCommitScope": "deps",
+			"commitMessageTopic": "rust {{depName}}",
+			"prTitle": "chore(deps): update rust {{depName}} to {{newVersion}}",
+			"groupName": "rust dependencies",
+			"schedule": ["before 4am on Monday"]
+		},
+		{
+			"description": "Node.js dependencies",
+			"matchManagers": ["pnpm"],
+			"semanticCommitType": "chore",
+			"semanticCommitScope": "deps",
+			"rangeStrategy": "bump"
+		},
+		{
+			"description": "Development dependencies",
+			"matchDepTypes": ["devDependencies"],
+			"semanticCommitType": "chore",
+			"semanticCommitScope": "dev-deps",
+			"automerge": false,
+			"groupName": "dev dependencies"
+		},
+		{
+			"description": "SWC related packages",
+			"matchPackagePatterns": ["^@swc/", "swc"],
+			"groupName": "swc packages",
+			"semanticCommitScope": "swc"
+		},
+		{
+			"description": "Testing packages",
+			"matchPackagePatterns": ["^vitest", "^@vitest/"],
+			"groupName": "test packages",
+			"semanticCommitScope": "test"
+		},
+		{
+			"description": "Major updates",
+			"matchUpdateTypes": ["major"],
+			"dependencyDashboardApproval": true,
+			"automerge": false,
+			"prTitle": "chore(deps): update {{depName}} major to {{newVersion}}"
+		}
+	],
+	"ignorePaths": [
+		"**/tests/**",
+		"**/fixtures/**",
+		"**/__tests__/**",
+		"**/test/**",
+		"target/**"
+	],
+	"ignoreDeps": ["node"],
+	"lockFileMaintenance": {
+		"enabled": true,
+		"schedule": ["before 4am on the first day of the month"]
+	},
+	"vulnerabilityAlerts": {
+		"enabled": true,
+		"schedule": ["at any time"]
+	},
+	"osvVulnerabilityAlerts": true,
+	"postUpdateOptions": ["pnpmDedupe"]
+}
