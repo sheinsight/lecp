@@ -1,16 +1,24 @@
 {
 	"compilerOptions": {
+		// Modules
 		"target": "ESNext",
-		//   "module": "ESNext",
-		//   "moduleResolution": "bundler",
-		"module": "NodeNext",
-		"moduleResolution": "nodenext",
-		"declaration": true,
-		"isolatedDeclarations": true,
-		"resolveJsonModule": true,
+		"module": "Preserve",
+		"moduleDetection": "force",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+
+		// lint
 		"strict": true,
-		"esModuleInterop": true,
+		"noUncheckedSideEffectImports": true,
+
+		// perf
 		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true
-	}
+		"isolatedDeclarations": true,
+
+		// dts
+		"emitDeclarationOnly": true,
+		"declaration": true,
+		"declarationMap": true
+	},
+	"exclude": ["**/dist", "**/es", "**/lib", "tests/**"]
 }

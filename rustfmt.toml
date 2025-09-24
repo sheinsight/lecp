@@ -1,0 +1,7 @@
+# https://rust-lang.github.io/rustfmt
+
+group_imports            = "StdExternalCrate"
+imports_granularity      = "Module"
+style_edition            = "2024"
+use_field_init_shorthand = true
+use_small_heuristics     = "Max"

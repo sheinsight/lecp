@@ -1,17 +1,69 @@
 {
-	"name": "@shined/lecp-cli",
-	"version": "0.0.1",
+	"name": "@shined/lecp",
+	"version": "0.1.0",
 	"description": "",
 	"keywords": [],
 	"license": "MIT",
 	"author": "",
 	"type": "module",
-	"main": "index.js",
+	"exports": {
+		".": "./es/index.js",
+		"./package.json": "./package.json"
+	},
+	"bin": {
+		"lecp": "bin/cli.js"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/sheinsight/lecp.git"
+	},
+	"files": [
+		"bin",
+		"es"
+	],
+	"engines": {
+		"node": ">=20.19.0"
+	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"dev": "node ./src/cli.ts -w",
+		"build": "node ./src/cli.ts"
+	},
+	"dependencies": {
+		"@microsoft/api-extractor": "^7.52.13",
+		"@rspack/core": "1.5.5",
+		"@shined/lecp-binding": "workspace:*",
+		"@svgr-rs/svgrs-plugin": "^0.2.0",
+		"@swc/types": "^0.1.25",
+		"chokidar": "^4.0.3",
+		"css-loader": "^7.1.2",
+		"deepmerge": "^4.3.1",
+		"jiti": "^2.5.1",
+		"less": "^4.4.1",
+		"less-loader": "^12.3.0",
+		"lightningcss": "^1.30.1",
+		"node-polyfill-webpack-plugin": "^4.1.0",
+		"picocolors": "^1.1.1",
+		"read-pkg": "^9.0.1",
+		"rspack-chain": "^1.4.1",
+		"source-map-loader": "^5.0.0",
+		"tinyglobby": "^0.2.15",
+		"typescript": "catalog:",
+		"typescript-transform-paths": "^3.5.5",
+		"yargs": "^18.0.0"
 	},
 	"devDependencies": {
-		"typescript": "catalog:"
+		"@types/less": "^3.0.8",
+		"@types/node": "catalog:"
 	},
-	"packageManager": "pnpm@9.14.4"
+	"peerDependencies": {
+		"@swc/helpers": "^0.5.17"
+	},
+	"peerDependenciesMeta": {
+		"@swc/helpers": {
+			"optional": true
+		}
+	}
 }

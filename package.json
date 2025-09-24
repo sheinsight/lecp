@@ -1,21 +1,44 @@
 {
-	"name": "lego-cp-next",
+	"name": "lecp-root",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@9.14.4",
-	"version": "0.0.1",
+	"packageManager": "pnpm@10.17.0",
+	"version": "0.1.0",
+	"files": [],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/sheinsight/lecp.git"
+	},
 	"scripts": {
-		"format": "@biomejs/biome format --write ./",
-		"lint": "oxlint"
+		"test": "pnpm test:js && pnpm test:rust",
+		"test:js": "vitest --run",
+		"test:rust": "cargo test --all --all-targets --all-features",
+		"format": "biome format --write && cargo fmt --all",
+		"lint": "pnpm lint:tsc && pnpm lint:js && pnpm lint:rust",
+		"lint:tsc": "pnpm -r --filter=!\"./crates/**\" exec tsc --noEmit",
+		"lint:js": "oxlint && biome check",
+		"lint:rust": "cargo clippy --all --all-targets --all-features -- -D warnings && cargo fmt --all -- --check",
+		"build": "pnpm build:rust && pnpm build:node",
+		"build:rust": "pnpm --filter=\"./crates/**\" build",
+		"build:node": "pnpm --filter=\"./packages/**\" build",
+		"doc:build": "rspress build",
+		"doc:dev": "rspress dev",
+		"doc:preview": "rspress preview",
+		"prerelease": "pnpm run test",
+		"release": "bumpp -r --no-push"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "MIT",
 	"description": "",
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
-		"oxlint": "^0.14.0",
-		"tsx": "^4.19.2",
-		"typescript": "catalog:"
+		"@biomejs/biome": "^2.2.4",
+		"@rspress/core": "^2.0.0-beta.33",
+		"@shined/lecp": "workspace:*",
+		"bumpp": "^10.2.3",
+		"oxlint": "^1.16.0",
+		"tinyglobby": "^0.2.15",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

@@ -1,0 +1,33 @@
+{
+	"compilerOptions": {
+		// Modules
+		"target": "ESNext",
+
+		// "module": "Preserve", // ts@5.4支持
+
+		// 默认开启("module": "Preserve") ↓↓↓
+		// "module": "ESNext",
+		// "moduleResolution": "bundler",
+		// "resolveJsonModule": true,
+		// "esModuleInterop": true,
+
+		// 设置后强制要求写后缀
+		"module": "NodeNext",
+		"moduleResolution": "nodenext",
+
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true, // ts@5.0支持
+		// "isolatedDeclarations": true, // perf
+		// isolatedModules:true, // verbatimModuleSyntax:true 默认开启
+
+		// lint
+		"strict": true,
+		"skipLibCheck": true, // perf
+
+		// dts
+		"noEmit": true,
+		"emitDeclarationOnly": true,
+		"declaration": true,
+		"declarationMap": true
+	}
+}

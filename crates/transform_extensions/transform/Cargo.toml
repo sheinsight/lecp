@@ -1,0 +1,15 @@
+[package]
+name    = "swc_transform_extensions"
+version = "0.1.0"
+
+authors.workspace      = true
+edition.workspace      = true
+homepage.workspace     = true
+license.workspace      = true
+repository.workspace   = true
+rust-version.workspace = true
+
+[dependencies]
+serde      = { workspace = true }
+serde_json = { workspace = true }
+swc_core   = { workspace = true, features = ["ecma_visit", "ecma_ast", "common", "ecma_transforms", "testing_transform"] }

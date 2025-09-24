@@ -1,62 +1,12 @@
 # LEGO-CP
 
-##
-- rust-first
-    - rspack
-    - swc
-    	- [x] babel 插件迁移
-    - LightningCSS
-        - 能否无缝迁移 postcss??
-		    - postcss-preset-env
-		    - postcss-modules
-			- [CSS Modules – Lightning CSS](https://lightningcss.dev/css-modules.html#custom-naming-patterns)
-				- > 只支持 rust 默认的 hash, 若不使用 hash 可表现一致
-    - 支持 webpack, babel, postcss 降级??
-        > 暂不支持
-- esm-first
-    - package.json `type: module`
-    - node `--experimental-require-module` 📡
-- bundle/bundless
-- js/css/dts
+<a href="https://npmjs.com/package/@shined/lecp"><img src="https://img.shields.io/npm/v/@shined/lecp" alt="npm version" /></a>
+<a href="https://npmjs.com/package/@shined/lecp"><img src="https://img.shields.io/npm/v/@shined/lecp/beta" alt="npm version" /></a>
 
-## TODO
-- [ ] extends
-    - web/web-legacy/node/node-legacy/...
-    - workspace
-- [ ] format 格式 (esm/cjs/umd)数组
-    - 场景1: 多个 umd
-    - 场景2: 多个 target
-- [ ] css
-    - css-modules 支持
-        - swc 插件 👌
-        - LightningCSS 支持 👌
-    - less 支持 ?
-        - 支持, 多线程并行编译
-        - 不支持, 但提供 less 语法检查无痛转 css
-- [ ] dts
-    - bundle: `@microsoft/api-extractor` 📡
-    - bundless:
-        - fast: `isolated declarations` 📡
-            - ts, oxc, swc 都支持
-        - default: rollup-plugin-dts(5.3~6.1 差异跟踪)
-- [ ] shim
-	 - cjs 支持 `import.meta.url`
-	 - esm 支持 `__filename`, `__dirname`,
-- [ ] polyfill
-	 - core-js
-	 - node-polyfill
-- [ ] externalHelpers
-	 - @swc/helpers
-	 - @babel/runtime
-- [ ] targets
-    - browserlist
-    - rspack.target 考虑 node, web
-- [ ] define
-	 - `process.env.NODE_ENV`
-	 - `__DEV__`
-- [ ] alias
-	 - `@` -> `src`
-- [ ] 内置 banner
-    - 微前端 umd sourcemap 支持
-- [ ] check/doctor
-    - package.json 导出检查
+
+## Install
+```bash
+npm install @shined/lecp
+```
+
+## Features

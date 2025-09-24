@@ -1,0 +1,22 @@
+.container {
+	/* add */
+	user-select: none;
+
+	/* add */
+	.logo {
+		/* background: image-set(url(logo.png) 2x, url(logo.png) 1x); */
+	}
+
+	/** remove */
+	.button {
+		-webkit-transition: background 200ms;
+		-moz-transition: background 200ms;
+		transition: background 200ms;
+	}
+}
+
+/** combine */
+.box {
+	grid-column-start: 1;
+	grid-column-end: -1;
+}

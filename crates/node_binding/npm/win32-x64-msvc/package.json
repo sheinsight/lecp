@@ -1,0 +1,26 @@
+{
+  "name": "@shined/lecp-binding-win32-x64-msvc",
+
+  "cpu": [
+    "x64"
+  ],
+  "main": "lecp.win32-x64-msvc.node",
+  "files": [
+    "lecp.win32-x64-msvc.node"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0"
+  },
+  "os": [
+    "win32"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sheinsight/lecp.git"
+  }
+}

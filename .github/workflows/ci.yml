@@ -1,0 +1,197 @@
+name: CI
+env:
+  DEBUG: napi:*
+  MACOSX_DEPLOYMENT_TARGET: '10.13'
+  NAPI_DIR: crates/node_binding
+permissions:
+  contents: write
+  id-token: write
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            build: pnpm build --platform --target x86_64-apple-darwin
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            build: pnpm build --platform --target x86_64-pc-windows-msvc
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            build: pnpm build --platform --target x86_64-unknown-linux-gnu --use-napi-cross
+            # docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            build: pnpm build --platform --target x86_64-unknown-linux-musl -x
+            # docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine-zig
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            build: pnpm build --platform --target aarch64-apple-darwin
+          - host: windows-latest
+            target: aarch64-pc-windows-msvc
+            build: pnpm build --platform --target aarch64-pc-windows-msvc
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            build: pnpm build --platform --target aarch64-unknown-linux-gnu --use-napi-cross
+            # docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            build: pnpm build --platform --target aarch64-unknown-linux-musl -x
+            # docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine-zig
+    name: stable - ${{ matrix.settings.target }} - node@20
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v5
+      # node
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      # rust
+      # - name: Install Rust
+      #   if: ${{ !matrix.settings.docker }}
+      #   uses: dtolnay/rust-toolchain@stable
+      #   with:
+      #     targets: ${{ matrix.settings.target }}
+
+      - name: Install Rust
+        if: ${{ !matrix.settings.docker }}
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ matrix.settings.target }}
+          override: true
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ~/.napi-rs
+            .cargo-cache
+            target/
+          key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
+      - uses: goto-bus-stop/setup-zig@v2
+        if: ${{ contains(matrix.settings.target, 'musl') }}
+        with:
+          version: 0.13.0
+      - name: Install cargo-zigbuild
+        uses: taiki-e/install-action@v2
+        if: ${{ contains(matrix.settings.target, 'musl') }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tool: cargo-zigbuild
+      - name: Setup toolchain
+        run: ${{ matrix.settings.setup }}
+        if: ${{ matrix.settings.setup }}
+        shell: bash
+      - name: Setup node x86
+        if: matrix.settings.target == 'i686-pc-windows-msvc'
+        run: pnpm config set supportedArchitectures.cpu "ia32"
+        shell: bash
+      - name: Install dependencies
+        run: pnpm install
+      - name: Setup node x86
+        uses: actions/setup-node@v5
+        if: matrix.settings.target == 'i686-pc-windows-msvc'
+        with:
+          node-version: 20
+          architecture: x86
+      # build
+      - name: Build
+        if: ${{ !matrix.settings.docker }}
+        run: cd ${{ env.NAPI_DIR }} && ${{ matrix.settings.build }}
+        shell: bash
+
+      - name: Build in docker
+        uses: addnab/docker-run-action@v3
+        if: ${{ matrix.settings.docker }}
+        with:
+          image: ${{ matrix.settings.docker }}
+          options: |
+            --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db
+            -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache
+            -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index
+            -v ${{ github.workspace }}:/build
+            -w /build
+          run: |
+            set -e
+            rustup target add ${{ matrix.settings.target }}
+            cd ${{ env.NAPI_DIR }} && ${{ matrix.settings.build }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: matrix.settings.target != 'wasm32-wasi-preview1-threads'
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: ${{ env.NAPI_DIR }}/*.node
+          if-no-files-found: error
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: matrix.settings.target == 'wasm32-wasi-preview1-threads'
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: ${{ env.NAPI_DIR }}/*.wasm
+          if-no-files-found: error
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v5
+      # node
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      # npm 11.5.1+ supports OIDC
+      - name: Update npm
+        run: npm install -g npm@latest
+      - name: Install dependencies
+        run: pnpm install
+      # napi
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ env.NAPI_DIR }}/artifacts
+      - name: Move artifacts
+        run:  cd ${{ env.NAPI_DIR }} && pnpm artifacts
+      - name: List packages
+        run: ls -R ${{ env.NAPI_DIR }}/npm
+        shell: bash
+      # core build
+      - name: Build other packages
+        run: pnpm --filter='./packages/**' build
+      # publish
+      - name: Determine npm tag
+        id: npm-tag
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG=$(node -e "
+            const version = '$VERSION';
+            const data = /^v?(?<version>.+)-(?<tag>\w+)\.\d+/.exec(version);
+            const tag = data?.groups?.tag ?? 'latest';
+            console.log(tag);
+          ")
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Detected version: $VERSION, using tag: $TAG"
+      - name: Publish
+        run: pnpm -r --filter=\!'@shined/swc-plugin-*' publish --no-git-checks --access public --tag ${{ steps.npm-tag.outputs.tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

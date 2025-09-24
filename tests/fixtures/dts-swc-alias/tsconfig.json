@@ -1,0 +1,32 @@
+{
+	"compilerOptions": {
+		// module
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"esModuleInterop": true,
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		// lint
+		"strict": true,
+		"skipLibCheck": true, // perf
+		"forceConsistentCasingInFileNames": true,
+		// dts
+		"noEmit": true,
+		"emitDeclarationOnly": true,
+		"declaration": true,
+		"declarationMap": true,
+		// react
+		"jsx": "react-jsx",
+		// perf
+		"isolatedDeclarations": true,
+
+		// alias
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	}
+}

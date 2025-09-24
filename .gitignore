@@ -1,9 +1,20 @@
 # node
 node_modules/
+# build
+dist/
+es/
+lib/
+umd/
 
 # rust
 debug/
 target/
+/target
+^target/
+target
+*.wasm
 
 # os
 .DS_Store
+
+/doc_build

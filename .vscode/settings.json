@@ -1,4 +1,28 @@
 {
+	"cSpell.words": [
+		"browserlist",
+		"bundless",
+		"lecp",
+		"lightningcss",
+		"miette",
+		"napi",
+		"pico",
+		"rspack"
+	],
+	"editor.codeActionsOnSave": {
+		"quickfix.biome": "explicit",
+		"source.organizeImports.biome": "explicit",
+		"source.fixAll.biome": "explicit"
+	},
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"references.preferredLocation": "peek",
 	"editor.defaultFormatter": "biomejs.biome",
-	"cSpell.words": ["browserlist", "bundless", "rspack"]
+	"[rust]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "rust-lang.rust-analyzer"
+	},
+	"[toml]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "tamasfe.even-better-toml"
+	}
 }

@@ -1,0 +1,42 @@
+[package]
+name    = "lecp_bundless"
+version = "0.1.0"
+
+authors.workspace      = true
+edition.workspace      = true
+homepage.workspace     = true
+license.workspace      = true
+repository.workspace   = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow     = { workspace = true }
+env_logger = { workspace = true }
+log        = { workspace = true }
+miette     = { workspace = true }
+owo-colors = { workspace = true }
+path-clean = { workspace = true }
+pathdiff   = { workspace = true }
+rayon      = { workspace = true }
+serde      = { workspace = true }
+serde_json = { workspace = true }
+thiserror  = { workspace = true }
+wax        = { workspace = true }
+
+swc = { workspace = true, features = ["isolated-dts"] }
+swc_core = { workspace = true, features = [
+    "base_concurrent",
+    "common_concurrent",
+    "ecma_ast",
+    "ecma_utils",
+    "ecma_visit",
+    "ecma_helpers_inline",
+    # "plugin_transform_host_native",
+    # "plugin_transform_host_native_filesystem_cache",
+] }
+
+swc-plugin-css-modules   = { workspace = true }
+swc_transform_define     = { workspace = true }
+swc_transform_extensions = { workspace = true }
+swc_transform_shims      = { workspace = true }
+swc_transform_ts2js      = { workspace = true }
