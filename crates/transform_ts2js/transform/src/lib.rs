@@ -1,8 +1,6 @@
 use serde::Deserialize;
-use swc_core::ecma::{
-    ast::{self, Pass},
-    visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass},
-};
+use swc_core::ecma::ast::{self, Pass};
+use swc_core::ecma::visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass};
 
 #[derive(Clone, Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -91,8 +89,9 @@ pub fn transform(config: Config) -> impl Pass {
 #[cfg(test)]
 mod tests {
 
-    use super::*;
     use swc_core::ecma::transforms::testing::test_inline;
+
+    use super::*;
 
     test_inline!(
         Default::default(),

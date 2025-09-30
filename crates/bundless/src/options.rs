@@ -1,10 +1,11 @@
-use anyhow::Result;
-use serde::{Deserialize, Serialize};
-use serde_json::json;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
+
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 use swc_core::base::config::Options as SwcOptions;
 
 use crate::{get_out_ext, serde_error_to_miette};

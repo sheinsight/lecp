@@ -1,17 +1,15 @@
-use serde::Deserialize;
 use std::collections::HashMap;
-use swc_core::{
-    common::{DUMMY_SP, util::take::Take},
-    ecma::{
-        ast::{
-            Decl, Expr, Ident, ImportDecl, ImportNamedSpecifier, ImportSpecifier, KeyValuePatProp,
-            MemberProp, MetaPropExpr, MetaPropKind, ModuleDecl, ModuleItem, ObjectPat,
-            ObjectPatProp, Pass, Pat, PropName, Stmt, VarDeclarator,
-        },
-        utils::{quote_ident, quote_str},
-        visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass},
-    },
+
+use serde::Deserialize;
+use swc_core::common::DUMMY_SP;
+use swc_core::common::util::take::Take;
+use swc_core::ecma::ast::{
+    Decl, Expr, Ident, ImportDecl, ImportNamedSpecifier, ImportSpecifier, KeyValuePatProp,
+    MemberProp, MetaPropExpr, MetaPropKind, ModuleDecl, ModuleItem, ObjectPat, ObjectPatProp, Pass,
+    Pat, PropName, Stmt, VarDeclarator,
 };
+use swc_core::ecma::utils::{quote_ident, quote_str};
+use swc_core::ecma::visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass};
 
 #[derive(Clone, Debug, Deserialize, Default, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -235,8 +233,9 @@ pub fn transform(config: Config) -> impl Pass {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use swc_core::ecma::transforms::testing::test_inline;
+
+    use super::*;
 
     test_inline!(
         Default::default(),

@@ -17,7 +17,7 @@
 		"lint": "pnpm lint:tsc && pnpm lint:js && pnpm lint:rust",
 		"lint:tsc": "pnpm -r --filter=!\"./crates/**\" exec tsc --noEmit",
 		"lint:js": "oxlint && biome check",
-		"lint:rust": "cargo clippy --all --all-targets --all-features -- -D warnings && cargo fmt --all -- --check",
+		"lint:rust": "cargo clippy --all --all-targets --all-features -- -D warnings && cargo +nightly fmt --all -- --check",
 		"build": "pnpm build:rust && pnpm build:node",
 		"build:rust": "pnpm --filter=\"./crates/**\" build",
 		"build:node": "pnpm --filter=\"./packages/**\" build",

@@ -1,12 +1,14 @@
+use std::collections::HashMap;
+use std::path::Path;
+use std::sync::Arc;
+
 use anyhow::{Context, Result};
 use log::debug;
-use std::collections::HashMap;
-use std::{path::Path, sync::Arc};
-use swc_core::{
-    base::{Compiler, TransformOutput, config::Options, try_with_handler},
-    common::{GLOBALS, SourceMap, comments::SingleThreadedComments},
-    ecma::ast::{Pass, noop_pass},
-};
+use swc_core::base::config::Options;
+use swc_core::base::{Compiler, TransformOutput, try_with_handler};
+use swc_core::common::comments::SingleThreadedComments;
+use swc_core::common::{GLOBALS, SourceMap};
+use swc_core::ecma::ast::{Pass, noop_pass};
 
 use crate::util::write_file;
 use crate::{BundlessOptions, ModuleType};

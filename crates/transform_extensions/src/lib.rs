@@ -1,6 +1,6 @@
 use swc_core::ecma::ast::Program;
-use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
-
+use swc_core::plugin::plugin_transform;
+use swc_core::plugin::proxies::TransformPluginProgramMetadata;
 use swc_transform_extensions::{Config, transform};
 
 #[plugin_transform]
