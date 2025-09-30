@@ -2,7 +2,7 @@
 	"name": "lecp-root",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@10.17.0",
+	"packageManager": "pnpm@10.17.1",
 	"version": "0.1.0",
 	"files": [],
 	"repository": {
@@ -13,7 +13,7 @@
 		"test": "pnpm test:js && pnpm test:rust",
 		"test:js": "vitest --run",
 		"test:rust": "cargo test --all --all-targets --all-features",
-		"format": "biome format --write && cargo fmt --all",
+		"format": "biome format --write && cargo +nightly fmt --all",
 		"lint": "pnpm lint:tsc && pnpm lint:js && pnpm lint:rust",
 		"lint:tsc": "pnpm -r --filter=!\"./crates/**\" exec tsc --noEmit",
 		"lint:js": "oxlint && biome check",
@@ -33,10 +33,10 @@
 	"description": "",
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.4",
-		"@rspress/core": "^2.0.0-beta.33",
+		"@rspress/core": "2.0.0-beta.34",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.2.3",
-		"oxlint": "^1.16.0",
+		"oxlint": "^1.19.0",
 		"tinyglobby": "^0.2.15",
 		"typescript": "catalog:",
 		"vitest": "catalog:"

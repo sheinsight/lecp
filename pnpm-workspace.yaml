@@ -4,8 +4,8 @@ packages:
   - examples/*
 
 catalog:
-  '@types/node': ^22.18.1
-  '@types/react': ^19.1.13
+  '@types/node': ^22.18.7
+  '@types/react': ^19.1.16
   '@types/react-dom': ^19.1.9
   '@vitest/coverage-v8': ^3.2.4
   react: ^19.1.1
