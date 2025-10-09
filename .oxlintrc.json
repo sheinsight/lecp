@@ -8,7 +8,9 @@
 	},
 	"globals": {},
 	"settings": {},
-	"rules": {},
+	"rules": {
+		"no-unused-expressions": ["error", { "allowShortCircuit": true }]
+	},
 	"ignorePatterns": ["**/snapshots/**"],
 	"overrides": [
 		{

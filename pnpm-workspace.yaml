@@ -4,13 +4,13 @@ packages:
   - examples/*
 
 catalog:
-  '@types/node': ^22.18.7
-  '@types/react': ^19.1.16
-  '@types/react-dom': ^19.1.9
+  '@types/node': ^22.18.8
+  '@types/react': ^19.2.2
+  '@types/react-dom': ^19.2.1
   '@vitest/coverage-v8': ^3.2.4
-  react: ^19.1.1
-  react-dom: ^19.1.1
-  typescript: ^5.9.2
+  react: ^19.2.0
+  react-dom: ^19.2.0
+  typescript: ^5.9.3
   vitest: ^3.2.4
 
 onlyBuiltDependencies:
