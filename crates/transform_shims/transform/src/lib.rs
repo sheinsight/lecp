@@ -71,6 +71,7 @@ impl VisitMut for TransformShims {
             }
         }
 
+        // { dirname, filename } = import.meta
         if self.config.target == Target::CJS {
             if let Some((_, value)) = self.id_map.get_key_value(&i.to_string()) {
                 let sym = match value.as_str() {
@@ -100,7 +101,7 @@ impl VisitMut for TransformShims {
                             "filename" => CJS_FILENAME,
                             _ => return,
                         };
-                        *e = quote_ident!(sym).into();
+                        *e = private_ident!(sym).into();
                         // *e = Ident::new_no_ctxt(sym.into(), DUMMY_SP).into();
                     }
                 }
@@ -293,11 +294,19 @@ mod tests {
         |_| transform(serde_json::from_str(r#"{"target":"cjs"}"#).unwrap()),
         fn_shims_cjs,
         r#"
+            const __dirname = "1";
+            const __filename = "2";
+            console.log(__dirname, __filename);
+
             console.log(import.meta.dirname);
             console.log(import.meta.filename);
             // console.log(import.meta.url); // 无需处理, swc 支持转换
         "#, // Input codes,
         r#"
+            const __dirname1 = "1";
+            const __filename1 = "2";
+            console.log(__dirname1, __filename1);
+
             console.log(__dirname);
             console.log(__filename);
             // console.log(require("url").pathToFileURL(__filename).toString());
@@ -311,6 +320,10 @@ mod tests {
         r#"
             const { dirname, filename } = {};
             {
+                // const __dirname = "1";
+                // const __filename = "2";
+                // console.log(__dirname, __filename);
+
                 const { dirname, filename, url } = import.meta;
                 console.log(dirname);
                 console.log(filename);
@@ -320,6 +333,10 @@ mod tests {
         r#"
             const { dirname, filename } = {};
             {
+                // const __dirname1 = "1";
+                // const __filename1 = "2";
+                // console.log(__dirname1, __filename1);
+
                 console.log(__dirname);
                 console.log(__filename);
                 console.log(require("url").pathToFileURL(__filename).toString());
