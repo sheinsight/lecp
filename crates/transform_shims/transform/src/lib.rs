@@ -8,7 +8,7 @@ use swc_core::ecma::ast::{
     MemberProp, MetaPropExpr, MetaPropKind, ModuleDecl, ModuleItem, ObjectPat, ObjectPatProp, Pass,
     Pat, PropName, Stmt, VarDeclarator,
 };
-use swc_core::ecma::utils::{quote_ident, quote_str};
+use swc_core::ecma::utils::{private_ident, quote_ident, quote_str};
 use swc_core::ecma::visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass};
 
 #[derive(Clone, Debug, Deserialize, Default, PartialEq)]
@@ -207,8 +207,7 @@ impl VisitMut for TransformShims {
                 span: DUMMY_SP,
                 specifiers: vec![ImportSpecifier::Named(ImportNamedSpecifier {
                     span: DUMMY_SP,
-                    // TODO: fileURLToPath 重名问题
-                    local: "fileURLToPath".into(),
+                    local: private_ident!("fileURLToPath").into(),
                     imported: None,
                     is_type_only: false,
                 })],
@@ -256,15 +255,18 @@ mod tests {
         |_| transform(serde_json::from_str(r#"{"target":"esm","legacy":true}"#).unwrap()),
         fn_shims_esm_legacy,
         r#"
+            export const fileURLToPath = () => {};
             console.log(__dirname);
             console.log(__filename);
             export {} // 临时加, 解析为 module
         "#, // Input codes,
         r#"
             import { fileURLToPath } from "node:url";
+            const fileURLToPath1 = ()=>{};
+            export { fileURLToPath1 as fileURLToPath };
             console.log(fileURLToPath(new URL('.', import.meta.url)));
             console.log(fileURLToPath(import.meta.url));
-            export {}
+            export { };
         "# // Output codes after transformed with plugin
     );
 
