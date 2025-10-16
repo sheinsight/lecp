@@ -4,7 +4,7 @@
 ## Introduction
 
 ### ESM Shims
-write `__filename` and `__dirname` in your code, and this plugin will transform them to right code in esm module.
+write `__filename`, `__dirname` and `require()` in your code, and this plugin will transform them to right code in esm module.
 
 ```js
 __filename
@@ -24,6 +24,11 @@ const __dirname = path.dirname(__filename)
 import { fileURLToPath } from 'url'
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+require()
+// ->
+import { createRequire } from 'node:module'
+const _require = createRequire(import.meta.url)
+// All require() calls are transformed to _require()
 
 ```
 
