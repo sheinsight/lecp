@@ -192,18 +192,19 @@ impl VisitMut for TransformShims {
         }
     }
 
-    // cjs support {filename,dirname} = import.meta
-    // 删除 ctxt 同一个 scope 中的 import.meta
-    // ident -> dirname -> import.meta.dirname, filename -> import.meta.filename
+    // CJS support: Transform destructured import.meta variables
+    // e.g., const { dirname, filename } = import.meta
+    // Maps the destructured identifiers to their import.meta property names
     fn visit_mut_var_declarator(&mut self, v: &mut VarDeclarator) {
         v.visit_mut_children_with(self);
 
+        // Only process for CJS target
         if self.config.target == Target::CJS {
-            let is_import_meta = v.init.as_ref().is_some_and(|init| {
-                matches!(&**init, Expr::MetaProp(MetaPropExpr { kind, .. }) if *kind == MetaPropKind::ImportMeta)
-            });
-
-            if is_import_meta {
+            // Check if this is destructuring from import.meta
+            if let Some(Expr::MetaProp(MetaPropExpr { kind: MetaPropKind::ImportMeta, .. })) =
+                v.init.as_deref()
+            {
+                // Extract the destructured property names and map them
                 if let Pat::Object(ObjectPat { props, .. }) = &v.name {
                     props.iter().for_each(|prop| match prop {
                         ObjectPatProp::KeyValue(KeyValuePatProp { key, value, .. }) => {
@@ -211,7 +212,6 @@ impl VisitMut for TransformShims {
                                 self.id_map.insert(ident.to_id(), name.sym.to_string());
                             }
                         }
-
                         ObjectPatProp::Assign(assign) => {
                             self.id_map.insert(assign.key.to_id(), assign.key.sym.to_string());
                         }
@@ -219,6 +219,7 @@ impl VisitMut for TransformShims {
                     });
                 }
 
+                // Mark the declarator for removal
                 v.name.take();
             }
         }
@@ -229,15 +230,8 @@ impl VisitMut for TransformShims {
     fn visit_mut_var_declarators(&mut self, vars: &mut Vec<VarDeclarator>) {
         vars.visit_mut_children_with(self);
 
-        vars.retain(|node| {
-            // We want to remove the node, so we should return false.
-            if node.name.is_invalid() {
-                return false;
-            }
-
-            // Return true if we want to keep the node.
-            true
-        });
+        // Remove declarators with invalid names (those marked for removal)
+        vars.retain(|node| !node.name.is_invalid());
     }
 
     // const ; -> ;
@@ -263,48 +257,48 @@ impl VisitMut for TransformShims {
     fn visit_mut_module_items(&mut self, items: &mut Vec<ModuleItem>) {
         items.visit_mut_children_with(self);
 
-        // Check if imports already exist using helper function
-        let has_import_url = has_import_specifier(items, "node:url", "fileURLToPath");
-        let has_import_create_require = has_import_specifier(items, "node:module", "createRequire");
-
         // Add import { fileURLToPath } from "node:url" for legacy ESM
-        if self.config.target == Target::ESM
-            && self.config.legacy
-            && self.has_legacy_transform
-            && !has_import_url
-        {
-            let import_decl = create_import_decl(private_ident!("fileURLToPath"), None, "node:url");
-            items.insert(0, ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+        if self.config.target == Target::ESM && self.config.legacy && self.has_legacy_transform {
+            // Only check if import exists when we need to add it
+            if !has_import_specifier(items, "node:url", "fileURLToPath") {
+                let import_decl =
+                    create_import_decl(private_ident!("fileURLToPath"), None, "node:url");
+                items.insert(0, ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+            }
         }
 
         // Add import { createRequire } from "node:module" and const _require = createRequire(import.meta.url)
-        if self.config.target == Target::ESM
-            && self.has_require_transform
-            && !has_import_create_require
-        {
-            // Create or reuse the shared identifier for createRequire
-            let create_require_ident = self
-                .create_require_ident
-                .get_or_insert_with(|| private_ident!("_createRequire"))
-                .clone();
+        if self.config.target == Target::ESM && self.has_require_transform {
+            // Only check if import exists when we need to add it
+            if !has_import_specifier(items, "node:module", "createRequire") {
+                // Create or reuse the shared identifier for createRequire
+                let create_require_ident = self
+                    .create_require_ident
+                    .get_or_insert_with(|| private_ident!("_createRequire"))
+                    .clone();
 
-            // Use the same _require identifier that was created during visit_mut_ident
-            let require_ident =
-                self.require_ident.as_ref().cloned().unwrap_or_else(|| private_ident!("_require"));
+                // Use the same _require identifier that was created during visit_mut_ident
+                let require_ident = self
+                    .require_ident
+                    .as_ref()
+                    .cloned()
+                    .unwrap_or_else(|| private_ident!("_require"));
 
-            // const _require = _createRequire(import.meta.url);
-            let require_var_decl =
-                create_require_var_decl(require_ident, create_require_ident.clone());
+                // const _require = _createRequire(import.meta.url);
+                let require_var_decl =
+                    create_require_var_decl(require_ident, create_require_ident.clone());
 
-            // import { createRequire as _createRequire } from "node:module";
-            let import_decl = create_import_decl(
-                create_require_ident,
-                Some(private_ident!("createRequire")),
-                "node:module",
-            );
+                // import { createRequire as _createRequire } from "node:module";
+                let import_decl = create_import_decl(
+                    create_require_ident,
+                    Some(private_ident!("createRequire")),
+                    "node:module",
+                );
 
-            items.insert(0, ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
-            items.insert(1, ModuleItem::Stmt(Stmt::Decl(Decl::Var(Box::new(require_var_decl)))));
+                items.insert(0, ModuleItem::ModuleDecl(ModuleDecl::Import(import_decl)));
+                items
+                    .insert(1, ModuleItem::Stmt(Stmt::Decl(Decl::Var(Box::new(require_var_decl)))));
+            }
         }
     }
 }
