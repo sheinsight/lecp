@@ -15,7 +15,7 @@ describe("bundless shims ok", async () => {
 		expect(content).toContain("import.meta.dirname");
 		expect(content).not.toContain("__dirname");
 		expect(content).toContain("import.meta.url");
-		expect(content).toContain("_require");
+		expect(content).toContain("__require");
 		expect(content).toContain("createRequire");
 	});
 

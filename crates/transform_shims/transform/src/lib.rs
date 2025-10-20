@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use serde::Deserialize;
 use swc_core::common::DUMMY_SP;
 use swc_core::common::util::take::Take;
-
 use swc_core::ecma::ast::{
     CallExpr, Callee, Decl, Expr, ExprOrSpread, Id, Ident, ImportDecl, ImportNamedSpecifier,
     ImportSpecifier, KeyValuePatProp, MemberExpr, MemberProp, MetaPropExpr, MetaPropKind,
@@ -82,7 +81,7 @@ fn create_import_decl(local: Ident, imported: Option<Ident>, module: &str) -> Im
     }
 }
 
-/// Create a require variable declaration: const _require = _createRequire(import.meta.url)
+/// Create a require variable declaration: const __require = _createRequire(import.meta.url)
 fn create_require_var_decl(require_ident: Ident, create_require_ident: Ident) -> VarDecl {
     VarDecl {
         span: DUMMY_SP,
@@ -121,10 +120,10 @@ impl VisitMut for TransformShims {
     fn visit_mut_ident(&mut self, i: &mut Ident) {
         match self.config.target {
             Target::ESM => {
-                // ESM: require -> _require (using the shared identifier)
+                // ESM: require -> __require (using the shared identifier)
                 if i.sym.as_ref() == "require" {
                     let require_ident =
-                        self.require_ident.get_or_insert_with(|| private_ident!("_require"));
+                        self.require_ident.get_or_insert_with(|| private_ident!("__require"));
                     *i = require_ident.clone();
                     self.has_require_transform = true;
                     return;
@@ -267,7 +266,7 @@ impl VisitMut for TransformShims {
             }
         }
 
-        // Add import { createRequire } from "node:module" and const _require = createRequire(import.meta.url)
+        // Add import { createRequire } from "node:module" and const __require = createRequire(import.meta.url)
         if self.config.target == Target::ESM && self.has_require_transform {
             // Only check if import exists when we need to add it
             if !has_import_specifier(items, "node:module", "createRequire") {
@@ -277,14 +276,14 @@ impl VisitMut for TransformShims {
                     .get_or_insert_with(|| private_ident!("_createRequire"))
                     .clone();
 
-                // Use the same _require identifier that was created during visit_mut_ident
+                // Use the same __require identifier that was created during visit_mut_ident
                 let require_ident = self
                     .require_ident
                     .as_ref()
                     .cloned()
-                    .unwrap_or_else(|| private_ident!("_require"));
+                    .unwrap_or_else(|| private_ident!("__require"));
 
-                // const _require = _createRequire(import.meta.url);
+                // const __require = _createRequire(import.meta.url);
                 let require_var_decl =
                     create_require_var_decl(require_ident, create_require_ident.clone());
 
@@ -464,9 +463,9 @@ mod tests {
         "#, // Input codes,
         r#"
             import { createRequire as _createRequire } from "node:module";
-            const _require = _createRequire(import.meta.url);
-            const fs = _require('fs');
-            const path = _require('path');
+            const __require = _createRequire(import.meta.url);
+            const fs = __require('fs');
+            const path = __require('path');
             console.log(fs, path);
             export {}
         "# // Output codes after transformed with plugin
@@ -477,7 +476,7 @@ mod tests {
         |_| transform(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
         fn_shims_esm_require_4,
         r#"
-            const _require = () => {};
+            const __require = () => {};
             const _createRequire = () => {};
             const fs = require('fs');
             const path = require('path');
@@ -486,11 +485,11 @@ mod tests {
         "#, // Input codes,
         r#"
             import { createRequire as _createRequire } from "node:module";
-            const _require = _createRequire(import.meta.url);
-            const _require1 = ()=>{};
+            const __require = _createRequire(import.meta.url);
+            const __require1 = ()=>{};
             const _createRequire1 = ()=>{};
-            const fs = _require('fs');
-            const path = _require('path');
+            const fs = __require('fs');
+            const path = __require('path');
             console.log(fs, path);
             export {}
         "# // Output codes after transformed with plugin
@@ -508,9 +507,9 @@ mod tests {
         "#, // Input codes,
         r#"
             import { createRequire as _createRequire } from "node:module";
-            const _require = _createRequire(import.meta.url);
+            const __require = _createRequire(import.meta.url);
             function loadModule() {
-                return _require('./module.js');
+                return __require('./module.js');
             }
             export {}
         "# // Output codes after transformed with plugin
@@ -527,8 +526,8 @@ mod tests {
         "#, // Input codes,
         r#"
             import { createRequire as _createRequire } from "node:module";
-            const _require = _createRequire(import.meta.url);
-            const fs = _require('fs');
+            const __require = _createRequire(import.meta.url);
+            const fs = __require('fs');
             console.log(import.meta.dirname);
             export {}
         "# // Output codes after transformed with plugin
@@ -547,10 +546,10 @@ mod tests {
         "#, // Input codes,
         r#"
             import { createRequire as _createRequire } from "node:module";
-            const _require = _createRequire(import.meta.url);
+            const __require = _createRequire(import.meta.url);
             const createRequire1 = ()=>{};
-            const fs = _require('fs');
-            const path = _require('path');
+            const fs = __require('fs');
+            const path = __require('path');
             console.log(fs, path);
             export {}
         "# // Output codes after transformed with plugin
