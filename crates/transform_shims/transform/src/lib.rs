@@ -1,14 +1,15 @@
 use std::collections::HashMap;
 
 use serde::Deserialize;
-use swc_core::common::DUMMY_SP;
 use swc_core::common::util::take::Take;
+use swc_core::common::{DUMMY_SP, Mark, SyntaxContext};
 use swc_core::ecma::ast::{
     CallExpr, Callee, Decl, Expr, ExprOrSpread, Id, Ident, ImportDecl, ImportNamedSpecifier,
     ImportSpecifier, KeyValuePatProp, MemberExpr, MemberProp, MetaPropExpr, MetaPropKind,
     ModuleDecl, ModuleExportName, ModuleItem, ObjectPat, ObjectPatProp, Pass, Pat, PropName, Stmt,
     VarDecl, VarDeclKind, VarDeclarator,
 };
+use swc_core::ecma::transforms::base::resolver;
 use swc_core::ecma::utils::{private_ident, quote_str};
 use swc_core::ecma::visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass};
 
@@ -38,6 +39,7 @@ struct TransformShims {
     has_require_transform: bool,
     require_ident: Option<Ident>,
     create_require_ident: Option<Ident>,
+    unresolved_ctxt: SyntaxContext,
 }
 
 const CJS_DIRNAME: &str = "__dirname";
@@ -52,15 +54,14 @@ const ESM_FILENAME_LEGACY: &str = "fileURLToPath(import.meta.url)";
 /// Check if the module items contain a specific import specifier from a module
 fn has_import_specifier(items: &[ModuleItem], module: &str, specifier: &str) -> bool {
     items.iter().any(|item| {
-        if let ModuleItem::ModuleDecl(ModuleDecl::Import(decl)) = item {
-            decl.src.value == module
-                && decl.specifiers.iter().any(|spec| {
-                    matches!(spec, ImportSpecifier::Named(ImportNamedSpecifier { local, .. })
-                        if local.sym.as_ref() == specifier)
-                })
-        } else {
-            false
-        }
+        matches!(item,
+            ModuleItem::ModuleDecl(ModuleDecl::Import(decl))
+            if decl.src.value == module
+            && decl.specifiers.iter().any(|spec| {
+                matches!(spec, ImportSpecifier::Named(ImportNamedSpecifier { local, .. })
+                    if local.sym.as_ref() == specifier)
+            })
+        )
     })
 }
 
@@ -130,24 +131,22 @@ impl VisitMut for TransformShims {
                 }
 
                 // Transform __dirname and __filename for ESM
-                // Note: does not consider scope shadowing of __dirname, __filename
-                let sym = match i.sym.as_ref() {
-                    "__dirname" => {
-                        if self.config.legacy {
-                            self.has_legacy_transform = true;
-                            ESM_DIRNAME_LEGACY
-                        } else {
-                            ESM_DIRNAME
-                        }
+                // Check if the identifier is in the unresolved scope (not shadowed)
+                if i.ctxt != self.unresolved_ctxt {
+                    return;
+                }
+
+                let sym = match (i.sym.as_ref(), self.config.legacy) {
+                    ("__dirname", true) => {
+                        self.has_legacy_transform = true;
+                        ESM_DIRNAME_LEGACY
                     }
-                    "__filename" => {
-                        if self.config.legacy {
-                            self.has_legacy_transform = true;
-                            ESM_FILENAME_LEGACY
-                        } else {
-                            ESM_FILENAME
-                        }
+                    ("__dirname", false) => ESM_DIRNAME,
+                    ("__filename", true) => {
+                        self.has_legacy_transform = true;
+                        ESM_FILENAME_LEGACY
                     }
+                    ("__filename", false) => ESM_FILENAME,
                     _ => return,
                 };
                 i.sym = sym.into();
@@ -303,14 +302,21 @@ impl VisitMut for TransformShims {
 }
 
 pub fn transform(config: Config) -> impl Pass {
-    visit_mut_pass(TransformShims {
-        config,
-        id_map: HashMap::with_capacity(4),
-        has_legacy_transform: false,
-        has_require_transform: false,
-        require_ident: None,
-        create_require_ident: None,
-    })
+    let unresolved_mark = Mark::new();
+    let top_level_mark = Mark::new();
+
+    (
+        resolver(unresolved_mark, top_level_mark, true),
+        visit_mut_pass(TransformShims {
+            config,
+            id_map: HashMap::new(),
+            has_legacy_transform: false,
+            has_require_transform: false,
+            require_ident: None,
+            create_require_ident: None,
+            unresolved_ctxt: SyntaxContext::empty().apply_mark(unresolved_mark),
+        }),
+    )
 }
 
 #[cfg(test)]
@@ -551,6 +557,132 @@ mod tests {
             const fs = __require('fs');
             const path = __require('path');
             console.log(fs, path);
+            export {}
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| transform(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
+        fn_shims_esm_dirname_shadowing,
+        r#"
+            // Global usage should be transformed
+            console.log(__dirname, __filename);
+
+            function test1() {
+                // Local shadowing should NOT be transformed
+                const __dirname = "/custom/path";
+                const __filename = "/custom/file.js";
+                console.log(__dirname, __filename);
+            }
+
+            // Global usage should be transformed again
+            console.log(__dirname);
+            export {}
+        "#, // Input codes,
+        r#"
+            // Global usage should be transformed
+            console.log(import.meta.dirname, import.meta.filename);
+
+            function test1() {
+                // Local shadowing should NOT be transformed
+                const __dirname = "/custom/path";
+                const __filename = "/custom/file.js";
+                console.log(__dirname, __filename);
+            }
+
+            // Global usage should be transformed again
+            console.log(import.meta.dirname);
+            export {}
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| transform(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
+        fn_shims_esm_dirname_shadowing_nested,
+        r#"
+            console.log(__dirname);
+
+            function outer() {
+                console.log(__dirname); // Should transform
+
+                function inner() {
+                    const __dirname = "inner";
+                    console.log(__dirname); // Should NOT transform (shadowed)
+                }
+
+                console.log(__dirname); // Should transform
+            }
+            export {}
+        "#, // Input codes,
+        r#"
+            console.log(import.meta.dirname);
+
+            function outer() {
+                console.log(import.meta.dirname); // Should transform
+
+                function inner() {
+                    const __dirname = "inner";
+                    console.log(__dirname); // Should NOT transform (shadowed)
+                }
+
+                console.log(import.meta.dirname); // Should transform
+            }
+            export {}
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| transform(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
+        fn_shims_esm_dirname_shadowing_block_scope,
+        r#"
+            console.log(__dirname);
+
+            {
+                const __dirname = "block";
+                console.log(__dirname); // Should NOT transform (block scope)
+            }
+
+            console.log(__dirname); // Should transform
+            export {}
+        "#, // Input codes,
+        r#"
+            console.log(import.meta.dirname);
+
+            {
+                const __dirname = "block";
+                console.log(__dirname); // Should NOT transform (block scope)
+            }
+
+            console.log(import.meta.dirname); // Should transform
+            export {}
+        "# // Output codes after transformed with plugin
+    );
+
+    test_inline!(
+        Default::default(),
+        |_| transform(serde_json::from_str(r#"{"target":"esm"}"#).unwrap()),
+        fn_shims_esm_dirname_shadowing_param,
+        r#"
+            console.log(__dirname);
+
+            function test(__dirname, __filename) {
+                console.log(__dirname, __filename); // Should NOT transform (params)
+            }
+
+            console.log(__dirname); // Should transform
+            export {}
+        "#, // Input codes,
+        r#"
+            console.log(import.meta.dirname);
+
+            function test(__dirname, __filename) {
+                console.log(__dirname, __filename); // Should NOT transform (params)
+            }
+
+            console.log(import.meta.dirname); // Should transform
             export {}
         "# // Output codes after transformed with plugin
     );
