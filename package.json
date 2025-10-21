@@ -33,11 +33,11 @@
 	"license": "MIT",
 	"description": "",
 	"devDependencies": {
-		"@biomejs/biome": "^2.2.5",
+		"@biomejs/biome": "^2.2.6",
 		"@rspress/core": "2.0.0-beta.34",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.3.1",
-		"oxlint": "^1.22.0",
+		"oxlint": "^1.23.0",
 		"tinyglobby": "^0.2.15",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
