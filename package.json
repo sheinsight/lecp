@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"packageManager": "pnpm@10.18.3",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"files": [],
 	"repository": {
 		"type": "git",
@@ -21,11 +21,12 @@
 		"build": "pnpm build:rust && pnpm build:node",
 		"build:rust": "pnpm --filter=\"./crates/**\" build",
 		"build:node": "pnpm --filter=\"./packages/**\" build",
+		"build:binding": "pnpm --filter=\"./crates/node_binding\" build",
 		"doc:build": "rspress build",
 		"doc:dev": "rspress dev",
 		"doc:preview": "rspress preview",
 		"prerelease": "pnpm run test",
-		"release": "bumpp -r --no-push"
+		"release": "bumpp -r --no-push && pnpm run build:binding && TAG=$(git describe --tags --abbrev=0) && git add . && git commit --amend --no-edit && git tag -f \"$TAG\""
 	},
 	"keywords": [],
 	"author": "",
