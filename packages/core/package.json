@@ -32,8 +32,8 @@
 		"build": "node ./src/cli.ts"
 	},
 	"dependencies": {
-		"@microsoft/api-extractor": "^7.53.1",
-		"@rspack/core": "1.5.8",
+		"@microsoft/api-extractor": "^7.53.3",
+		"@rspack/core": "1.6.0",
 		"@shined/lecp-binding": "workspace:*",
 		"@svgr-rs/svgrs-plugin": "^0.2.0",
 		"@swc/types": "^0.1.25",
@@ -57,7 +57,7 @@
 	"devDependencies": {
 		"@types/less": "^3.0.8",
 		"@types/node": "catalog:",
-		"@types/yargs": "^17.0.33"
+		"@types/yargs": "^17.0.34"
 	},
 	"peerDependencies": {
 		"@swc/helpers": "^0.5.17"

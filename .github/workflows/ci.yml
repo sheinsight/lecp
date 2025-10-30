@@ -160,9 +160,6 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
           registry-url: https://registry.npmjs.org
-      # npm 11.5.1+ supports OIDC
-      - name: Update npm
-        run: npm install -g npm@latest
       - name: Install dependencies
         run: pnpm install
       # napi
