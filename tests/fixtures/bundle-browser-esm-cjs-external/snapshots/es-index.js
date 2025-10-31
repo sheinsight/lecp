@@ -1,17 +1,14 @@
+import { __webpack_require__ } from "./runtime.js";
 import react from "react";
 import { produce } from "immer";
-;
-;
 const Demo = {
     "title": "demo-component__title",
     "foo": "demo-component__foo"
 };
-;
 const components_Demo = {
     "title": "demo-component__title",
     "foo": "demo-component__foo"
 };
-;
 console.log("styles", components_Demo);
 const Demo_Demo = ()=>{
     return /*#__PURE__*/ React.createElement("div", {
@@ -21,10 +18,7 @@ const Demo_Demo = ()=>{
     }, "Hello, World!"));
 };
 const src_components_Demo = Demo_Demo;
-;
 const sleep = (ms)=>new Promise((resolve)=>setTimeout(resolve, ms));
-;
-;
 const src = ()=>/*#__PURE__*/ react.createElement(src_components_Demo, null);
 const asyncFn = async ()=>{
     await sleep(1000);
@@ -42,6 +36,7 @@ if (typeof window !== "undefined") {
     console.log("Browser environment");
 }
 console.log(produce);
-export { asyncFn, src as default, sleep };
+export default src;
+export { asyncFn, sleep };
 
 //# sourceMappingURL=index.js.map

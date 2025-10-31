@@ -1,3 +1,4 @@
+import rspack from "@rspack/core";
 import type { PluginFn } from "../chain.ts";
 
 export const pluginEsm: PluginFn = chain => {
@@ -14,6 +15,9 @@ export const pluginEsm: PluginFn = chain => {
 	// default -> 'modern-module' invalid (webpack right)
 	chain.externalsType("module-import");
 
+	// output.module:true -> 'module'
+	// chain.output.chunkFormat("module");
+
 	chain.module.parser.set("javascript", {
 		importMeta: false,
 		requireResolve: false, // rspack only, webpack(5.98.0+): /* webpackIgnore: true */ + commonjsMagicComments: true,
@@ -24,4 +28,8 @@ export const pluginEsm: PluginFn = chain => {
 
 	// chain.optimization.concatenateModules(true); // production 默认启用
 	chain.optimization.avoidEntryIife(true); // production (rspack 默认不启用，webpack 默认启用 5.95.0+)
+
+	// rspack@1.6.0+ 支持
+	chain.plugin("esm-lib").use(rspack.experiments.EsmLibraryPlugin);
+	chain.optimization.runtimeChunk("single");
 };
