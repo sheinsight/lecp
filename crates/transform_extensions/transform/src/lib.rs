@@ -20,16 +20,17 @@ pub struct Config {
 }
 
 fn replace_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
+    let path = &src.value.to_atom_lossy().to_string();
     // Only handle relative path
-    if !src.value.starts_with('.') {
+    if !path.starts_with('.') {
         return None;
     }
 
     // with extension
-    let ext = config.extensions.iter().find(|(key, _)| src.value.ends_with(*key));
+    let ext = config.extensions.iter().find(|(key, _)| path.ends_with(*key));
 
     if let Some((key, ext)) = ext {
-        if let Some(name) = src.value.strip_suffix(key) {
+        if let Some(name) = path.strip_suffix(key) {
             return Some(format!("{name}{ext}").into());
         }
     }
