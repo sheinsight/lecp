@@ -2,6 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import ts from "typescript";
 
+// TypeScript file extensions to check
+const TS_EXTENSIONS = new Set([".ts", ".tsx", ".mts", ".cts"]);
+
 // refer: https://github.com/colinhacks/zshy/blob/main/src/tx-extension-rewrite.ts#L6
 export const createExtensionRewriteTransformer =
 	(config: { ext: string }): ts.TransformerFactory<ts.SourceFile | ts.Bundle> =>
@@ -46,9 +49,9 @@ export const createExtensionRewriteTransformer =
 
 					const ext = path.extname(originalText).toLowerCase();
 
-					// rewrite .js to resolved js extension
-					if (ext === ".js" || ext === ".ts") {
-						const newText = originalText.slice(0, -3) + config.ext;
+					// rewrite .js or .ts/.tsx/.mts/.cts to resolved js extension
+					if (ext === ".js" || TS_EXTENSIONS.has(ext)) {
+						const newText = originalText.slice(0, -ext.length) + config.ext;
 						if (isImport) {
 							return ts.factory.updateImportDeclaration(
 								node,
@@ -88,16 +91,23 @@ export const createExtensionRewriteTransformer =
 							const sourceFileDir = path.dirname(sourceFile.fileName);
 							const resolvedPath = path.resolve(sourceFileDir, originalText);
 
-							// Check if the extensionless import refers to a file (e.g., d.ts)
-							const potentialFile = resolvedPath + ".ts";
-							const potentialIndexFile = path.join(resolvedPath, "index.ts");
+							let fileExists = false;
+							for (const ext of TS_EXTENSIONS) {
+								if (fs.existsSync(resolvedPath + ext)) {
+									fileExists = true;
+									break;
+								}
+							}
 
-							if (
-								fs.existsSync(potentialIndexFile) &&
-								!fs.existsSync(potentialFile)
-							) {
-								// Directory with index.ts exists, use index path
-								newText = originalText + "/index" + config.ext;
+							// Only check index files if no direct file was found
+							if (!fileExists) {
+								for (const ext of TS_EXTENSIONS) {
+									if (fs.existsSync(path.join(resolvedPath, "index" + ext))) {
+										// Directory with index.ts/tsx/etc exists, use index path
+										newText = originalText + "/index" + config.ext;
+										break; // Early exit: index found
+									}
+								}
 							}
 							// Otherwise, use the default behavior (originalText + config.ext)
 						}
