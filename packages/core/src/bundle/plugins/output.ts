@@ -28,10 +28,9 @@ export const pluginOutput: PluginFn = (chain, { options, config: { pkg } }) => {
 	chain.module.when(sourcemap, module => {
 		module
 			.rule("source-map")
-			.test(/\.(js|mjs|jsx|ts|tsx|css)$/)
+			.test(/\.m?js$/)
 			.enforce("pre")
-			.use("source-map-loader")
-			.loader(requireResolve("source-map-loader"))
+			.set("extractSourceMap", true)
 			.end();
 	});
 };
