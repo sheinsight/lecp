@@ -1,4 +1,4 @@
-import { getOutJsExt, requireResolve, toUmdName } from "../../util/index.ts";
+import { getOutJsExt, toUmdName } from "../../util/index.ts";
 import type { PluginFn } from "../chain.ts";
 
 const rspackModuleMap = {
