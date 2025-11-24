@@ -1,18 +1,16 @@
 [package]
-name    = "swc_plugin_transform_extensions"
+name    = "swc_transform_extensions"
 version = "0.1.0"
 
-authors      = { workspace = true }
-description  = ""
-edition      = { workspace = true }
-repository   = { workspace = true }
-rust-version = { workspace = true }
-
-[lib]
-crate-type = ["cdylib"]
+authors.workspace      = true
+edition.workspace      = true
+homepage.workspace     = true
+license.workspace      = true
+repository.workspace   = true
+rust-version.workspace = true
 
 [dependencies]
-serde                    = { workspace = true }
-serde_json               = { workspace = true }
-swc_core                 = { workspace = true, features = ["ecma_plugin_transform"] }
-swc_transform_extensions = { path = "./transform" }
+path-absolutize = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+swc_core        = { workspace = true, features = ["ecma_visit", "ecma_ast", "common", "ecma_transforms", "testing_transform"] }

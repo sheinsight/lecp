@@ -87,7 +87,15 @@ pub fn transform_file(
                             }
 
                             let extensions_pass = swc_transform_extensions::transform(
-                                swc_transform_extensions::Config { extensions: extensions_map },
+                                swc_transform_extensions::Config {
+                                    extensions: extensions_map,
+                                    source_dir: Some(
+                                        bundless_options.src_dir().to_string_lossy().to_string(),
+                                    ),
+                                    current_dir: file
+                                        .parent()
+                                        .map(|p| p.to_string_lossy().to_string()),
+                                },
                             );
 
                             (ts2js_pass, extensions_pass)
@@ -120,7 +128,15 @@ pub fn transform_file(
                             }
 
                             let extensions_pass = swc_transform_extensions::transform(
-                                swc_transform_extensions::Config { extensions: extensions_map },
+                                swc_transform_extensions::Config {
+                                    extensions: extensions_map,
+                                    source_dir: Some(
+                                        bundless_options.src_dir().to_string_lossy().to_string(),
+                                    ),
+                                    current_dir: file
+                                        .parent()
+                                        .map(|p| p.to_string_lossy().to_string()),
+                                },
                             );
 
                             // css modules

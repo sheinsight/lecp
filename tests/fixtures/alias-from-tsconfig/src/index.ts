@@ -10,3 +10,8 @@ console.log(c0, c1, c2);
 	const { a: d2 } = await import("@/util/index.ts");
 	console.log(d0, d1, d2);
 })();
+
+// 如果涉及到修改后缀, 暂不支持 @@/read-pkg 这种形式的别名，需要指定到具体文件
+import readPkg, { readPackageSync } from "@@/read-pkg/index.js";
+
+console.log(readPkg, readPackageSync);

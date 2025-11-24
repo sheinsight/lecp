@@ -3403,16 +3403,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "swc_plugin_transform_extensions"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "swc_core",
- "swc_transform_extensions",
-]
-
-[[package]]
 name = "swc_plugin_transform_shims"
 version = "0.1.0"
 dependencies = [
@@ -3495,6 +3485,7 @@ dependencies = [
 name = "swc_transform_extensions"
 version = "0.1.0"
 dependencies = [
+ "path-absolutize",
  "serde",
  "serde_json",
  "swc_core",
