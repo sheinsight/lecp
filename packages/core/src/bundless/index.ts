@@ -104,7 +104,7 @@ export const bundlessFiles = async (
 
 	// 清除文件
 	if (clean) {
-		logger.info(`clear directory: ${outDir.replace(cwd, ".")}`);
+		logger.info(`🧹 clear directory: ${outDir.replace(cwd, ".")}`);
 		await fs.rm(outDir, { recursive: true, force: true });
 	}
 
