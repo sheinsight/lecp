@@ -68,8 +68,6 @@ importers:
 
   crates/transform_define: {}
 
-  crates/transform_extensions: {}
-
   crates/transform_shims: {}
 
   crates/transform_ts2js: {}
