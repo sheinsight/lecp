@@ -1,4 +1,6 @@
+;
 const sleep = (ms)=>new Promise((resolve)=>setTimeout(resolve, ms));
+;
 const asyncFn = async ()=>{
     await sleep(1000);
     console.log("Async function executed");

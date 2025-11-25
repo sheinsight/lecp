@@ -23,7 +23,7 @@ export const pluginCjs: PluginFn = chain => {
 
 	chain.module.parser.set("javascript", {
 		importMeta: false,
-		requireResolve: false, // rspack only, webpack(5.98.0+): /* webpackIgnore: true */ + commonjsMagicComments: true,
+		requireResolve: false, // rspack only, webpack@5.98.0+: /* webpackIgnore: true */ + commonjsMagicComments: true,
 		requireAsExpression: false, // rspack only
 		requireDynamic: false, // rspack only, webpack: /* webpackIgnore: true */
 		importDynamic: false, // rspack only, webpack: /* webpackIgnore: true */
