@@ -1,14 +1,10 @@
 use serde_json::Value;
-use swc_core::{
-    common::DUMMY_SP,
-    ecma::{
-        ast::{
-            ArrayLit, Expr, ExprOrSpread, Ident, ImportSpecifier, KeyValueProp, Lit, MemberExpr,
-            MemberProp, ObjectLit, Pass, Prop, PropName, PropOrSpread, UnaryOp,
-        },
-        visit::{VisitMut, VisitMutWith, visit_mut_pass},
-    },
+use swc_core::common::DUMMY_SP;
+use swc_core::ecma::ast::{
+    ArrayLit, Expr, ExprOrSpread, Ident, ImportSpecifier, KeyValueProp, Lit, MemberExpr,
+    MemberProp, ObjectLit, Pass, Prop, PropName, PropOrSpread, UnaryOp,
 };
+use swc_core::ecma::visit::{VisitMut, VisitMutWith, visit_mut_pass};
 
 #[derive(Default)]
 pub struct TransformDefine {
@@ -161,8 +157,9 @@ fn create_expr(value: Value) -> Option<Expr> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use swc_core::ecma::transforms::testing::test_inline;
+
+    use super::*;
 
     test_inline!(
         Default::default(),

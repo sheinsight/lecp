@@ -49,7 +49,12 @@ export function getRspackConfig(
 	chain.cache(watch).experiments({ cache: watch });
 
 	// perf
-	chain.experiments({ nativeWatcher: true, lazyBarrel: true });
+	chain.experiments({ nativeWatcher: true });
+
+	// remove useless code
+	chain.experiments({
+		rspackFuture: { bundlerInfo: { force: false } },
+	});
 
 	[
 		pluginOutput,

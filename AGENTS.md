@@ -68,13 +68,13 @@ pnpm format
 ### Documentation
 ```bash
 # Start docs dev server
-pnpm doc:dev
+pnpm docs:dev
 
 # Build documentation
-pnpm doc:build
+pnpm docs:build
 
 # Preview built docs
-pnpm doc:preview
+pnpm docs:preview
 ```
 
 ## Configuration System

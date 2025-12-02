@@ -6,7 +6,7 @@ const _dirname = path.dirname(_filename);
 console.log(_dirname, _filename);
 
 // write cjs in esm
-console.log(__dirname, __filename);
+console.log(__dirname, __filename, require);
 
 // write esm in cjs
 console.log(import.meta.dirname);

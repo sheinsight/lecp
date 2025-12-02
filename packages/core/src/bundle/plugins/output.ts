@@ -1,4 +1,4 @@
-import { getOutJsExt, requireResolve, toUmdName } from "../../util/index.ts";
+import { getOutJsExt, toUmdName } from "../../util/index.ts";
 import type { PluginFn } from "../chain.ts";
 
 const rspackModuleMap = {
@@ -28,10 +28,9 @@ export const pluginOutput: PluginFn = (chain, { options, config: { pkg } }) => {
 	chain.module.when(sourcemap, module => {
 		module
 			.rule("source-map")
-			.test(/\.(js|mjs|jsx|ts|tsx|css)$/)
+			.test(/\.m?js$/)
 			.enforce("pre")
-			.use("source-map-loader")
-			.loader(requireResolve("source-map-loader"))
+			.set("extractSourceMap", true)
 			.end();
 	});
 };

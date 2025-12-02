@@ -1,12 +1,14 @@
+use std::collections::HashMap;
+use std::path::Path;
+use std::sync::Arc;
+
 use anyhow::{Context, Result};
 use log::debug;
-use std::collections::HashMap;
-use std::{path::Path, sync::Arc};
-use swc_core::{
-    base::{Compiler, TransformOutput, config::Options, try_with_handler},
-    common::{GLOBALS, SourceMap, comments::SingleThreadedComments},
-    ecma::ast::{Pass, noop_pass},
-};
+use swc_core::base::config::Options;
+use swc_core::base::{Compiler, TransformOutput, try_with_handler};
+use swc_core::common::comments::SingleThreadedComments;
+use swc_core::common::{GLOBALS, SourceMap};
+use swc_core::ecma::ast::{Pass, noop_pass};
 
 use crate::util::write_file;
 use crate::{BundlessOptions, ModuleType};
@@ -85,7 +87,15 @@ pub fn transform_file(
                             }
 
                             let extensions_pass = swc_transform_extensions::transform(
-                                swc_transform_extensions::Config { extensions: extensions_map },
+                                swc_transform_extensions::Config {
+                                    extensions: extensions_map,
+                                    source_dir: Some(
+                                        bundless_options.src_dir().to_string_lossy().to_string(),
+                                    ),
+                                    current_dir: file
+                                        .parent()
+                                        .map(|p| p.to_string_lossy().to_string()),
+                                },
                             );
 
                             (ts2js_pass, extensions_pass)
@@ -118,7 +128,15 @@ pub fn transform_file(
                             }
 
                             let extensions_pass = swc_transform_extensions::transform(
-                                swc_transform_extensions::Config { extensions: extensions_map },
+                                swc_transform_extensions::Config {
+                                    extensions: extensions_map,
+                                    source_dir: Some(
+                                        bundless_options.src_dir().to_string_lossy().to_string(),
+                                    ),
+                                    current_dir: file
+                                        .parent()
+                                        .map(|p| p.to_string_lossy().to_string()),
+                                },
                             );
 
                             // css modules

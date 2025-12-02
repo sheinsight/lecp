@@ -21,6 +21,10 @@ describe("bundless alias ok", async () => {
 		expect(content).toContain("./util/index.cjs");
 		expect(content).not.toContain("@/util");
 		expect(content).not.toContain("util/index.ts");
+
+		// 非 src 下的后缀不需要转换
+		expect(content).toContain("../compiled/read-pkg/index.js");
+		expect(content).not.toContain("../compiled/read-pkg/index.cjs");
 	});
 
 	// TODO: swc.module.ignoreDynamic, import("@/util") 不转换

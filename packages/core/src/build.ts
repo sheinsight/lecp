@@ -65,7 +65,7 @@ export const build = async (
 
 		const { outDir, dts } = finalOptions;
 
-		logger.info(`${colors.white(`${mode} ${formatOptions.type}`)}\n`);
+		logger.info(`🚀 ${colors.white(`${mode} ${formatOptions.type}`)}\n`);
 
 		const { duration } = await measure(async () => {
 			if (mode === "bundless") {
@@ -85,7 +85,7 @@ export const build = async (
 			}
 		});
 
-		logger.info(`${mode} ${formatOptions.type} in ${duration}ms`);
+		logger.info(`⏳ ${mode} ${formatOptions.type} in ${duration}ms`);
 
 		if (dts) {
 			logger.info(`generate dts (${dts.mode})`);
@@ -113,7 +113,7 @@ export const build = async (
 				}
 			});
 
-			logger.info(`dts generated in ${duration}ms`);
+			logger.info(`⏳ dts generated in ${duration}ms`);
 		}
 
 		return taskWatchers;

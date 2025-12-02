@@ -1,6 +1,6 @@
 {
 	"name": "@shined/lecp-binding",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"license": "MIT",
 	"engines": {
 		"node": ">= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0"
@@ -43,7 +43,7 @@
 		"demo": "node --experimental-strip-types demo.mts"
 	},
 	"devDependencies": {
-		"@napi-rs/cli": "3.2.0",
+		"@napi-rs/cli": "3.4.1",
 		"@types/node": "catalog:"
 	},
 	"optionalDependencies": {

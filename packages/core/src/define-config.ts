@@ -1,4 +1,5 @@
 import type { Configuration as RspackConfig } from "@rspack/core";
+import type { Options as SwcOptions } from "@swc/types";
 import type Less from "less";
 import type { TransformOptions as LightningCssTransformOptions } from "lightningcss";
 import type RspackChain from "rspack-chain";
@@ -287,6 +288,11 @@ export interface UserConfig {
 	 * @default true
 	 */
 	clean?: boolean;
+
+	/**
+	 * swc 编译选项
+	 */
+	swcOptions?: SwcOptions;
 }
 
 export type UserConfigFn = () => UserConfig | Promise<UserConfig>;

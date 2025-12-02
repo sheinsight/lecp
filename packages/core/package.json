@@ -1,6 +1,6 @@
 {
 	"name": "@shined/lecp",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "",
 	"keywords": [],
 	"license": "MIT",
@@ -32,23 +32,22 @@
 		"build": "node ./src/cli.ts"
 	},
 	"dependencies": {
-		"@microsoft/api-extractor": "^7.52.13",
-		"@rspack/core": "1.5.5",
+		"@microsoft/api-extractor": "^7.55.1",
+		"@rspack/core": "1.6.5",
 		"@shined/lecp-binding": "workspace:*",
 		"@svgr-rs/svgrs-plugin": "^0.2.0",
 		"@swc/types": "^0.1.25",
-		"chokidar": "^4.0.3",
+		"chokidar": "^5.0.0",
 		"css-loader": "^7.1.2",
 		"deepmerge": "^4.3.1",
-		"jiti": "^2.5.1",
-		"less": "^4.4.1",
+		"jiti": "^2.6.1",
+		"less": "^4.4.2",
 		"less-loader": "^12.3.0",
-		"lightningcss": "^1.30.1",
+		"lightningcss": "^1.30.2",
 		"node-polyfill-webpack-plugin": "^4.1.0",
 		"picocolors": "^1.1.1",
-		"read-pkg": "^9.0.1",
+		"read-pkg": "^10.0.0",
 		"rspack-chain": "^1.4.1",
-		"source-map-loader": "^5.0.0",
 		"tinyglobby": "^0.2.15",
 		"typescript": "catalog:",
 		"typescript-transform-paths": "^3.5.5",
@@ -56,7 +55,8 @@
 	},
 	"devDependencies": {
 		"@types/less": "^3.0.8",
-		"@types/node": "catalog:"
+		"@types/node": "catalog:",
+		"@types/yargs": "^17.0.35"
 	},
 	"peerDependencies": {
 		"@swc/helpers": "^0.5.17"

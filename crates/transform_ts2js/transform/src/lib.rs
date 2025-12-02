@@ -1,8 +1,6 @@
 use serde::Deserialize;
-use swc_core::ecma::{
-    ast::{self, Pass},
-    visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass},
-};
+use swc_core::ecma::ast::{self, Pass};
+use swc_core::ecma::visit::{VisitMut, VisitMutWith, noop_visit_mut_type, visit_mut_pass};
 
 #[derive(Clone, Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -20,7 +18,7 @@ fn replace_ts_extension(src: &ast::Str, config: &Config) -> Option<ast::Str> {
     //     return None;
     // }
 
-    let path = &src.value;
+    let path = &src.value.to_atom_lossy().to_string();
     TS_EXTENSIONS.iter().find_map(|(ts_ext, js_ext)| {
         if path.ends_with(ts_ext) && !path.ends_with(&format!(".d{ts_ext}")) {
             let ext = if config.preserve_import_extension { js_ext } else { ".js" };
@@ -91,8 +89,9 @@ pub fn transform(config: Config) -> impl Pass {
 #[cfg(test)]
 mod tests {
 
-    use super::*;
     use swc_core::ecma::transforms::testing::test_inline;
+
+    use super::*;
 
     test_inline!(
         Default::default(),

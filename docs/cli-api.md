@@ -42,6 +42,6 @@ const config = defineConfig({
 });
 
 // build
-const await build(config);
+const result = await build(config);
 ```
 

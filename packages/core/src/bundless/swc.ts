@@ -180,8 +180,8 @@ export const getSwcOptions = (
 				// outFileExtension: outJsExt.slice(1), // 1.10.1+ 支持
 			},
 			minify,
-			env: { targets },
 			sourceMaps: sourcemap,
+			env: { targets },
 		} as SwcOptions,
 	]);
 };

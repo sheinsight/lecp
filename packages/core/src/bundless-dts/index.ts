@@ -66,6 +66,7 @@ export const getDiagnosticsLog = (diagnostics?: ts.Diagnostic[]): string => {
 export const getTsConfigFileContent = (options: {
 	cwd: string;
 	exclude?: string[];
+	include?: string[];
 }): ts.ParsedCommandLine => {
 	const { cwd, exclude = [] } = options;
 	const configFile = ts.findConfigFile(cwd, ts.sys.fileExists);
@@ -83,7 +84,7 @@ export const getTsConfigFileContent = (options: {
 	// extends includes 文件是相对于当前文件的. 继承后的路径不是想要的,如果不重新指定的话
 	// ['src/**/*'] -> ['../../src/**/*']  (extends: '../../tsconfig.json')
 	// 如何根据 extends 还原相对路径? 暂时写死 ['src/**/*']
-	config.include = ["src/**/*"]; // 影响 fileNames 生成
+	config.include = options.include ?? ["src/**/*"]; // 影响 fileNames 生成
 	config.exclude = testPatternForTs.concat(config.exclude || [], exclude);
 
 	return ts.parseJsonConfigFileContent(config, ts.sys, cwd);
@@ -98,7 +99,7 @@ const bundlessEmitDts = async (
 	onSuccess?: () => void,
 ): Promise<Watcher | void> => {
 	const { cwd, watch } = config;
-	const { outDir: typesDir, type: format, targets } = bundlessOptions;
+	const { outDir: typesDir, type: format, targets, entry } = bundlessOptions;
 
 	const outJsExt = getOutJsExt(
 		!!targets.node,
@@ -106,7 +107,11 @@ const bundlessEmitDts = async (
 		format,
 	);
 
-	const { fileNames, options } = getTsConfigFileContent({ cwd, exclude: [] });
+	const { fileNames, options } = getTsConfigFileContent({
+		cwd,
+		include: [entry],
+		exclude: [],
+	});
 	logger.debug("dts 编译文件: ", fileNames);
 
 	// 没有文件提前退出
