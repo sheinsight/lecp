@@ -129,6 +129,7 @@ const bundlessEmitDts = async (
 		outDir: typesDir,
 		declarationDir: typesDir,
 		incremental: false,
+		rootDir: entry,
 	};
 
 	// 暂时优先使用内部配置.可以优化速度
