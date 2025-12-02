@@ -1,5 +1,14 @@
 # 更新日志
 
+# 0.2.0
+2025-12-02
+
+- 💥 支持传入 `swcOptions`
+- 🐞 修复 bundless js 未识别 `entry`
+- 🐞 修复 bundless dts 未识别 `entry`
+- 🏰: bump dependencies
+> rspack@1.6.5, swc_core@49
+
 # 0.1.2
 2025-11-25
 
