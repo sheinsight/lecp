@@ -33,11 +33,11 @@
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.55.1",
-		"@rspack/core": "1.6.4",
+		"@rspack/core": "1.6.5",
 		"@shined/lecp-binding": "workspace:*",
 		"@svgr-rs/svgrs-plugin": "^0.2.0",
 		"@swc/types": "^0.1.25",
-		"chokidar": "^4.0.3",
+		"chokidar": "^5.0.0",
 		"css-loader": "^7.1.2",
 		"deepmerge": "^4.3.1",
 		"jiti": "^2.6.1",
