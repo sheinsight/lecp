@@ -14,7 +14,7 @@
     return (()=>{
         "use strict";
         var __webpack_modules__ = {
-            883: function(module1) {
+            883 (module1) {
                 module1.exports = __rspack_external__883;
             }
         };
