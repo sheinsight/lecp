@@ -1,6 +1,6 @@
 {
 	"name": "@shined/lecp-binding",
-	"version": "0.1.2",
+	"version": "0.2.0",
 	"license": "MIT",
 	"engines": {
 		"node": ">= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0"
