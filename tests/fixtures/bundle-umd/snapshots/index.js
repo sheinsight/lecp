@@ -10,12 +10,12 @@
     } else {
         root["DemoComponent"] = factory(root["React"]);
     }
-})(self, (__WEBPACK_EXTERNAL_MODULE__883__)=>{
+})(self, (__rspack_external__883)=>{
     return (()=>{
         "use strict";
         var __webpack_modules__ = {
             883: function(module1) {
-                module1.exports = __WEBPACK_EXTERNAL_MODULE__883__;
+                module1.exports = __rspack_external__883;
             }
         };
         var __webpack_module_cache__ = {};
