@@ -99,7 +99,13 @@ const bundlessEmitDts = async (
 	onSuccess?: () => void,
 ): Promise<Watcher | void> => {
 	const { cwd, watch } = config;
-	const { outDir: typesDir, type: format, targets, entry } = bundlessOptions;
+	const {
+		outDir: typesDir,
+		type: format,
+		targets,
+		entry,
+		exclude,
+	} = bundlessOptions;
 
 	const outJsExt = getOutJsExt(
 		!!targets.node,
@@ -110,7 +116,7 @@ const bundlessEmitDts = async (
 	const { fileNames, options } = getTsConfigFileContent({
 		cwd,
 		include: [entry],
-		exclude: [],
+		exclude: exclude,
 	});
 	logger.debug("dts 编译文件: ", fileNames);
 
@@ -118,7 +124,7 @@ const bundlessEmitDts = async (
 	if (!fileNames?.length && !watch) return;
 	logger.debug("user tsconfig options: ", options);
 
-	const overrideTsconfig = {
+	const overrideTsconfig: ts.CompilerOptions = {
 		...OVERRIDE_TS_OPTIONS,
 		outDir: typesDir,
 		declarationDir: typesDir,
