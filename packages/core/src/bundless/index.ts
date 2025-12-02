@@ -183,6 +183,7 @@ export const bundlessFiles = async (
 		format: options.type,
 		isModule: config.pkg.type === "module",
 		srcDir: options.entry,
+		swcOptions: options.swcOptions,
 		cwd,
 	};
 

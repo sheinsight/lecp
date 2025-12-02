@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use swc_core::base::config::Options as SwcOptions;
 
+use crate::util::merge_json_values;
 use crate::{get_out_ext, serde_error_to_miette};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -149,21 +150,21 @@ pub struct BundlessOptions {
     pub cwd: PathBuf,
     pub format: ModuleType,
     pub sourcemap: bool,
-    minify: bool,
-    targets: serde_json::Value,
-    shims: Shims,
-    external_helpers: Option<bool>,
+    pub minify: bool,
+    pub targets: serde_json::Value,
+    pub shims: Shims,
+    pub external_helpers: Option<bool>,
     #[serde(default = "default_alias")]
     pub alias: Option<Alias>,
-    define: Option<Define>,
+    pub define: Option<Define>,
     pub css: Option<CSS>,
     pub react: React,
-    out_ext: String,
+    pub out_ext: String,
     pub exclude: Vec<String>,
-    //
+    pub swc_options: Option<serde_json::Value>,
     pub out_dir: Option<PathBuf>,
     pub src_dir: Option<PathBuf>,
-    is_module: bool,
+    pub is_module: bool,
 }
 
 fn default_cwd() -> PathBuf {
@@ -199,6 +200,7 @@ impl Default for BundlessOptions {
             css: Default::default(),
             react: Default::default(),
             exclude: vec![],
+            swc_options: Default::default(),
             out_dir: Default::default(),
             out_ext: Default::default(),
             src_dir: Default::default(),
@@ -302,15 +304,12 @@ impl BundlessOptions {
         } else {
             None
         };
-        let config_json = json!({
-            "swcrc": false,
-            "configFile": false,
-            "sourceMaps": self.sourcemap,
-            "minify": self.minify,
+
+        // default
+        let mut config_json = json!({
             "env": {
                 "mode": "entry",
                 "coreJs": "3",
-                "targets": self.targets
             },
             "jsc": {
                 // https://swc.rs/docs/configuration/compilation#jscexternalhelpers
@@ -320,8 +319,6 @@ impl BundlessOptions {
                     "tsx": true,
                     "decorators": true
                 },
-                "baseUrl": self.cwd,
-                "paths": self.alias_to_ts_paths(),
                 "transform": {
                     "legacyDecorator": true,
                     "decoratorMetadata": true,
@@ -334,23 +331,43 @@ impl BundlessOptions {
                         "globals": self.get_globals_from_define(),
                     }
                 },
+                "baseUrl": self.cwd,
+                "paths": self.alias_to_ts_paths(),
                 // @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
                 "minify": minify_options,
                 "experimental": {
-                    "cacheRoot": "node_modules/.cache/swc",
-                    "plugins": self.get_plugins()
+                    "plugins": self.get_plugins(),
+                    "cacheRoot": "node_modules/.cache/swc"
                 }
             },
+        });
+
+        // user
+        if let Some(user_swc_options) = &self.swc_options {
+            merge_json_values(&mut config_json, user_swc_options);
+        }
+
+        // protected
+        let protected_fields = json!({
+            "swcrc": false,
+            "configFile": false,
             "module": {
                 "type": self.format.to_string(),
                 "resolveFully": true,
                 // node@14+ 支持在 cjs import(),无需转换
                 // "ignoreDynamic": true, -> 导致 alias 无法生效
                 "outFileExtension": self.out_ext(),
+            },
+            "minify": self.minify,
+            "sourceMaps": self.sourcemap,
+            "env": {
+                "targets": self.targets
             }
         });
+        merge_json_values(&mut config_json, &protected_fields);
 
         let config_str = config_json.to_string();
+
         serde_json::from_str::<SwcOptions>(&config_str).map_err(|e| {
             let miette_err = serde_error_to_miette(e, &config_str, "Could not parse swc config");
             anyhow::anyhow!("{:?}", miette_err)

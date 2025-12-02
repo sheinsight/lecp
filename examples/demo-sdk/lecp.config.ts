@@ -4,6 +4,12 @@ export default defineConfig({
 	format: [
 		{
 			type: "cjs",
+			// swcOptions: {
+			// 	module: {
+			// 		type: "commonjs",
+			// 		ignoreDynamic: true,
+			// 	},
+			// },
 		},
 		{
 			type: "esm",
