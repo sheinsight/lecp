@@ -1,5 +1,15 @@
 # 更新日志
 
+# 0.2.1
+2025-12-04
+
+- 🐞 bundless dts 配置 exclude 额外生成 dts
+>  exclude 未设置生效
+- 🐞 bundless dts 可能生成嵌套的目录结构
+> 设置 rootDir: entry，不受 cwd 影响
+- 🏰: bump dependencies
+> rspack@1.6.6，swc_core@50
+
 # 0.2.0
 2025-12-02
 
