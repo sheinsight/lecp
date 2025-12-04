@@ -89,13 +89,13 @@
     exports.asyncFn = __webpack_exports__.asyncFn;
     exports["default"] = __webpack_exports__["default"];
     exports.sleep = __webpack_exports__.sleep;
-    for(var __webpack_i__ in __webpack_exports__){
+    for(var __rspack_i in __webpack_exports__){
         if ([
             "asyncFn",
             "default",
             "sleep"
-        ].indexOf(__webpack_i__) === -1) {
-            exports[__webpack_i__] = __webpack_exports__[__webpack_i__];
+        ].indexOf(__rspack_i) === -1) {
+            exports[__rspack_i] = __webpack_exports__[__rspack_i];
         }
     }
     Object.defineProperty(exports, '__esModule', {
