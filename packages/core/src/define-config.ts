@@ -21,7 +21,7 @@ export type DtsOptions = {
 	 * - "bundless": 保持源文件结构，生成多个声明文件
 	 * @default "bundless"
 	 */
-	mode: FormatMode;
+	mode?: FormatMode;
 
 	/**
 	 * 构建引擎
