@@ -8,8 +8,8 @@ LECP 提供 shims 功能，实现 ESM 和 CommonJS 模块系统之间的变量�
 
 1. **渐进式迁移**：从 CommonJS 迁移到 ESM 的项目，允许逐步迁移代码
 2. **多格式输出**：使用现代 ESM 语法编写源码，但需要同时输出 ESM 和 CJS 格式以兼容不同的消费环境
-	- **ESM 产物**：可以使用 CommonJS 变量 `__dirname`、`__filename`、`require`
-	- **CJS 产物**：可以使用 ESM 变量 `import.meta.url`、`import.meta.dirname`、`import.meta.filename`
+   - **ESM 产物**：可以使用 CommonJS 变量 `__dirname`、`__filename`、`require`
+   - **CJS 产物**：可以使用 ESM 变量 `import.meta.url`、`import.meta.dirname`、`import.meta.filename`
 
 ## 配置选项
 
@@ -27,16 +27,17 @@ interface ShimsOptions {
 }
 ```
 
-| 配置 | Node.js 版本支持 | 实现方式 |
-|------|-----------------|----------|
-| `legacy: false` (默认) | 20.11+ | 使用 `import.meta.{dirname, filename}` |
-| `legacy: true` | 10.12+ | 使用 `fileURLToPath` + `createRequire` |
+| 配置                   | Node.js 版本支持 | 实现方式                               |
+| ---------------------- | ---------------- | -------------------------------------- |
+| `legacy: false` (默认) | 20.11+           | 使用 `import.meta.{dirname, filename}` |
+| `legacy: true`         | 10.12+           | 使用 `fileURLToPath` + `createRequire` |
 
 ## ESM 产物中的 CJS 兼容
 
 在 ESM 产物中，可以直接使用 CJS 的全局变量：
 
 ### 源代码
+
 ```ts
 // 在 ESM 模块中使用 CJS 变量
 console.log(__dirname);   // 当前目录路径
@@ -47,6 +48,7 @@ const pkg = require('./package.json');
 ```
 
 ### 标准模式 (Node.js 20.11+)
+
 ```ts
 // __dirname
 console.log(import.meta.dirname);
@@ -61,6 +63,7 @@ const pkg = require('./package.json');
 ```
 
 ### legacy 模式 (Node.js 10.12+)
+
 ```ts
 // __dirname
 import path from 'node:path';
@@ -81,6 +84,7 @@ const pkg = require('./package.json');
 在 CommonJS 产物中，可以使用 ESM 的 import.meta 变量：
 
 ### 源代码
+
 ```ts
 // 在 CJS 模块中使用 ESM 变量
 console.log(import.meta.url);      // 文件 URL
@@ -89,6 +93,7 @@ console.log(import.meta.filename); // 文件路径
 ```
 
 ### 转换结果
+
 ```ts
 // import.meta.url
 console.log(require('url').pathToFileURL(__filename).toString());

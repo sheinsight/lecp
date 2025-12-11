@@ -25,9 +25,9 @@ npx lecp build
 lecp 配置文件统一约定为 `lecp.config.ts`。
 
 不支持其他格式的配置文件，如 `lecp.config.js`、`lecp.config.mts`,`lecp.config.cts` 等。
+
 > 目前通过 [jiti](https://github.com/unjs/jiti) 加载配置文件，不用关心 node esm/cjs 的语法区别，
 > 例如 同时支持 `__filename`, ` import.meta.url`。
-
 
 ## API
 
@@ -44,4 +44,3 @@ const config = defineConfig({
 // build
 const result = await build(config);
 ```
-

@@ -1,4 +1,3 @@
-
 # 构建目标 (Targets)
 
 LECP 通过 `targets` 配置项来指定代码的兼容目标环境，支持现代 JavaScript 语法降级。
@@ -25,10 +24,10 @@ LECP 会根据构建格式自动选择合适的默认目标：
 
 推荐自行设置 target，明确项目支持的最低版本。
 
-
 ## 支持的目标环境
 
 ### 浏览器环境
+
 ```typescript
 targets: {
   chrome: 55,      // Chrome 55+
@@ -38,6 +37,7 @@ targets: {
 更多值参考 [browserlist 官方文档](https://github.com/browserslist/browserslist#browsers)
 
 ### Node.js 环境
+
 ```typescript
 targets: {
   node: "20.11.0"  // Node.js 20.11.0+
@@ -45,6 +45,7 @@ targets: {
 ```
 
 ### 混合环境
+
 ```typescript
 targets: {
   chrome: 55,
@@ -57,11 +58,11 @@ targets: {
 UMD 模式下同时设置 `targets.chrome` 和 `targets.node` 会导致构建失败，因为 `output.chunkFormat` 无法同时满足两个目标的要求。
 
 **解决方案：**
+
 - 如果确认没有代码分割，可以强制设置 `output.chunkFormat`
 - **推荐做法：** UMD 仅用于 Web 平台，作为 CDN 方式引入
 
 :::
-
 
 ## polyfill
 
@@ -76,11 +77,13 @@ LECP 内置了一些 Node.js 的 polyfill，确保在浏览器环境中也能正
 ## 关键版本说明
 
 ### Chrome 55
+
 - **新特性**：支持原生 `async/await` 语法
 
 减少 polyfill 体积，提升运行性能
 
 ### Node.js 20.11+
+
 - **新特性**：
   - 支持 `import.meta.dirname`
   - 支持 `import.meta.filename`
@@ -88,6 +91,7 @@ LECP 内置了一些 Node.js 的 polyfill，确保在浏览器环境中也能正
 shims 实现更加小巧
 
 ### Node.js 22.12+ / 20.19+
+
 - **新特性**：默认支持 ESM 模块
 
 可以不输出 `cjs` 格式

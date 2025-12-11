@@ -26,10 +26,10 @@ export default defineConfig({
 不同格式在各模式下的支持情况：
 
 | 格式 | Bundless 模式 | Bundle 模式 |
-|------|--------------|-------------|
+| ---- | ------------- | ----------- |
 | ESM  | ✅ (默认)     | ✅          |
 | CJS  | ✅ (默认)     | ✅          |
-| UMD  | ❌            | ✅ (默认)    |
+| UMD  | ❌            | ✅ (默认)   |
 
 ### BundlessFormat
 
@@ -125,10 +125,12 @@ interface BundleFormat {
 **类型：** `Record<string, string | number>`
 
 **默认值：**
+
 - 仅 CJS 编译场景：`{node: "20.11.0"}`
 - 其他情况：`{chrome: 55}`
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 
@@ -144,7 +146,7 @@ export default defineConfig({
 :::tips 注意事项
 lecp 只做语法降级，不会自动引入 polyfill。通常业务系统会自动引入 polyfill。
 
-如果希望进一步减少体积，可以参考 [externalHelpers](#externalHelpers)  选项。
+如果希望进一步减少体积，可以参考 [externalHelpers](#externalHelpers) 选项。
 
 :::
 
@@ -152,6 +154,7 @@ lecp 只做语法降级，不会自动引入 polyfill。通常业务系统会自
 UMD 模式下同时设置 `targets.chrome` 和 `targets.node` 会导致构建失败，因为 `output.chunkFormat` 无法同时满足两个目标的要求。
 
 **解决方案：**
+
 - 如果确认没有代码分割，可以强制设置 `output.chunkFormat`
 - **推荐做法：** UMD 仅用于 Web 平台，作为 CDN 方式引入
 
@@ -187,6 +190,7 @@ interface DtsOptions {
 ```
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 
@@ -214,13 +218,14 @@ export default defineConfig({
 
 **类型：** `Record<string, string>`
 
-**默认值：**  tsconfig.json 的 `paths` 字段获取
+**默认值：** tsconfig.json 的 `paths` 字段获取
 
 设置路径别名映射
 
 支持设置相对路径，相对路径基于项目根目录。
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 
@@ -243,6 +248,7 @@ export default defineConfig({
 参考 [Rspack DefinePlugin](https://rspack.rs/plugins/webpack/define-plugin) 文档
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 
@@ -270,12 +276,13 @@ export default defineConfig({
 - `shims: true`：启用默认配置
 - `shims: { legacy: true }`：启用传统兼容模式
 
-| 配置 | Node.js 版本支持 | 实现方式 |
-|------|-----------------|----------|
-| `legacy: false` (默认) | 20.11+ | 使用 `import.meta.{dirname, filename}` |
-| `legacy: true` | 10.12+ | 使用 `fileURLToPath`,`createRequire`  |
+| 配置                   | Node.js 版本支持 | 实现方式                               |
+| ---------------------- | ---------------- | -------------------------------------- |
+| `legacy: false` (默认) | 20.11+           | 使用 `import.meta.{dirname, filename}` |
+| `legacy: true`         | 10.12+           | 使用 `fileURLToPath`,`createRequire`   |
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 
@@ -307,14 +314,17 @@ React 相关的编译配置。
 **类型：** `"classic" | "automatic" | "preserve"`
 
 **默认值：** `"automatic"`
+
 > 会自动读取 tsconfig.json 中的 jsx 配置，优先级更高
 
 **JSX 转换模式：**
+
 - `"automatic"`：使用 `react/jsx-runtime`（React 17+ 推荐）
 - `"classic"`：使用 `React.createElement`（传统方式）
 - `"preserve"`：不对 JSX 语法进行任何转换
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 
@@ -335,6 +345,7 @@ export default defineConfig({
 ### react.importSource
 
 jsx 函数使用的模块名称。
+
 > tsconfig.json 中的 `jsxImportSource`
 
 **类型：** `string`
@@ -342,9 +353,11 @@ jsx 函数使用的模块名称。
 如 "react", "preact", "solid-js", "@emotion/react", ...
 
 **默认值：** `"react"`
+
 > 会自动读取 tsconfig.json 中的 jsxImportSource 配置，优先级更高
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 export default defineConfig({
@@ -362,7 +375,6 @@ export default defineConfig({
 });
 ```
 
-
 ## css
 
 CSS 相关的处理配置。
@@ -374,11 +386,13 @@ CSS 相关的处理配置。
 **默认值：** `false`
 
 **CSS Modules 配置：**
+
 - `false`：关闭 CSS Modules
 - `true`：使用默认命名规则 `${packageName}__[local]`
 - `string`：自定义命名规则模板
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 
@@ -443,7 +457,6 @@ export default defineConfig({
 
 ```
 
-
 ## exclude
 
 **类型：** `string[]`
@@ -453,6 +466,7 @@ export default defineConfig({
 指定编译时需要忽略的文件或目录，支持 [glob 模式](https://github.com/SuperchupuDev/tinyglobby)。
 
 **示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 
@@ -464,7 +478,6 @@ export default defineConfig({
 });
 ```
 
-
 ## extends
 
 **类型：** `string`
@@ -474,11 +487,13 @@ export default defineConfig({
 继承其他配置文件，类似于 `tsconfig.json` 的 extends 功能。适用于 monorepo 项目的配置复用场景。
 
 **路径支持：**
+
 - 相对路径：相对于当前配置文件
 - 绝对路径：文件系统绝对路径
 - npm 包：支持从 node_modules 加载
 
 **示例：**
+
 ```ts
 // 子项目配置
 import { defineConfig } from '@shined/lecp';
