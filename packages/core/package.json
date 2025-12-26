@@ -5,27 +5,24 @@
 	"keywords": [],
 	"license": "MIT",
 	"author": "",
-	"type": "module",
-	"exports": {
-		".": "./es/index.js",
-		"./package.json": "./package.json"
-	},
-	"bin": {
-		"lecp": "bin/cli.js"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/sheinsight/lecp.git"
+	},
+	"bin": {
+		"lecp": "bin/cli.js"
 	},
 	"files": [
 		"bin",
 		"es"
 	],
-	"engines": {
-		"node": ">=20.19.0"
+	"type": "module",
+	"exports": {
+		".": "./es/index.js",
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"dev": "node ./src/cli.ts -w",
@@ -65,5 +62,8 @@
 		"@swc/helpers": {
 			"optional": true
 		}
+	},
+	"engines": {
+		"node": ">=20.19.0"
 	}
 }

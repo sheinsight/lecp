@@ -7,8 +7,8 @@
 	],
 	"license": "ISC",
 	"author": "",
-	"main": "./swc_plugin_transform_define.wasm",
 	"files": [],
+	"main": "./swc_plugin_transform_define.wasm",
 	"scripts": {
 		"build": "cargo build-wasi --release && cp ../../target/wasm32-wasip1/release/swc_plugin_transform_define.wasm ."
 	}

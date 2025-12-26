@@ -2,37 +2,20 @@
 	"name": "@shined/lecp-binding",
 	"version": "0.2.2",
 	"license": "MIT",
-	"engines": {
-		"node": ">= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0"
-	},
-	"type": "commonjs",
-	"main": "index.js",
-	"types": "index.d.ts",
-	"files": [
-		"index.js",
-		"index.d.ts"
-	],
-	"publishConfig": {
-		"access": "public",
-		"registry": "https://registry.npmjs.org/"
-	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/sheinsight/lecp.git"
 	},
-	"napi": {
-		"binaryName": "lecp",
-		"packageName": "@shined/lecp-binding",
-		"targets": [
-			"aarch64-apple-darwin",
-			"aarch64-unknown-linux-gnu",
-			"aarch64-unknown-linux-musl",
-			"aarch64-pc-windows-msvc",
-			"x86_64-apple-darwin",
-			"x86_64-pc-windows-msvc",
-			"x86_64-unknown-linux-gnu",
-			"x86_64-unknown-linux-musl"
-		]
+	"files": [
+		"index.d.ts",
+		"index.js"
+	],
+	"type": "commonjs",
+	"main": "index.js",
+	"types": "index.d.ts",
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
 	},
 	"scripts": {
 		"build": "napi build --release --platform --strip",
@@ -55,5 +38,22 @@
 		"@shined/lecp-binding-linux-x64-musl": "workspace:*",
 		"@shined/lecp-binding-win32-arm64-msvc": "workspace:*",
 		"@shined/lecp-binding-win32-x64-msvc": "workspace:*"
+	},
+	"napi": {
+		"binaryName": "lecp",
+		"packageName": "@shined/lecp-binding",
+		"targets": [
+			"aarch64-apple-darwin",
+			"aarch64-unknown-linux-gnu",
+			"aarch64-unknown-linux-musl",
+			"aarch64-pc-windows-msvc",
+			"x86_64-apple-darwin",
+			"x86_64-pc-windows-msvc",
+			"x86_64-unknown-linux-gnu",
+			"x86_64-unknown-linux-musl"
+		]
+	},
+	"engines": {
+		"node": ">= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0"
 	}
 }

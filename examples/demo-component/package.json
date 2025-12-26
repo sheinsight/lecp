@@ -1,15 +1,15 @@
 {
 	"name": "demo-component",
-	"private": true,
 	"version": "0.2.2",
+	"private": true,
+	"description": "",
+	"keywords": [],
+	"license": "ISC",
+	"author": "",
 	"main": "index.js",
 	"scripts": {
 		"dev": "lecp --watch",
 		"build": "lecp"
-	},
-	"peerDependencies": {
-		"react": ">=16.8.0",
-		"react-dom": ">=16.8.0"
 	},
 	"dependencies": {
 		"immer": "^11.0.1"
@@ -23,8 +23,8 @@
 		"react-dom": "catalog:",
 		"typescript": "catalog:"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"description": ""
+	"peerDependencies": {
+		"react": ">=16.8.0",
+		"react-dom": ">=16.8.0"
+	}
 }
