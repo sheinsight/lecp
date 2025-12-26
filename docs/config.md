@@ -139,6 +139,8 @@ export default defineConfig({
     node: "22.12.0",
     // or
     chrome: 87
+    // or
+    es2015: "",
   },
 });
 ```
