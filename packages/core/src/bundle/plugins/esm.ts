@@ -5,6 +5,9 @@ export const pluginEsm: PluginFn = chain => {
 	chain.experiments({ outputModule: true });
 	chain.output.module(true);
 
+	// default -> 'modern-module' invalid (webpack right)
+	chain.externalsType("module-import");
+
 	// output.modern-module (修复和 module 默认值不一致)
 	// @ref: https://github.com/web-infra-dev/rspack/blob/main/packages/rspack/src/config/defaults.ts
 	chain.output.chunkLoading("import").workerChunkLoading("import");
@@ -12,11 +15,8 @@ export const pluginEsm: PluginFn = chain => {
 	// node.__filename, node.__dirname
 	// outputModule:true -> 'node_modules'; auto shims
 
-	// default -> 'modern-module' invalid (webpack right)
-	chain.externalsType("module-import");
-
 	// output.module:true -> 'module'
-	// chain.output.chunkFormat("module");
+	chain.output.chunkFormat("module");
 
 	chain.module.parser.set("javascript", {
 		importMeta: false,
