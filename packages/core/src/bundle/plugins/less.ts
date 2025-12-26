@@ -1,7 +1,7 @@
 import { requireResolve } from "../../util/index.ts";
 import type { PluginFn } from "../chain.ts";
 
-export const pluginLess: PluginFn = chain => {
+export const pluginLess: PluginFn = (chain, { options }) => {
 	const lessRule = chain.module.rule("less").test(/\.less$/i);
 
 	const cssRule = chain.module.rule("css");
@@ -22,6 +22,6 @@ export const pluginLess: PluginFn = chain => {
 		.loader(requireResolve("less-loader"))
 		.options({
 			implementation: requireResolve("less"),
-			lessOptions: {},
+			lessOptions: options.css.lessOptions ?? {},
 		});
 };
