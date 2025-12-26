@@ -4,6 +4,7 @@ import type { SystemConfig } from "./build.ts";
 import { tsPathsToAlias } from "./bundless/swc.ts";
 import { DEFAULT_NODE_TARGET, DEFAULT_WEB_TARGET } from "./constant.ts";
 import type {
+	BuildTarget,
 	BundleFormat,
 	BundlessFormat,
 	DtsOptions,
@@ -170,6 +171,102 @@ export const getFinalUserOptions = (
 	return buildOptions as FinalUserConfig;
 };
 
+/**
+ * The esX to browserslist mapping is transformed from
+ * https://github.com/rspack-contrib/browserslist-to-es-version
+ */
+const ESX_TO_BROWSERSLIST: Record<string, Record<string, string>> = {
+	es5: {
+		chrome: "13",
+		edge: "12",
+		firefox: "2",
+		ios: "6",
+		node: "0.6",
+		safari: "5.1",
+	},
+	get es6() {
+		return ESX_TO_BROWSERSLIST.es2015;
+	},
+	es2015: {
+		chrome: "51",
+		edge: "79",
+		firefox: "53",
+		ios: "16.3",
+		node: "6.5",
+		safari: "16.3",
+	},
+	es2016: {
+		chrome: "52",
+		edge: "79",
+		firefox: "53",
+		ios: "16.3",
+		node: "7",
+		safari: "16.3",
+	},
+	es2017: {
+		chrome: "55",
+		edge: "79",
+		firefox: "53",
+		ios: "16.3",
+		node: "7.6",
+		safari: "16.3",
+	},
+	es2018: {
+		chrome: "64",
+		edge: "79",
+		firefox: "78",
+		ios: "16.3",
+		node: "10",
+		safari: "16.3",
+	},
+	es2019: {
+		chrome: "66",
+		edge: "79",
+		firefox: "78",
+		ios: "16.3",
+		node: "10",
+		safari: "16.3",
+	},
+	es2020: {
+		chrome: "91",
+		edge: "91",
+		firefox: "80",
+		ios: "16.3",
+		node: "16.9",
+		safari: "16.3",
+	},
+	es2021: {
+		chrome: "91",
+		edge: "91",
+		firefox: "80",
+		ios: "16.3",
+		node: "16.9",
+		safari: "16.3",
+	},
+	es2022: {
+		chrome: "94",
+		edge: "94",
+		firefox: "93",
+		ios: "16.4",
+		node: "16.11",
+		safari: "16.4",
+	},
+	// ES2023 did not introduce new ECMA syntax, so map it to ES2022.
+	// SWC currently supports syntax only up to ES2022
+	get es2023() {
+		return ESX_TO_BROWSERSLIST.es2022;
+	},
+	get es2024() {
+		return ESX_TO_BROWSERSLIST.es2022;
+	},
+	get es2025() {
+		return ESX_TO_BROWSERSLIST.es2022;
+	},
+	get esnext() {
+		return ESX_TO_BROWSERSLIST.es2022;
+	},
+} as const;
+
 // export function getFinalFormatOptions(
 // 	userConfig: FinalUserConfig,
 // 	formatOptions: Required<BundlessFormat>,
@@ -234,7 +331,37 @@ export function getFinalFormatOptions(
 		};
 	}
 
-	if (!options.targets) {
+	// esXXXX -> browserslist
+	if (options.targets) {
+		const expandedTargets: BuildTarget = {};
+		const esVersionKeys = Object.keys(ESX_TO_BROWSERSLIST);
+
+		for (const [key, value] of Object.entries(options.targets)) {
+			const esKey = (
+				key.toLowerCase() === "es" ? `es${value}` : key
+			).toLowerCase();
+
+			if (esKey.startsWith("es")) {
+				if (esVersionKeys.includes(esKey)) {
+					// Helper to apply browser targets from ESX mapping
+					const browserTargets = ESX_TO_BROWSERSLIST[esKey];
+					if (browserTargets) {
+						for (const [browser, version] of Object.entries(browserTargets)) {
+							expandedTargets[browser] ??= options.targets[browser] ?? version;
+						}
+					}
+				} else {
+					logger.warn("unknown es version for target:", esKey);
+				}
+			} else {
+				expandedTargets[key] = value;
+			}
+		}
+
+		options.targets = expandedTargets;
+	}
+
+	if (!options.targets || Object.keys(options.targets).length === 0) {
 		const isCjsOnly = format.every(item => item.type === "cjs");
 		options.targets = isCjsOnly
 			? { node: DEFAULT_NODE_TARGET }
