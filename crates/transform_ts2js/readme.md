@@ -1,6 +1,7 @@
 # @shined/swc-plugin-transform-ts2js
 
 ## Reference
+
 - `allowImportingTsExtensions`: 支持 ts 后缀的 import
   - https://www.typescriptlang.org/tsconfig/#allowImportingTsExtensions
   - tsc: https://github.com/microsoft/TypeScript/pull/59767

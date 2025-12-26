@@ -1,39 +1,36 @@
 {
 	"name": "@shined/lecp",
-	"version": "0.2.2",
+	"version": "0.3.0",
 	"description": "",
 	"keywords": [],
 	"license": "MIT",
 	"author": "",
-	"type": "module",
-	"exports": {
-		".": "./es/index.js",
-		"./package.json": "./package.json"
-	},
-	"bin": {
-		"lecp": "bin/cli.js"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/sheinsight/lecp.git"
+	},
+	"bin": {
+		"lecp": "bin/cli.js"
 	},
 	"files": [
 		"bin",
 		"es"
 	],
-	"engines": {
-		"node": ">=20.19.0"
+	"type": "module",
+	"exports": {
+		".": "./es/index.js",
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"dev": "node ./src/cli.ts -w",
 		"build": "node ./src/cli.ts"
 	},
 	"dependencies": {
-		"@microsoft/api-extractor": "^7.55.1",
-		"@rspack/core": "1.6.6",
+		"@microsoft/api-extractor": "^7.55.2",
+		"@rspack/core": "1.6.7",
 		"@shined/lecp-binding": "workspace:*",
 		"@svgr-rs/svgrs-plugin": "^0.2.0",
 		"@swc/types": "^0.1.25",
@@ -47,7 +44,7 @@
 		"node-polyfill-webpack-plugin": "^4.1.0",
 		"picocolors": "^1.1.1",
 		"read-pkg": "^10.0.0",
-		"rspack-chain": "^1.4.1",
+		"rspack-chain": "^1.4.2",
 		"tinyglobby": "^0.2.15",
 		"typescript": "catalog:",
 		"typescript-transform-paths": "^3.5.5",
@@ -65,5 +62,8 @@
 		"@swc/helpers": {
 			"optional": true
 		}
+	},
+	"engines": {
+		"node": ">=20.19.0"
 	}
 }

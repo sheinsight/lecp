@@ -1,9 +1,9 @@
 # @shined/swc-plugin-transform-shims
 
-
 ## Introduction
 
 ### ESM Shims
+
 write `__filename`, `__dirname` and `require()` in your code, and this plugin will transform them to right code in esm module.
 
 ```js
@@ -31,7 +31,6 @@ const _require = createRequire(import.meta.url)
 // All require() calls are transformed to _require()
 
 ```
-
 
 ### CommonJS Shims
 

@@ -10,9 +10,9 @@
 		"rspack"
 	],
 	"oxc.fmt.experimental": true,
-  	"editor.defaultFormatter": "oxc.oxc-vscode",
+	"editor.defaultFormatter": "oxc.oxc-vscode",
 	"editor.codeActionsOnSave": {
-		"source.fixAll.oxc": "explicit",
+		"source.fixAll.oxc": "explicit"
 	},
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"references.preferredLocation": "peek",

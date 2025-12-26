@@ -1,23 +1,23 @@
 {
 	"name": "demo-sdk",
-	"type": "module",
+	"version": "0.3.0",
 	"private": true,
-	"version": "0.2.2",
+	"description": "",
+	"keywords": [],
+	"license": "ISC",
+	"author": "",
+	"type": "module",
 	"main": "index.js",
 	"scripts": {
 		"dev": "lecp --watch",
 		"build": "lecp"
 	},
+	"dependencies": {
+		"immer": "^11.0.1"
+	},
 	"devDependencies": {
 		"@shined/lecp": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"description": "",
-	"dependencies": {
-		"immer": "^11.0.1"
 	}
 }

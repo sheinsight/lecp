@@ -1,6 +1,5 @@
 # 构建模式（Bundless & Bundle）
 
-
 ## Bundless 模式
 
 保持源文件的目录结构，为每个源文件生成对应的声明文件：
@@ -8,10 +7,12 @@
 `esm` 和 `cjs` 两种格式会默认使用 Bundless 模式进行构建。
 
 **适用场景：**
+
 - 需要与源码结构保持一致，方便调试
 - 希望用户按需引入模块，tree-shaking 更高效
 
 **输出示例：**
+
 ```
 src/
 ├── index.ts      → es/index.js.       or lib/index.cjs
@@ -28,12 +29,13 @@ src/
 `umd` 格式只能使用 Bundle 模式进行构建。
 `esm` 和 `cjs` 格式也可以选择 Bundle 模式进行构建：
 
-
 **适用场景：**
+
 - umd 格式需要用于 CDN 引用
 - 希望提供单一入口文件，隐藏内部模块结构
 
 **输出示例：**
+
 ```
 
 umd/
@@ -43,6 +45,7 @@ umd/
 ```
 
 **设置示例：**
+
 ```ts
 import { defineConfig } from '@shined/lecp';
 

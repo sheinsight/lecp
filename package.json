@@ -1,22 +1,25 @@
 {
 	"name": "lecp-root",
+	"version": "0.3.0",
 	"private": true,
-	"type": "module",
-	"packageManager": "pnpm@10.24.0",
-	"version": "0.2.2",
-	"files": [],
+	"description": "",
+	"keywords": [],
+	"license": "MIT",
+	"author": "",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/sheinsight/lecp.git"
 	},
+	"files": [],
+	"type": "module",
 	"scripts": {
 		"test": "pnpm test:js && pnpm test:rust",
 		"test:js": "vitest --run",
 		"test:rust": "cargo test --all --all-targets --all-features",
-		"format": "biome format --write && cargo +nightly fmt --all",
+		"format": "oxfmt && cargo +nightly fmt --all",
 		"lint": "pnpm lint:tsc && pnpm lint:js && pnpm lint:rust",
 		"lint:tsc": "pnpm -r --filter=!\"./crates/**\" exec tsc --noEmit",
-		"lint:js": "oxlint && biome check",
+		"lint:js": "oxlint && oxfmt --check",
 		"lint:rust": "cargo clippy --all --all-targets --all-features -- -D warnings && cargo +nightly fmt --all -- --check",
 		"build": "pnpm build:rust && pnpm build:node",
 		"build:rust": "pnpm --filter=\"./crates/**\" build",
@@ -28,18 +31,15 @@
 		"prerelease": "pnpm run test",
 		"release": "bumpp -r --no-push && pnpm run build:binding && TAG=$(git describe --tags --abbrev=0) && git add . && git commit --amend --no-edit && git tag -f \"$TAG\""
 	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT",
-	"description": "",
 	"devDependencies": {
 		"@rspress/core": "2.0.0-rc.1",
 		"@shined/lecp": "workspace:*",
 		"bumpp": "^10.3.2",
-		"oxfmt": "^0.16.0",
-		"oxlint": "^1.31.0",
+		"oxfmt": "^0.17.0",
+		"oxlint": "^1.32.0",
 		"tinyglobby": "^0.2.15",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
-	}
+	},
+	"packageManager": "pnpm@10.24.0"
 }

@@ -6,17 +6,9 @@ export const pluginCjs: PluginFn = chain => {
 	// chunkLoading: 'require',
 	// workerChunkLoading: 'async-node',
 
-	// chrome:
-	// chunkFormat: 'array-push',
-	// chunkLoading: 'jsonp',
-	// workerChunkLoading: 'import-scripts',
-
-	// node+chrome: 不推荐
-	// chunkFormat: 'array-push', // error
-	// chunkLoading: 'jsonp', // universal error
-	// workerChunkLoading: 'import-scripts',
-
 	chain.output.chunkFormat("commonjs");
+	chain.output.chunkLoading("require");
+	chain.output.workerChunkLoading("async-node");
 
 	// default -> 'commonjs'
 	chain.externalsType("commonjs-import"); // rspack-only

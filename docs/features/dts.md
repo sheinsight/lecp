@@ -50,10 +50,12 @@ export default defineConfig({
 ```
 
 **适用场景：**
+
 - 库项目需要保持清晰的模块结构
 - 需要与源码结构保持一致
 
 **输出示例：**
+
 ```
 src/
 ├── index.ts      → lib/index.d.ts
@@ -80,7 +82,6 @@ src/
 
 详情参考 [TypeScript 官方文档 | isolatedDeclarations](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations)
 :::
-
 
 #### 构建引擎
 

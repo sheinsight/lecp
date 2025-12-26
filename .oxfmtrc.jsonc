@@ -3,6 +3,7 @@
 	"useTabs": true,
 	"arrowParens": "avoid",
 	"printWidth": 80,
+
 	"ignorePatterns": [
 		"**/crates/**/npm/**",
 		"**/crates/node_binding/index.*",
@@ -13,6 +14,12 @@
 		"**/umd/**",
 		"**/tests/**/snapshots/**",
 		"**/doc_build/**",
-		"**/compiled/**"
-	]
+		"**/compiled/**",
+		"**/pnpm-lock.yaml",
+		"**/pnpm-workspace.yaml",
+		// 暂不支持 overrides 配置，需要 "trailingComma":"none",目前会自动加逗号
+		"**/tsconfig.json",
+
+		"**/*.toml",
+	],
 }

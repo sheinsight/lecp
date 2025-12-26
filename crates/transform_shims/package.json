@@ -1,14 +1,14 @@
 {
 	"name": "@shined/swc-plugin-transform-shims",
-	"version": "0.2.2",
+	"version": "0.3.0",
 	"description": "",
 	"keywords": [
 		"swc-plugin"
 	],
 	"license": "ISC",
 	"author": "",
-	"main": "swc_plugin_transform_shims.wasm",
 	"files": [],
+	"main": "swc_plugin_transform_shims.wasm",
 	"scripts": {
 		"build": "cargo build-wasi --release && cp ../../target/wasm32-wasip1/release/swc_plugin_transform_shims.wasm ."
 	}

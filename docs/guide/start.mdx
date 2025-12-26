@@ -50,19 +50,23 @@ LECP 使用 SWC 生成 js，为了获得最佳性能和兼容性，建议使用�
 :::details tsconfig 配置说明
 
 **模块系统配置：**
+
 - `"module": "Preserve"`: 保留原始模块语法，让构建工具处理模块转换
 - `"verbatimModuleSyntax": true`: 确保类型导入/导出语法的准确性
 - `"allowImportingTsExtensions": true`: 允许导入 `.ts` 扩展名文件
 
 **严格模式配置：**
+
 - `"strict": true`: 启用所有严格类型检查
 - `"noUncheckedSideEffectImports": true`: 检查副作用导入
 
 **性能优化：**
+
 - `"skipLibCheck": true`: 跳过库文件类型检查以提升性能
 - `"isolatedDeclarations": true`: (可选) 启用独立声明模式
 
 **声明文件配置：**
+
 - `"noEmit": true`: TypeScript 不生成文件，由 LECP 处理
 - `"declaration": true`: 生成 `.d.ts` 文件
 - `"declarationMap": true`: 生成声明文件映射,便于调试。
@@ -70,7 +74,6 @@ LECP 使用 SWC 生成 js，为了获得最佳性能和兼容性，建议使用�
 > 💡 **注意**: 这些配置遵循 [SWC 迁移指南](https://swc.rs/docs/migrating-from-tsc) 的要求，确保与 SWC 编译器的兼容性。
 
 :::
-
 
 ## Node 包
 
@@ -198,7 +201,6 @@ dist/
 
 :::
 
-
 ## Web 包配置
 
 对于 Web 平台包（如 React 组件库等），推荐以下配置：
@@ -241,7 +243,6 @@ export default defineConfig({
 :::tip
 面向浏览器的包，在今天已经无需设置 cjs 格式。
 :::
-
 
 ### 输出结构
 

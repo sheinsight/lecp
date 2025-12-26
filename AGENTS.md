@@ -9,6 +9,7 @@ LECP (LEGO-CP) is a Rust-first build tool for JavaScript/TypeScript projects, fo
 ## Architecture
 
 ### Hybrid Rust/Node.js Structure
+
 - **Rust Core**: `crates/` contains the core Rust implementation
   - `bundless/`: Core bundless build logic
   - `node_binding/`: N-API bindings for Node.js integration
@@ -18,6 +19,7 @@ LECP (LEGO-CP) is a Rust-first build tool for JavaScript/TypeScript projects, fo
 - **Tests**: `tests/fixtures/` contains comprehensive test scenarios
 
 ### Key Components
+
 - **Configuration**: `lecp.config.ts` files define build configurations using `defineConfig()`
 - **Build Modes**: Supports bundle (single file) and bundless (preserve structure) modes
 - **TypeScript**: Dual DTS generation via SWC (fast) or TSC (complete)
@@ -27,6 +29,7 @@ LECP (LEGO-CP) is a Rust-first build tool for JavaScript/TypeScript projects, fo
 ## Development Commands
 
 ### Build & Test
+
 ```bash
 # Full build (Rust + Node.js)
 pnpm build
@@ -48,6 +51,7 @@ pnpm test:rust
 ```
 
 ### Linting & Formatting
+
 ```bash
 # Lint everything (TypeScript + JavaScript + Rust)
 pnpm lint
@@ -66,6 +70,7 @@ pnpm format
 ```
 
 ### Documentation
+
 ```bash
 # Start docs dev server
 pnpm docs:dev
@@ -80,6 +85,7 @@ pnpm docs:preview
 ## Configuration System
 
 ### Project Configuration (`lecp.config.ts`)
+
 Projects configure builds using `defineConfig()` from `@shined/lecp`:
 
 ```typescript
@@ -97,6 +103,7 @@ export default defineConfig({
 ```
 
 ### Build Formats
+
 - **ESM**: Modern ES modules (`.js` extension)
 - **CJS**: CommonJS (`.cjs` extension)
 - **UMD**: Universal module format for browsers
@@ -104,6 +111,7 @@ export default defineConfig({
 - **Bundle**: Single-file output
 
 ### DTS Generation
+
 - **SWC**: Fast TypeScript declaration generation
 - **TSC**: Full TypeScript compiler (slower but more complete)
 - Both support bundless and bundled modes
@@ -113,6 +121,7 @@ export default defineConfig({
 The project uses extensive fixture-based testing in `tests/fixtures/`, with each fixture representing a specific build scenario. Tests verify both output correctness and snapshot consistency.
 
 ### Running Specific Tests
+
 Individual fixture tests can be run by navigating to the fixture directory and running the test file.
 
 ## Package Management
