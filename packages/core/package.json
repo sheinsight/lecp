@@ -29,25 +29,25 @@
 		"build": "node ./src/cli.ts"
 	},
 	"dependencies": {
-		"@microsoft/api-extractor": "^7.55.2",
-		"@rspack/core": "1.6.7",
+		"@microsoft/api-extractor": "^7.58.7",
+		"@rspack/core": "2.0.0",
 		"@shined/lecp-binding": "workspace:*",
 		"@svgr-rs/svgrs-plugin": "^0.2.0",
-		"@swc/types": "^0.1.25",
+		"@swc/types": "^0.1.26",
 		"chokidar": "^5.0.0",
-		"css-loader": "^7.1.2",
+		"css-loader": "^7.1.4",
 		"deepmerge": "^4.3.1",
 		"jiti": "^2.6.1",
-		"less": "^4.4.2",
-		"less-loader": "^12.3.0",
-		"lightningcss": "^1.30.2",
+		"less": "^4.6.4",
+		"less-loader": "^12.3.2",
+		"lightningcss": "^1.32.0",
 		"node-polyfill-webpack-plugin": "^4.1.0",
 		"picocolors": "^1.1.1",
-		"read-pkg": "^10.0.0",
-		"rspack-chain": "^1.4.2",
-		"tinyglobby": "^0.2.15",
+		"read-pkg": "^10.1.0",
+		"rspack-chain": "^2.0.1",
+		"tinyglobby": "^0.2.16",
 		"typescript": "catalog:",
-		"typescript-transform-paths": "^3.5.5",
+		"typescript-transform-paths": "^3.5.6",
 		"yargs": "^18.0.0"
 	},
 	"devDependencies": {
@@ -56,7 +56,7 @@
 		"@types/yargs": "^17.0.35"
 	},
 	"peerDependencies": {
-		"@swc/helpers": "^0.5.17"
+		"@swc/helpers": "^0.5.21"
 	},
 	"peerDependenciesMeta": {
 		"@swc/helpers": {

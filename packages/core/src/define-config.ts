@@ -2,7 +2,7 @@ import type { Configuration as RspackConfig } from "@rspack/core";
 import type { Options as SwcOptions } from "@swc/types";
 import type Less from "less";
 import type { TransformOptions as LightningCssTransformOptions } from "lightningcss";
-import type RspackChain from "rspack-chain";
+import type { RspackChain } from "rspack-chain";
 
 /** 编译类型 */
 export type FormatType = "esm" | "cjs" | "umd";

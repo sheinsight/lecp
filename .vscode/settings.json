@@ -9,12 +9,11 @@
 		"pico",
 		"rspack"
 	],
-	"oxc.fmt.experimental": true,
 	"editor.defaultFormatter": "oxc.oxc-vscode",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.oxc": "explicit"
 	},
-	"typescript.tsdk": "node_modules/typescript/lib",
+	"js/ts.tsdk.path": "node_modules/typescript/lib",
 	"references.preferredLocation": "peek",
 	"[rust]": {
 		"editor.formatOnSave": true,

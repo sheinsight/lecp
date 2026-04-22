@@ -1,4 +1,4 @@
-import type RspackChain from "rspack-chain";
+import type { RspackChain } from "rspack-chain";
 import { getSwcOptions } from "../../bundless/swc.ts";
 import type { PluginFn } from "../chain.ts";
 

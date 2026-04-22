@@ -2,7 +2,6 @@
 import type { PluginFn } from "../chain.ts";
 
 export const pluginEsm: PluginFn = chain => {
-	chain.experiments({ outputModule: true });
 	chain.output.module(true);
 
 	// default -> 'modern-module' invalid (webpack right)
@@ -28,8 +27,4 @@ export const pluginEsm: PluginFn = chain => {
 
 	// chain.optimization.concatenateModules(true); // production 默认启用
 	chain.optimization.avoidEntryIife(true); // production (rspack 默认不启用，webpack@5.95.0+ 默认启用 )
-
-	// rspack@1.6.0+ 支持 (暂时不开启，目前对于有import style的库会生成额外的 runtime.js)
-	// chain.plugin("esm-lib").use(rspack.experiments.EsmLibraryPlugin);
-	// chain.optimization.runtimeChunk("single");
 };

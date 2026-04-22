@@ -50,8 +50,9 @@ pub fn merge_json_values(base: &mut serde_json::Value, overlay: &serde_json::Val
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn test_merge_objects_deeply() {

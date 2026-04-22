@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 import type { RspackOptions } from "@rspack/core";
-import RspackChain from "rspack-chain";
+import { RspackChain } from "rspack-chain";
 import type { SystemConfig } from "../build.ts";
 import type { FinalBundleFormat } from "../define-config.ts";
 import { getBrowsersList } from "../util/index.ts";
@@ -46,15 +46,10 @@ export function getRspackConfig(
 
 	chain.externals(externals);
 
-	chain.cache(watch).experiments({ cache: watch });
+	chain.cache(watch);
 
 	// perf
 	chain.experiments({ nativeWatcher: true });
-
-	// remove useless code
-	chain.experiments({
-		rspackFuture: { bundlerInfo: { force: false } },
-	});
 
 	[
 		pluginOutput,

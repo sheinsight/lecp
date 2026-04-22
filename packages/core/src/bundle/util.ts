@@ -1,4 +1,4 @@
-import RspackChain from "rspack-chain";
+import { RspackChain } from "rspack-chain";
 
 export const stringify = RspackChain.toString as (
 	config: unknown,
