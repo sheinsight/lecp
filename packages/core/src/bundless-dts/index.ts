@@ -15,6 +15,7 @@ import type {
 } from "../define-config.ts";
 import { getOutJsExt } from "../util/index.ts";
 import { logger } from "../util/logger.ts";
+import { bundlessTsgoDts } from "./tsgo.ts";
 import { createExtensionRewriteTransformer } from "./tx-extension-rewrite.ts";
 
 /**
@@ -482,6 +483,10 @@ export async function bundlessDts(
 	config: SystemConfig,
 	onSuccess?: () => void,
 ): Promise<void | Watcher> {
+	if (options.dts.builder === "tsgo") {
+		return bundlessTsgoDts(options, config, onSuccess);
+	}
+
 	const { tsconfig } = config;
 	if (tsconfig?.isolatedDeclarations) {
 		return bundlessTransformDts(options, config, onSuccess);

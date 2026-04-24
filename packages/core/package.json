@@ -56,10 +56,14 @@
 		"@types/yargs": "^17.0.35"
 	},
 	"peerDependencies": {
-		"@swc/helpers": "^0.5.21"
+		"@swc/helpers": "^0.5.21",
+		"@typescript/native-preview": ">=7.0.0-dev"
 	},
 	"peerDependenciesMeta": {
 		"@swc/helpers": {
+			"optional": true
+		},
+		"@typescript/native-preview": {
 			"optional": true
 		}
 	},

@@ -34,6 +34,7 @@
 	"devDependencies": {
 		"@rspress/core": "2.0.9",
 		"@shined/lecp": "workspace:*",
+		"@typescript/native-preview": "7.0.0-dev.20260424.1",
 		"bumpp": "^11.0.1",
 		"oxfmt": "^0.46.0",
 		"oxlint": "^1.61.0",
