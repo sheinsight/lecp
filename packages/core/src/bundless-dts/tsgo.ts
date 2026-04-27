@@ -1,13 +1,16 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import { createRequire } from "node:module";
-import path from "node:path";
 import { tmpdir } from "node:os";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+import chokidar from "chokidar";
 import colors from "picocolors";
 import { glob } from "tinyglobby";
 import ts from "typescript";
 import tsPathsTransformer from "typescript-transform-paths";
 import type { SystemConfig, Watcher } from "../build.ts";
+import { testPattern, testPatternForTs } from "../constant.ts";
 import type {
 	FinalBundleFormat,
 	FinalBundlessFormat,
@@ -21,21 +24,14 @@ type BundlessOptions = FinalBundleFormat | FinalBundlessFormat;
 async function getTsgoExePath(): Promise<string> {
 	try {
 		const require = createRequire(import.meta.url);
-		const pkgJsonPath = require.resolve(
-			"@typescript/native-preview/package.json",
-		);
+		const pkgJsonPath =
+			require.resolve("@typescript/native-preview/package.json");
 		const libPath = path.resolve(
 			path.dirname(pkgJsonPath),
 			"./lib/getExePath.js",
 		);
 
-		// Windows 需要 file:// 协议
-		const fileUrl =
-			process.platform === "win32"
-				? new URL(`file:///${libPath.replace(/\\/g, "/")}`).href
-				: libPath;
-
-		const mod = await import(fileUrl);
+		const mod = await import(pathToFileURL(libPath).href);
 		const getExePath: () => string = mod.default;
 		return getExePath();
 	} catch {
@@ -53,8 +49,14 @@ function runTsgoCli(options: {
 	rootDir: string;
 	declarationMap: boolean;
 }): Promise<void> {
-	const { exePath, cwd, tsconfigPath, declarationDir, rootDir, declarationMap } =
-		options;
+	const {
+		exePath,
+		cwd,
+		tsconfigPath,
+		declarationDir,
+		rootDir,
+		declarationMap,
+	} = options;
 
 	const args = [
 		"--project",
@@ -91,19 +93,19 @@ function runTsgoCli(options: {
 			stderr += data.toString();
 		});
 
-		child.on("close", (code) => {
+		child.on("close", code => {
 			if (code !== 0) {
 				if (stderr.trim()) logger.error(stderr.trim());
 				reject(new Error(`tsgo exited with code ${code}`));
 			} else {
+				if (stderr.trim())
+					logger.debug(`${colors.cyan("[tsgo]")} ${stderr.trim()}`);
 				resolve();
 			}
 		});
 
-		child.on("error", (err) => {
-			reject(
-				new Error(`Failed to spawn tsgo: ${err.message}`),
-			);
+		child.on("error", err => {
+			reject(new Error(`Failed to spawn tsgo: ${err.message}`));
 		});
 	});
 }
@@ -120,7 +122,7 @@ async function postProcessTsgoOutput(options: {
 	const { tempDir, outDir, srcDir, outJsExt, outDtsExt, tsconfig, cwd } =
 		options;
 
-	const dtsFiles = await glob("**/*.d.ts", {
+	const dtsFiles = await glob("**/*.d.{ts,mts,cts}", {
 		cwd: tempDir,
 		absolute: true,
 	});
@@ -131,10 +133,11 @@ async function postProcessTsgoOutput(options: {
 		const relPath = path.relative(tempDir, dtsFile);
 		const content = await fs.readFile(dtsFile, "utf-8");
 
-		// 用原始源文件路径作为 fileName，让文件系统检查正确解析
+		// .d.ts -> .ts, .d.mts -> .mts, .d.cts -> .cts
+		const srcExt = relPath.match(/\.d\.(m?ts|cts)$/)?.[1] ?? "ts";
 		const originalSourcePath = path.join(
 			srcDir,
-			relPath.replace(/\.d\.ts$/, ".ts"),
+			relPath.replace(/\.d\.(m?ts|cts)$/, `.${srcExt}`),
 		);
 
 		const sourceFile = ts.createSourceFile(
@@ -146,12 +149,12 @@ async function postProcessTsgoOutput(options: {
 		);
 
 		// @ts-expect-error 兼容 cjs,esm 加载
-		const pathsTransformer = (tsPathsTransformer?.default ?? tsPathsTransformer)(
-			undefined,
-			undefined,
-			undefined,
-			{ fileNames: [originalSourcePath], compilerOptions: tsconfig },
-		);
+		const pathsTransformer = (
+			tsPathsTransformer?.default ?? tsPathsTransformer
+		)(undefined, undefined, undefined, {
+			fileNames: [originalSourcePath],
+			compilerOptions: tsconfig,
+		});
 
 		const extensionTransformer = createExtensionRewriteTransformer({
 			ext: `.${outJsExt}`,
@@ -166,11 +169,8 @@ async function postProcessTsgoOutput(options: {
 		let code = printer.printFile(transformed as ts.SourceFile);
 		transformResult.dispose();
 
-		// 计算输出文件名和路径
-		const outRelPath = relPath.replace(
-			/\.d\.ts$/,
-			`.d.${outDtsExt}`,
-		);
+		// 统一输出为 .d.{outDtsExt}（如 .d.ts 或 .d.cts）
+		const outRelPath = relPath.replace(/\.d\.(m?ts|cts)$/, `.d.${outDtsExt}`);
 		const outFilePath = path.join(outDir, outRelPath);
 
 		// 处理 sourcemap 引用
@@ -184,33 +184,79 @@ async function postProcessTsgoOutput(options: {
 		}
 
 		if (hasSourceMap) {
-			// 移除 tsgo 生成的 sourceMappingURL（如果有）
 			code = code.replace(
 				/\/\/# sourceMappingURL=.*$/m,
 				`//# sourceMappingURL=${path.basename(outFilePath)}.map`,
 			);
 
-			// 修正 d.ts.map 的 file 字段并写入
 			const mapContent = await fs.readFile(mapFile, "utf-8");
 			const sourceMap = JSON.parse(mapContent);
 			sourceMap.file = path.basename(outFilePath);
+			if (Array.isArray(sourceMap.sources)) {
+				sourceMap.sources = sourceMap.sources.map((src: string) => {
+					const absSource = path.resolve(path.dirname(mapFile), src);
+					return path.relative(path.dirname(outFilePath), absSource);
+				});
+			}
 			const outMapPath = outFilePath + ".map";
 			await fs.mkdir(path.dirname(outMapPath), { recursive: true });
 			await fs.writeFile(outMapPath, JSON.stringify(sourceMap));
 		} else {
-			// 无 sourcemap 时移除可能存在的 sourceMappingURL
-			code = code.replace(/\/\/# sourceMappingURL=.*\n?$/m, "");
+			code = code.replace(/\/\/# sourceMappingURL=.*$/m, "");
 		}
 
 		await fs.mkdir(path.dirname(outFilePath), { recursive: true });
 		await fs.writeFile(outFilePath, code);
 
-		const fileRelPath = dtsFile.replace(`${cwd}/`, "");
+		const srcFileRelPath = originalSourcePath.replace(`${cwd}/`, "");
 		const outFileRelPath = outFilePath.replace(`${cwd}/`, "");
 		logger.info(
 			"bundless(dts)",
-			`${colors.yellow(fileRelPath)} to ${colors.blackBright(outFileRelPath)}`,
+			`${colors.yellow(srcFileRelPath)} to ${colors.blackBright(outFileRelPath)}`,
 		);
+	}
+}
+
+async function runTsgoAndPostProcess(ctx: {
+	exePath: string;
+	cwd: string;
+	tsconfigPath: string;
+	srcDir: string;
+	outDir: string;
+	outJsExt: string;
+	outDtsExt: string;
+	format: string;
+	declarationMap: boolean;
+	tsconfig: ts.CompilerOptions;
+	onSuccess?: () => void;
+}): Promise<void> {
+	const tempDir = await fs.mkdtemp(
+		path.join(tmpdir(), `lecp-tsgo-${ctx.format}-`),
+	);
+
+	try {
+		await runTsgoCli({
+			exePath: ctx.exePath,
+			cwd: ctx.cwd,
+			tsconfigPath: ctx.tsconfigPath,
+			declarationDir: tempDir,
+			rootDir: ctx.srcDir,
+			declarationMap: ctx.declarationMap,
+		});
+
+		await postProcessTsgoOutput({
+			tempDir,
+			outDir: ctx.outDir,
+			srcDir: ctx.srcDir,
+			outJsExt: ctx.outJsExt,
+			outDtsExt: ctx.outDtsExt,
+			tsconfig: ctx.tsconfig,
+			cwd: ctx.cwd,
+		});
+
+		ctx.onSuccess?.();
+	} finally {
+		await fs.rm(tempDir, { recursive: true, force: true });
 	}
 }
 
@@ -225,55 +271,124 @@ export async function bundlessTsgoDts(
 	const exePath = await getTsgoExePath();
 	logger.debug("tsgo binary:", exePath);
 
-	const tsconfigPath = ts.findConfigFile(cwd, ts.sys.fileExists);
-	if (!tsconfigPath) {
+	const originalTsconfigPath = ts.findConfigFile(cwd, ts.sys.fileExists);
+	if (!originalTsconfigPath) {
 		logger.error(`cannot find tsconfig.json in ${cwd}`);
 		return;
 	}
 
-	const outJsExt = getOutJsExt(
-		!!targets.node,
-		pkg.type === "module",
-		format,
-	);
+	const outJsExt = getOutJsExt(!!targets.node, pkg.type === "module", format);
 	const outDtsExt = outJsExt.replace(/^(c|m)?js$/, "$1ts");
-
-	// 检查 tsconfig 中是否启用了 declarationMap
 	const declarationMap = tsconfig?.declarationMap !== false;
 
-	// 创建临时目录
-	const tempDir = await fs.mkdtemp(
-		path.join(tmpdir(), `lecp-tsgo-${format}-`),
-	);
+	const tempTsconfigPath = path.join(cwd, `tsconfig.lecp-tsgo-${format}.json`);
+	const tempTsconfig = {
+		extends: `./${path.relative(cwd, originalTsconfigPath)}`,
+		include: [`${path.relative(cwd, srcDir)}/**/*`],
+		exclude: testPatternForTs.concat(options.exclude ?? []),
+	};
+	await fs.writeFile(tempTsconfigPath, JSON.stringify(tempTsconfig));
+
+	const ctx = {
+		exePath,
+		cwd,
+		tsconfigPath: tempTsconfigPath,
+		srcDir,
+		outDir,
+		outJsExt,
+		outDtsExt,
+		format,
+		declarationMap,
+		tsconfig: tsconfig ?? {},
+		onSuccess,
+	};
 
 	try {
-		await runTsgoCli({
-			exePath,
-			cwd,
-			tsconfigPath,
-			declarationDir: tempDir,
-			rootDir: srcDir,
-			declarationMap,
-		});
-
-		await postProcessTsgoOutput({
-			tempDir,
-			outDir,
-			srcDir,
-			outJsExt,
-			outDtsExt,
-			tsconfig: tsconfig ?? {},
-			cwd,
-		});
-
-		onSuccess?.();
+		await runTsgoAndPostProcess(ctx);
 	} finally {
-		await fs.rm(tempDir, { recursive: true, force: true });
+		await fs.rm(tempTsconfigPath, { force: true });
 	}
 
 	if (watch) {
-		logger.warn(
-			"tsgo builder does not support watch mode yet. DTS will only be generated on initial build.",
+		const excludePatterns = testPattern.concat(
+			"**/*.d.ts",
+			options.exclude ?? [],
 		);
+
+		const watcher = chokidar.watch(".", {
+			cwd: srcDir,
+			ignoreInitial: true,
+			ignored: excludePatterns,
+		});
+
+		let building = false;
+		let dirty = false;
+		let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+		let changedFiles: string[] = [];
+
+		const cleanupDtsOutput = async (file: string) => {
+			const dtsFile = path.join(
+				outDir,
+				file.replace(/\.(c|m)?(t|j)sx?$/, `.d.${outDtsExt}`),
+			);
+			await fs.rm(dtsFile, { force: true });
+			await fs.rm(dtsFile + ".map", { force: true });
+			logger.info(
+				"bundless(dts)",
+				`${colors.cyan("[tsgo]")} removed ${colors.blackBright(dtsFile.replace(`${cwd}/`, ""))}`,
+			);
+		};
+
+		watcher.on("all", (event, file) => {
+			if (!/\.(c|m)?(ts|tsx)$/.test(file)) return;
+
+			if (event === "unlink") {
+				cleanupDtsOutput(file);
+				return;
+			}
+
+			if (event !== "add" && event !== "change") return;
+
+			changedFiles.push(file);
+
+			if (building) {
+				dirty = true;
+				return;
+			}
+
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(async () => {
+				building = true;
+				try {
+					do {
+						dirty = false;
+						const files = changedFiles;
+						changedFiles = [];
+						logger.info(
+							"bundless(dts)",
+							`${colors.cyan("[tsgo]")} rebuilding due to ${files.map(f => colors.yellow(f)).join(", ")}...`,
+						);
+						await runTsgoAndPostProcess(ctx);
+					} while (dirty);
+				} catch (error) {
+					logger.error(error);
+					if (dirty) {
+						dirty = false;
+						changedFiles = [];
+						setImmediate(() => watcher.emit("all", "change", "retry"));
+					}
+				} finally {
+					building = false;
+				}
+			}, 100);
+		});
+
+		const originalClose = watcher.close.bind(watcher);
+		watcher.close = async () => {
+			clearTimeout(debounceTimer);
+			return originalClose();
+		};
+
+		return watcher;
 	}
 }

@@ -262,15 +262,15 @@ const watchDeclaration = (
 			customTransformers,
 		): ts.EmitResult => {
 			const transformers = customTransformers ?? {};
-			transformers.afterDeclarations ??= [];
-			transformers.afterDeclarations.concat(
+			transformers.afterDeclarations = [
+				...(transformers.afterDeclarations ?? []),
 				// @ts-expect-error 兼容 cjs,esm 加载
 				(tsPathsTransformer?.default ?? tsPathsTransformer)(
 					program.getProgram(),
 				),
 				// .cjs, .mjs 后缀转换
 				createExtensionRewriteTransformer({ ext: "." + outJsExt }),
-			);
+			];
 
 			return originalEmit(
 				targetSourceFile,
@@ -415,7 +415,8 @@ async function bundlessTransformDts(
 			`${colors.yellow(fileRelPath)} to ${colors.blackBright(outFileRelPath)}`,
 		);
 
-		const result = await dtsBuilders[dts.builder](file);
+		const result =
+			await dtsBuilders[dts.builder as keyof typeof dtsBuilders](file);
 		if (!result) return;
 		let { code, map } = result;
 
@@ -484,6 +485,7 @@ export async function bundlessDts(
 	onSuccess?: () => void,
 ): Promise<void | Watcher> {
 	if (options.dts.builder === "tsgo") {
+		logger.info("generate dts with tsgo");
 		return bundlessTsgoDts(options, config, onSuccess);
 	}
 

@@ -139,6 +139,9 @@ importers:
       '@swc/types':
         specifier: ^0.1.26
         version: 0.1.26
+      '@typescript/native-preview':
+        specifier: '>=7.0.0-dev'
+        version: 7.0.0-dev.20260424.1
       chokidar:
         specifier: ^5.0.0
         version: 5.0.0
