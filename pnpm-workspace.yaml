@@ -13,10 +13,10 @@ catalog:
   typescript: ^6.0.3
   vitest: ^4.1.5
 
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - '@swc/core'
-  - core-js
-  - esbuild
+allowBuilds:
+  '@biomejs/biome': true
+  '@swc/core': true
+  core-js: true
+  esbuild: true
 
 verifyDepsBeforeRun: install
