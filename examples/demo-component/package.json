@@ -12,7 +12,7 @@
 		"build": "lecp"
 	},
 	"dependencies": {
-		"immer": "^11.0.1"
+		"immer": "^11.1.6"
 	},
 	"devDependencies": {
 		"@shined/lecp": "workspace:*",

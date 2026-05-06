@@ -30,7 +30,7 @@
 	},
 	"dependencies": {
 		"@microsoft/api-extractor": "^7.58.7",
-		"@rspack/core": "2.0.0",
+		"@rspack/core": "2.0.1",
 		"@shined/lecp-binding": "workspace:*",
 		"@svgr-rs/svgrs-plugin": "^0.2.0",
 		"@swc/types": "^0.1.26",

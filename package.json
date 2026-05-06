@@ -32,12 +32,12 @@
 		"release": "bumpp -r --no-push && pnpm run build:binding && TAG=$(git describe --tags --abbrev=0) && git add . && git commit --amend --no-edit && git tag -f \"$TAG\""
 	},
 	"devDependencies": {
-		"@rspress/core": "2.0.9",
+		"@rspress/core": "2.0.10",
 		"@shined/lecp": "workspace:*",
 		"@typescript/native-preview": "7.0.0-dev.20260424.1",
 		"bumpp": "^11.0.1",
-		"oxfmt": "^0.46.0",
-		"oxlint": "^1.61.0",
+		"oxfmt": "^0.47.0",
+		"oxlint": "^1.62.0",
 		"tinyglobby": "^0.2.16",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
