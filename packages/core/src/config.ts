@@ -115,7 +115,7 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 		builder: "rspack",
 		outDir: "umd",
 		entry: "src",
-		minify: true,
+		minify: false,
 		// name: pkg.name,
 	} as BundleFormat,
 };
@@ -151,7 +151,7 @@ export const getFinalUserOptions = (
 
 		if (data.mode === "bundle") {
 			data.name ??= pkg.name;
-			data.fileName ??= "index";
+			data.fileName ??= data.minify ? "index.min" : "index";
 
 			// bundle 模式下，默认从package.json 自动获取 externals
 			if (["esm", "cjs"].includes(data.type)) {
