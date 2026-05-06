@@ -1,13 +1,27 @@
 # 更新日志
 
+# 0.4.0
+
+2026-05-06
+
+- 💥 UMD 默认 `minify` 改为 `false`，`fileName` 按 `minify` 自动推导
+  > 若需要压缩产物，须显式新增配置：`{ type: "umd", minify: true }`
+- 💥 支持 `tsgo` 作为 DTS 构建引擎
+  > 设置 `dts.builder: "tsgo"` 启用，需安装 `@typescript/native-preview` 为可选依赖
+- 🐞 修复多 format 并行构建时 `clean` 竞态导致输出被互相删除的问题
+  > 将清理逻辑提升到顶层，按 outDir 去重后统一执行，再启动并行任务
+- 🐞 修复 `lessCompile` 默认值 `true` 不生效的问题
+- 🏰 bump dependencies
+  > rspack@2.0, swc_core@64, swc@62
+
 # 0.3.0
 
 2025-12-26
 
 - 💥 `target` 支持 `esXXXX: ""`
-> 例如 `es2015: ""`，表示编译到 ES2015 标准
--  🏰 bump dependencies
-> swc_core@53
+  > 例如 `es2015: ""`，表示编译到 ES2015 标准
+- 🏰 bump dependencies
+  > swc_core@53
 
 # 0.2.2
 
