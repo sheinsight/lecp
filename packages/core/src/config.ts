@@ -140,6 +140,9 @@ export const getFinalUserOptions = (
 
 	const buildOptions = merge<UserConfig>(defaultConfig, userConfig);
 
+	// shallow merge doesn't preserve nested defaults, so merge css explicitly
+	buildOptions.css = { ...defaultConfig.css, ...userConfig.css };
+
 	buildOptions.format = userConfig.format.map(item => {
 		const data = {
 			...defaultFormatConfig[item.type],
