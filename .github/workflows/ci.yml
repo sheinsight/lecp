@@ -163,3 +163,5 @@ jobs:
           echo "Detected version: $VERSION, using tag: $TAG"
       - name: Publish
         run: pnpm -r --filter=\!'@shined/swc-plugin-*' publish --no-git-checks --access public --tag ${{ steps.npm-tag.outputs.tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
