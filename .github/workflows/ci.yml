@@ -25,11 +25,9 @@ jobs:
           - host: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             build: pnpm build --platform --target x86_64-unknown-linux-gnu --use-napi-cross
-            # docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
             build: pnpm build --platform --target x86_64-unknown-linux-musl -x
-            # docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine-zig
           - host: macos-latest
             target: aarch64-apple-darwin
             build: pnpm build --platform --target aarch64-apple-darwin
@@ -39,39 +37,30 @@ jobs:
           - host: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             build: pnpm build --platform --target aarch64-unknown-linux-gnu --use-napi-cross
-            # docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
           - host: ubuntu-latest
             target: aarch64-unknown-linux-musl
             build: pnpm build --platform --target aarch64-unknown-linux-musl -x
-            # docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine-zig
-    name: stable - ${{ matrix.settings.target }} - node@20
+    name: stable - ${{ matrix.settings.target }} - node@24
     runs-on: ${{ matrix.settings.host }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       # node
       - name: setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       - name: Install Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
           cache: pnpm
       # rust
-      # - name: Install Rust
-      #   if: ${{ !matrix.settings.docker }}
-      #   uses: dtolnay/rust-toolchain@stable
-      #   with:
-      #     targets: ${{ matrix.settings.target }}
-
       - name: Install Rust
-        if: ${{ !matrix.settings.docker }}
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           target: ${{ matrix.settings.target }}
           override: true
 
       - name: Cache cargo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry/index/
@@ -103,42 +92,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       - name: Setup node x86
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         if: matrix.settings.target == 'i686-pc-windows-msvc'
         with:
-          node-version: 20
+          node-version: 24
           architecture: x86
       # build
       - name: Build
-        if: ${{ !matrix.settings.docker }}
         run: cd ${{ env.NAPI_DIR }} && ${{ matrix.settings.build }}
         shell: bash
 
-      - name: Build in docker
-        uses: addnab/docker-run-action@v3
-        if: ${{ matrix.settings.docker }}
-        with:
-          image: ${{ matrix.settings.docker }}
-          options: |
-            --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db
-            -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache
-            -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index
-            -v ${{ github.workspace }}:/build
-            -w /build
-          run: |
-            set -e
-            rustup target add ${{ matrix.settings.target }}
-            cd ${{ env.NAPI_DIR }} && ${{ matrix.settings.build }}
-
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: matrix.settings.target != 'wasm32-wasi-preview1-threads'
         with:
           name: bindings-${{ matrix.settings.target }}
           path: ${{ env.NAPI_DIR }}/*.node
           if-no-files-found: error
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: matrix.settings.target == 'wasm32-wasi-preview1-threads'
         with:
           name: bindings-${{ matrix.settings.target }}
@@ -150,12 +122,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       # node
       - name: setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       - name: Install Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
           cache: pnpm
@@ -164,7 +136,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       # napi
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: ${{ env.NAPI_DIR }}/artifacts
       - name: Move artifacts
@@ -192,3 +164,4 @@ jobs:
         run: pnpm -r --filter=\!'@shined/swc-plugin-*' publish --no-git-checks --access public --tag ${{ steps.npm-tag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          npm_config_tag: ${{ steps.npm-tag.outputs.tag }}
