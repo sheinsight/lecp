@@ -2,7 +2,7 @@
 
 # 0.4.0
 
-2026-05-06
+2026-05-07
 
 - 💥 UMD 默认 `minify` 改为 `false`，`fileName` 按 `minify` 自动推导
   > 若需要压缩产物，须显式新增配置：`{ type: "umd", minify: true }`
