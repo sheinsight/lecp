@@ -4,6 +4,7 @@ export default defineConfig({
 	format: [
 		{
 			type: "umd",
+			minify: true,
 			fileName: "index.min",
 			externals: {
 				react: "React",
@@ -13,7 +14,6 @@ export default defineConfig({
 		},
 		{
 			type: "umd",
-			minify: false,
 			externals: {
 				react: "React",
 				"react-dom": "ReactDOM",

@@ -1,6 +1,6 @@
 {
 	"name": "lecp-root",
-	"version": "0.4.0-beta.2",
+	"version": "0.4.0-beta.3",
 	"private": true,
 	"description": "",
 	"keywords": [],
@@ -42,5 +42,5 @@
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	},
-	"packageManager": "pnpm@11.0.6"
+	"packageManager": "pnpm@10.33.4"
 }
