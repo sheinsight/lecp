@@ -1,5 +1,5 @@
 import { type LightningcssLoaderOptions, rspack } from "@rspack/core";
-import type RspackChain from "rspack-chain";
+import type { RspackChain } from "rspack-chain";
 import { getBrowsersList, requireResolve } from "../../util/index.ts";
 import type { PluginFn } from "../chain.ts";
 

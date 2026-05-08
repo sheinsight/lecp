@@ -31,4 +31,42 @@
    - remove `babel`, 只支持 `swc`
    - `postcss` -> `lightningcss`
      > 所以不支持 `:global`, `:local`，只支持 `:global(.foo)`, `:local(.foo)`
+   - CSS Modules 实现机制变更，**不再支持运行时动态键名访问**
+     - v1 通过 postcss 在文件头部注入样式元数据，不关心调用方式，动态键名可正常运行
+     - v2 通过 `swc-plugin-css-modules` 在调用处静态替换，无法处理运行时动态键名
+
+     ```jsx
+     import styles from '../styles/modal.less'
+
+     // v1（可用，动态键名在运行时解析）
+     const colors = ['', 'fail', 'success', 'fail']
+     <span className={`${styles.info} ${styles[colors[submitState]]}`}>
+
+     // v2（需改写，提前映射为静态属性访问）
+     const colorClasses = ['', styles.fail, styles.success, styles.fail]
+     <span className={`${styles.info} ${colorClasses[submitState]}`}>
+     ```
+
    - dts 生成(开启 `isolatedDeclarations`)， 支持使用 `swc` 进行编译
+
+5. **默认值变更**
+   - UMD 产物默认只生成未压缩的 `index.js`，不再同时生成压缩版本。若需要压缩产物，需显式新增配置项：
+
+     ```ts
+     format: [{ type: "umd" }, { type: "umd", minify: true }];
+     ```
+
+   - `targets` 默认值升级，覆盖的浏览器/Node 版本范围缩小：
+
+     |                     | v1               | v2                    |
+     | ------------------- | ---------------- | --------------------- |
+     | Web（含 ESM / UMD） | `{ chrome: 48 }` | `{ chrome: 55 }`      |
+     | Node-only（纯 CJS） | `{ node: 14 }`   | `{ node: "20.11.0" }` |
+
+     若项目需要支持旧版环境，须显式声明：
+
+     ```ts
+     targets: {
+     	chrome: 48;
+     }
+     ```

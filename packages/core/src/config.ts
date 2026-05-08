@@ -115,7 +115,7 @@ const defaultFormatConfig: Record<FormatType, BundlessFormat | BundleFormat> = {
 		builder: "rspack",
 		outDir: "umd",
 		entry: "src",
-		minify: true,
+		minify: false,
 		// name: pkg.name,
 	} as BundleFormat,
 };
@@ -140,6 +140,9 @@ export const getFinalUserOptions = (
 
 	const buildOptions = merge<UserConfig>(defaultConfig, userConfig);
 
+	// shallow merge doesn't preserve nested defaults, so merge css explicitly
+	buildOptions.css = { ...defaultConfig.css, ...userConfig.css };
+
 	buildOptions.format = userConfig.format.map(item => {
 		const data = {
 			...defaultFormatConfig[item.type],
@@ -148,7 +151,7 @@ export const getFinalUserOptions = (
 
 		if (data.mode === "bundle") {
 			data.name ??= pkg.name;
-			data.fileName ??= "index";
+			data.fileName ??= data.minify ? "index.min" : "index";
 
 			// bundle 模式下，默认从package.json 自动获取 externals
 			if (["esm", "cjs"].includes(data.type)) {

@@ -1,6 +1,6 @@
 {
 	"name": "lecp-root",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"private": true,
 	"description": "",
 	"keywords": [],
@@ -32,14 +32,15 @@
 		"release": "bumpp -r --no-push && pnpm run build:binding && TAG=$(git describe --tags --abbrev=0) && git add . && git commit --amend --no-edit && git tag -f \"$TAG\""
 	},
 	"devDependencies": {
-		"@rspress/core": "2.0.0-rc.1",
+		"@rspress/core": "2.0.10",
 		"@shined/lecp": "workspace:*",
-		"bumpp": "^10.3.2",
-		"oxfmt": "^0.17.0",
-		"oxlint": "^1.32.0",
-		"tinyglobby": "^0.2.15",
+		"@typescript/native-preview": "7.0.0-dev.20260424.1",
+		"bumpp": "^11.0.1",
+		"oxfmt": "^0.47.0",
+		"oxlint": "^1.62.0",
+		"tinyglobby": "^0.2.16",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	},
-	"packageManager": "pnpm@10.27.0"
+	"packageManager": "pnpm@10.33.4"
 }

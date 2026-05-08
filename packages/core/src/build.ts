@@ -50,16 +50,29 @@ export const build = async (
 	const options = getFinalUserOptions(userConfig, systemConfig);
 	const { format } = options;
 
-	const taskPromises = format.map(async formatOptions => {
+	// Pre-compute all final options so we can deduplicate outDirs for clean
+	const formatFinalOptions = format.map(formatOptions =>
+		getFinalFormatOptions(options, formatOptions, systemConfig),
+	);
+
+	// Clean each unique outDir exactly once before parallel builds start,
+	// preventing formats that share the same outDir from deleting each other's output.
+	const outDirsToClean = new Set(
+		formatFinalOptions.filter(o => o.clean).map(o => o.outDir),
+	);
+	await Promise.all(
+		[...outDirsToClean].map(outDir => {
+			logger.info(`🧹 clear directory: ${outDir.replace(cwd, ".")}`);
+			return fs.rm(outDir, { recursive: true, force: true, maxRetries: 3 });
+		}),
+	);
+
+	const taskPromises = format.map(async (formatOptions, index) => {
 		let taskWatchers: Watcher[] = [];
 
 		const { mode } = formatOptions;
 
-		const finalOptions = getFinalFormatOptions(
-			options,
-			formatOptions,
-			systemConfig,
-		);
+		const finalOptions = formatFinalOptions[index];
 
 		// console.log(`build options: ${JSON.stringify(finalOptions, null, 2)}`);
 

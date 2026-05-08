@@ -51,8 +51,17 @@
 			"semanticCommitScope": "test"
 		},
 		{
+			"description": "GitHub Actions",
+			"matchManagers": ["github-actions"],
+			"semanticCommitType": "chore",
+			"semanticCommitScope": "ci",
+			"groupName": "github actions",
+			"automerge": false
+		},
+		{
 			"description": "Major updates",
 			"matchUpdateTypes": ["major"],
+			"matchManagers": ["!github-actions"],
 			"dependencyDashboardApproval": true,
 			"automerge": false,
 			"prTitle": "chore(deps): update {{depName}} major to {{newVersion}}"

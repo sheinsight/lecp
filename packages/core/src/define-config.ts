@@ -2,7 +2,7 @@ import type { Configuration as RspackConfig } from "@rspack/core";
 import type { Options as SwcOptions } from "@swc/types";
 import type Less from "less";
 import type { TransformOptions as LightningCssTransformOptions } from "lightningcss";
-import type RspackChain from "rspack-chain";
+import type { RspackChain } from "rspack-chain";
 
 /** 编译类型 */
 export type FormatType = "esm" | "cjs" | "umd";
@@ -12,7 +12,7 @@ export type FormatType = "esm" | "cjs" | "umd";
 export type BuilderType = "swc" | "rspack";
 // postcss ...
 export type CssBuilderType = "lightningcss";
-export type DtsBuilderType = "ts" | "swc";
+export type DtsBuilderType = "ts" | "swc" | "tsgo";
 
 export type DtsOptions = {
 	/**
@@ -27,6 +27,7 @@ export type DtsOptions = {
 	 * 构建引擎
 	 * - "ts": TypeScript 编译器（功能完整，支持 d.ts.map）
 	 * - "swc": SWC 编译器（速度更快，但不支持 d.ts.map）
+	 * - "tsgo": Go 原生 TypeScript 编译器（速度最快，需安装 @typescript/native-preview）
 	 * @default "ts"
 	 * @description 仅在 bundless + isolatedDeclarations 模式下可选择 swc
 	 */

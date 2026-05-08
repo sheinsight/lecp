@@ -8,7 +8,8 @@ use log::{debug, info};
 use owo_colors::OwoColorize;
 use rayon::prelude::*;
 use swc::{transform_file, write_file_and_sourcemap};
-use wax::Glob;
+use wax::walk::{Entry, FileIterator};
+use wax::{Glob, any};
 
 pub use crate::options::{BundlessOptions, CSS, Define, JsxRuntime, ModuleType, React, Shims};
 pub use crate::util::serde_error_to_miette;
@@ -132,7 +133,7 @@ pub fn bundless_files(options: &BundlessOptions) -> Result<()> {
 
     let glob: Glob<'_> = Glob::new("**/*.{ts,tsx,cts,mts,js,jsx,cjs,mjs}")?;
     glob.walk(&src_dir)
-        .not(ignore)?
+        .not(any(ignore)?)?
         .par_bridge()
         .filter_map(Result::ok)
         .map(|entry| entry.path().to_owned())
@@ -209,7 +210,7 @@ pub fn bundless_dts(options: &BundlessOptions) -> Result<()> {
 
     let glob: Glob<'_> = Glob::new("**/*.{ts,tsx,cts,mts,js,jsx,cjs,mjs}")?;
     glob.walk(&src_dir)
-        .not(ignore)?
+        .not(any(ignore)?)?
         .par_bridge()
         .filter_map(Result::ok)
         .map(|entry| entry.path().to_owned())

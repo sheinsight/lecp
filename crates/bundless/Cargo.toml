@@ -26,6 +26,7 @@ wax        = { workspace = true }
 swc = { workspace = true, features = ["isolated-dts"] }
 swc_core = { workspace = true, features = [
     "base_concurrent",
+    "base_module",
     "common_concurrent",
     "ecma_ast",
     "ecma_utils",
