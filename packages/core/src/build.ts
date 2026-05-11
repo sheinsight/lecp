@@ -31,14 +31,18 @@ export interface SystemConfig {
 	tsconfig?: CompilerOptions;
 }
 
-export interface Watcher {
+interface Watcher {
 	close(): Promise<void> | void;
+}
+
+export interface BuildResult {
+	close(): Promise<void>;
 }
 
 export const build = async (
 	userConfig: UserConfig,
 	inputSystemConfig: InputSystemConfig = {},
-): Promise<Watcher[]> => {
+): Promise<BuildResult> => {
 	const cwd = inputSystemConfig.cwd ?? process.cwd();
 	const systemConfig = {
 		...inputSystemConfig,
@@ -133,7 +137,10 @@ export const build = async (
 	});
 
 	const allTaskWatchers = await Promise.all(taskPromises);
-	return allTaskWatchers.flat();
+	const watchers = allTaskWatchers.flat();
+	return {
+		close: async () => { await Promise.allSettled(watchers.map(w => w.close())); },
+	};
 };
 
 // cwd -> configFiles, config
