@@ -1,7 +1,7 @@
 import colors from "picocolors";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { build, init, type Watcher } from "./build.ts";
+import { build, init, type BuildResult } from "./build.ts";
 import { watchConfig } from "./restart.ts";
 import { measure } from "./util/index.ts";
 import { logger } from "./util/logger.ts";
@@ -22,17 +22,17 @@ yargs(hideBin(process.argv))
 			},
 		},
 		async argv => {
-			let watchers: Watcher[] = [];
+			let result: BuildResult | null = null;
 
 			const handler = async () => {
-				watchers?.forEach(watcher => watcher.close());
+				await result?.close();
 
 				const systemConfig = { watch: argv.watch, logLevel: argv.logLevel };
 				const { config, files } = await init(systemConfig);
 
 				const { duration } = await measure(async () => {
 					console.log(`\n${colors.white("LECP start build")}\n`);
-					watchers = await build(config, systemConfig);
+					result = await build(config, systemConfig);
 				});
 
 				console.log(`\n🌈 build success in ${duration}ms`);

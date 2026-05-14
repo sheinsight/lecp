@@ -80,8 +80,9 @@ interface BundleFormat {
 
   /**
    * 包名称
-   * @description 默认从 package.json 的 name 字段获取
-   * UMD 模式下会转换为驼峰命名，如 react-dom -> ReactDOM
+   * @description UMD 模式下作为全局变量名（对应 output.library.name）
+   * - 显式传入时直接使用，不做转换
+   * - 未传入时自动从 package.json 的 name 字段生成，如 react-dom -> ReactDOM
    */
   name?: string;
 

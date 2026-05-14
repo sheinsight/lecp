@@ -17,7 +17,8 @@ export const pluginOutput: PluginFn = (chain, { options, config: { pkg } }) => {
 		.path(outDir)
 		.filename(`[name].${outJsExt}`)
 		.library({
-			name: format === "umd" ? toUmdName(name) : undefined,
+			// 用户显式传入的 name 直接使用，未传则从 pkg.name 自动生成规范的 UMD 全局变量名
+			name: format === "umd" ? (name ?? toUmdName(pkg.name)) : undefined,
 			type: rspackModuleMap[format],
 		});
 

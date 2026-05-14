@@ -1,5 +1,14 @@
 # 更新日志
 
+# 0.5.0
+
+2026-05-12
+
+- 💥 API 模式支持 watch mode，新增 `watchConfig` 配置项
+  > 通过 `build({ watchConfig: { ... } })` 启用监听模式，并发布 `BuildResult` 类型
+- 🐞 UMD `name` 显式传入时直接使用，不再自动做驼峰转换
+  > 用户不传则回退为 `toUmdName(pkg.name)` 推导
+
 # 0.4.0
 
 2026-05-07

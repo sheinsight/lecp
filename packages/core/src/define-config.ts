@@ -96,11 +96,9 @@ export interface BundleFormat extends Format {
 
 	/**
 	 * 包名称
-	 * @description 默认从 package.json 的 name 字段获取
-	 * - umd:
-	 *  命名转化 蛇形 -> 驼峰, 如 react-dom -> ReactDOM
-	 *  对应 rspack的 output.library.name
-	 *
+	 * @description UMD 模式下作为全局变量名（对应 rspack output.library.name）
+	 * - 显式传入时直接使用，不做转换
+	 * - 未传入时自动从 package.json 的 name 字段生成，如 react-dom -> ReactDOM
 	 */
 	name?: string;
 

@@ -150,7 +150,6 @@ export const getFinalUserOptions = (
 		};
 
 		if (data.mode === "bundle") {
-			data.name ??= pkg.name;
 			data.fileName ??= data.minify ? "index.min" : "index";
 
 			// bundle 模式下，默认从package.json 自动获取 externals
