@@ -1,5 +1,12 @@
 # 更新日志
 
+# 0.5.1
+
+2026-06-11
+
+- 🐞 修复 bundless dts watch 模式下 TS5055 报错
+  > outDir 产物 `.d.ts` 在重建时被模块解析重新拾取为输入文件，通过包装 `ts.System` 对编译器隐藏 outDir 下的声明文件产物；同时支持 monorepo symlink 场景的 `realpath` 回退解析
+
 # 0.5.0
 
 2026-05-12
