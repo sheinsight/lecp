@@ -227,6 +227,10 @@ const emitDeclaration = (
  * watch 模式下, 首次 emit 写入 outDir 的 .d.ts 会在重建时被模块解析
  * 重新拾取为输入文件, 再次写入时触发 TS5055 (would overwrite input file).
  * 包装 ts.System, 对编译器隐藏 outDir 下的声明文件, 使其不参与模块解析.
+ *
+ * 在 monorepo / pnpm workspace 中, node_modules 内的包通常是指向 packages/ 的
+ * 符号链接. TS 模块解析时传入的是 symlink 路径, 需要 realpath 解析后再比较,
+ * 否则 symlink 路径会绕过前缀匹配, TS 内部 realpath 后仍触发 TS5055.
  */
 export const createDtsHidingSystem = (
 	outDir: string | undefined,
@@ -240,10 +244,23 @@ export const createDtsHidingSystem = (
 	};
 	const dir = outDir ? normalize(outDir).replace(/\/*$/, "/") : undefined;
 
+	const resolveReal = (fileName: string): string => {
+		try {
+			return sys.realpath?.(fileName) ?? fileName;
+		} catch {
+			return fileName;
+		}
+	};
+
 	const isOutputDts = (fileName: string): boolean => {
 		if (!dir) return false;
+		if (!/\.d\.(c|m)?ts(\.map)?$/.test(fileName)) return false;
+		// 先用原始路径快速匹配 (非 symlink 场景)
 		const name = normalize(fileName);
-		return name.startsWith(dir) && /\.d\.(c|m)?ts(\.map)?$/.test(name);
+		if (name.startsWith(dir)) return true;
+		// symlink 场景: realpath 解析后再比较
+		const realName = normalize(resolveReal(fileName));
+		return realName.startsWith(dir);
 	};
 
 	return {

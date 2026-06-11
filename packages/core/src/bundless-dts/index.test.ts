@@ -111,6 +111,68 @@ describe("createDtsHidingSystem", () => {
 		});
 	});
 
+	describe("symlink 场景 (monorepo / pnpm workspace)", () => {
+		it("通过 node_modules symlink 指向 outDir 的 .d.ts 也应被隐藏", () => {
+			const { sys } = createMockSys({
+				realpath: (fileName: string) => {
+					// node_modules/@scope/pkg -> ../../packages/components 的 symlink
+					if (fileName.startsWith("/project/node_modules/@scope/pkg/")) {
+						return fileName.replace(
+							"/project/node_modules/@scope/pkg/",
+							"/project/es/",
+						);
+					}
+					return fileName;
+				},
+			});
+			const system = createDtsHidingSystem(OUT_DIR, sys);
+			// symlink 路径 realpath 后落在 outDir 下
+			expect(
+				system.fileExists(
+					"/project/node_modules/@scope/pkg/index.d.ts",
+				),
+			).toBe(false);
+			expect(
+				system.readFile(
+					"/project/node_modules/@scope/pkg/index.d.ts",
+				),
+			).toBeUndefined();
+		});
+
+		it("symlink 指向 outDir 外部的 .d.ts 不受影响", () => {
+			const { sys } = createMockSys({
+				realpath: (fileName: string) => {
+					if (fileName.startsWith("/project/node_modules/@scope/other/")) {
+						return fileName.replace(
+							"/project/node_modules/@scope/other/",
+							"/other-project/lib/",
+						);
+					}
+					return fileName;
+				},
+			});
+			const system = createDtsHidingSystem(OUT_DIR, sys);
+			expect(
+				system.fileExists(
+					"/project/node_modules/@scope/other/index.d.ts",
+				),
+			).toBe(true);
+		});
+
+		it("sys.realpath 不存在时不报错, 按原始路径判断", () => {
+			const { sys } = createMockSys({ realpath: undefined });
+			const system = createDtsHidingSystem(OUT_DIR, sys);
+			// symlink 路径前缀不匹配 outDir, 且无 realpath, 应透传
+			expect(
+				system.fileExists(
+					"/project/node_modules/@scope/pkg/index.d.ts",
+				),
+			).toBe(true);
+			// 直接 outDir 路径仍被隐藏
+			expect(system.fileExists("/project/es/index.d.ts")).toBe(false);
+		});
+	});
+
 	describe("边界情况", () => {
 		it("outDir 为 undefined 时完全透传", () => {
 			const { sys } = createMockSys();
