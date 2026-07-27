@@ -1,5 +1,12 @@
 # 更新日志
 
+# 0.5.2
+
+2026-07-27
+
+- 🐞 修复因 `UserConfigExport` 未导出, 导致在 `"declaration": true` 配置下 `lego.config.ts` 文件有ts报错
+- 🐞 bundless esm 格式默认保留 `import ... with { type: 'json' }` 语法
+
 # 0.5.1
 
 2026-06-11
