@@ -10,16 +10,16 @@ LECP 支持 React 组件库的开发，包含以下功能：
 ## 示例
 
 ```jsx
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  react: {
-    runtime: "automatic", // 可以在 tsconfig.json 中配置, lecp 会自动读取
-  },
-  css: {
-    cssModules: true, // 开启 css modules
-    lessCompile: true // 默认不推荐使用 less，仅仅作为基于 antd 二开组件的兼容支持
-  }
+	react: {
+		runtime: "automatic", // 可以在 tsconfig.json 中配置, lecp 会自动读取
+	},
+	css: {
+		cssModules: true, // 开启 css modules
+		lessCompile: true, // 默认不推荐使用 less，仅仅作为基于 antd 二开组件的兼容支持
+	},
 });
 ```
 
@@ -33,29 +33,27 @@ export default defineConfig({
 使用 `lightningcss` 作为 css解析器， 所以不支持 `:global`, `:local`，只支持 `:global(.foo)`, `:local(.foo)` 。[详情](https://github.com/parcel-bundler/lightningcss/issues/6#issuecomment-1002148141)
 
 ```less
-
 /* ❎ */
-:global .foo{
-  color: red;
+:global .foo {
+	color: red;
 }
 
 /* ❎ */
 :global .foo {
-    .bar {
-        color: red;
-    }
+	.bar {
+		color: red;
+	}
 }
 
 /* ✅ */
 :global(.foo) {
-  color: red;
+	color: red;
 }
 
 /* ✅ */
 :global(.foo) {
-    :global(.bar) {
-        color: red;
-    }
+	:global(.bar) {
+		color: red;
+	}
 }
-
 ```

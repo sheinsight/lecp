@@ -11,13 +11,10 @@
 **默认值：** `[]`
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  format: [
-    { type: "esm" },
-    { type: "umd" },
-  ],
+	format: [{ type: "esm" }, { type: "umd" }],
 });
 ```
 
@@ -35,23 +32,23 @@ export default defineConfig({
 
 ```ts
 interface BundlessFormat {
-  mode?: "bundless";
-  builder?: "swc";
-  type: "esm" | "cjs";
+	mode?: "bundless";
+	builder?: "swc";
+	type: "esm" | "cjs";
 
-  /**
-   * 入口文件夹
-   * @default "./src"
-   */
-  entry?: string;
+	/**
+	 * 入口文件夹
+	 * @default "./src"
+	 */
+	entry?: string;
 
-  /**
-   * 输出目录
-   * @default 根据 type 决定：
-   * - esm -> "./es"
-   * - cjs -> "./lib"
-   */
-  outDir?: string;
+	/**
+	 * 输出目录
+	 * @default 根据 type 决定：
+	 * - esm -> "./es"
+	 * - cjs -> "./lib"
+	 */
+	outDir?: string;
 }
 ```
 
@@ -59,63 +56,63 @@ interface BundlessFormat {
 
 ```ts
 interface BundleFormat {
-  mode?: "bundle";
-  builder?: "rspack";
-  type: "esm" | "cjs" | "umd";
+	mode?: "bundle";
+	builder?: "rspack";
+	type: "esm" | "cjs" | "umd";
 
-  /**
-   * 入口文件
-   * @default "./src/index.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"
-   */
-  entry?: string;
+	/**
+	 * 入口文件
+	 * @default "./src/index.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"
+	 */
+	entry?: string;
 
-  /**
-   * 输出目录
-   * @default 根据 type 决定：
-   * - esm -> "./es"
-   * - cjs -> "./lib"
-   * - umd -> "./umd"
-   */
-  outDir?: string;
+	/**
+	 * 输出目录
+	 * @default 根据 type 决定：
+	 * - esm -> "./es"
+	 * - cjs -> "./lib"
+	 * - umd -> "./umd"
+	 */
+	outDir?: string;
 
-  /**
-   * 包名称
-   * @description UMD 模式下作为全局变量名（对应 output.library.name）
-   * - 显式传入时直接使用，不做转换
-   * - 未传入时自动从 package.json 的 name 字段生成，如 react-dom -> ReactDOM
-   */
-  name?: string;
+	/**
+	 * 包名称
+	 * @description UMD 模式下作为全局变量名（对应 output.library.name）
+	 * - 显式传入时直接使用，不做转换
+	 * - 未传入时自动从 package.json 的 name 字段生成，如 react-dom -> ReactDOM
+	 */
+	name?: string;
 
-  /**
-   * 输出文件名称
-   * @default "index"
-   */
-  fileName?: string;
+	/**
+	 * 输出文件名称
+	 * @default "index"
+	 */
+	fileName?: string;
 
- /**
+	/**
 	 * 打包排除的 package
 	 * @default  esm,cjs: 排除 dependencies, peerDependencies, optionalDependencies,  umd: undefined
 	 * umd 无法自动获取 root， 只能手动设置。否则可以排除 peerDependencies
 	 */
 	externals?: RspackConfig["externals"];
 
-  /**
-   * 需要额外编译的 node_modules 包
-   * @default []
-   * @description 当第三方包的产物不满足当前编译目标时使用
-   * 默认不编译 node_modules 下的文件
-   * @example
-   *    ["immer"]: 编译 "immer"
+	/**
+	 * 需要额外编译的 node_modules 包
+	 * @default []
+	 * @description 当第三方包的产物不满足当前编译目标时使用
+	 * 默认不编译 node_modules 下的文件
+	 * @example
+	 *    ["immer"]: 编译 "immer"
 	 *    [/node_modules[\\/]immer[\\/]/]: 编译 "immer"
 	 *    [/[\\/]node_modules[\\/]/]: 编译 node_modules 下的所有包
-   */
-  extraCompile?: (string | RegExp)[];
+	 */
+	extraCompile?: (string | RegExp)[];
 
-  /** 自定义 Rspack 配置 */
-  modifyRspackConfig?: (config: RspackConfig) => RspackConfig;
+	/** 自定义 Rspack 配置 */
+	modifyRspackConfig?: (config: RspackConfig) => RspackConfig;
 
-  /** 通过 rspack-chain 修改配置 */
-  modifyRspackChain?: (chain: RspackChain) => void;
+	/** 通过 rspack-chain 修改配置 */
+	modifyRspackChain?: (chain: RspackChain) => void;
 }
 ```
 
@@ -173,39 +170,39 @@ UMD 模式下同时设置 `targets.chrome` 和 `targets.node` 会导致构建失
 
 ```ts
 interface DtsOptions {
-  /**
-   * 生成模式
-   * - "bundle": 使用 @microsoft/api-extractor 生成单个声明文件
-   * - "bundless": 保持源文件结构，生成多个声明文件
-   * @default "bundless"
-   */
-  mode: "bundless" | "bundle";
+	/**
+	 * 生成模式
+	 * - "bundle": 使用 @microsoft/api-extractor 生成单个声明文件
+	 * - "bundless": 保持源文件结构，生成多个声明文件
+	 * @default "bundless"
+	 */
+	mode: "bundless" | "bundle";
 
-  /**
-   * 构建引擎
-   * - "ts": TypeScript 编译器（功能完整，支持 d.ts.map）
-   * - "swc": SWC 编译器（速度更快，但不支持 d.ts.map）
-   * @default "ts"
-   * @description 仅在 bundless + isolatedDeclarations 模式下可选择 swc
-   */
-  builder?: "ts" | "swc";
+	/**
+	 * 构建引擎
+	 * - "ts": TypeScript 编译器（功能完整，支持 d.ts.map）
+	 * - "swc": SWC 编译器（速度更快，但不支持 d.ts.map）
+	 * @default "ts"
+	 * @description 仅在 bundless + isolatedDeclarations 模式下可选择 swc
+	 */
+	builder?: "ts" | "swc";
 }
 ```
 
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  // 关闭声明文件生成
-  dts: false,
+	// 关闭声明文件生成
+	dts: false,
 
-  // 或者自定义配置
-  dts: {
-    mode: "bundle",
-    builder: "ts"
-  }
+	// 或者自定义配置
+	dts: {
+		mode: "bundle",
+		builder: "ts",
+	},
 });
 ```
 
@@ -230,13 +227,13 @@ export default defineConfig({
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  alias: {
-    '@': './src',
-    '@@': './compiled'
-  },
+	alias: {
+		"@": "./src",
+		"@@": "./compiled",
+	},
 });
 ```
 
@@ -253,15 +250,15 @@ export default defineConfig({
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  define: {
-    'process.env.NODE_ENV': '"production"',
-    __VERSION__: '"1.0.0"',
-    __DEV__: 'false',
-    'typeof window': '"object"'
-  },
+	define: {
+		"process.env.NODE_ENV": '"production"',
+		__VERSION__: '"1.0.0"',
+		__DEV__: "false",
+		"typeof window": '"object"',
+	},
 });
 ```
 
@@ -287,12 +284,12 @@ export default defineConfig({
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  shims: {
-    legacy: true  // 支持 比 20.11更低版本的 Node.js
-  }
+	shims: {
+		legacy: true, // 支持 比 20.11更低版本的 Node.js
+	},
 });
 ```
 
@@ -329,12 +326,12 @@ React 相关的编译配置。
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  react: {
-    runtime: "classic"
-  }
+	react: {
+		runtime: "classic",
+	},
 });
 ```
 
@@ -362,19 +359,19 @@ jsx 函数使用的模块名称。
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 export default defineConfig({
-  react: {
-    runtime: "automatic",
-    importSource: "preact"
-  }
+	react: {
+		runtime: "automatic",
+		importSource: "preact",
+	},
 });
 
 export default defineConfig({
-  react: {
-    runtime: "preserve",
-    importSource: "solid-js"
-  }
+	react: {
+		runtime: "preserve",
+		importSource: "solid-js",
+	},
 });
 ```
 
@@ -397,14 +394,14 @@ CSS 相关的处理配置。
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  css: {
-    cssModules: true,
-    // 或自定义命名规则
-    // cssModules: "[name]__[local]___[hash:base64:5]"
-  }
+	css: {
+		cssModules: true,
+		// 或自定义命名规则
+		// cssModules: "[name]__[local]___[hash:base64:5]"
+	},
 });
 ```
 
@@ -448,16 +445,15 @@ export default defineConfig({
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  format: [
-    { type: "umd", fileName: "index", minify: false },
-    { type: "umd", fileName: "index.min" }
-  ],
-  clean: false
+	format: [
+		{ type: "umd", fileName: "index", minify: false },
+		{ type: "umd", fileName: "index.min" },
+	],
+	clean: false,
 });
-
 ```
 
 ## exclude
@@ -471,13 +467,13 @@ export default defineConfig({
 **示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  exclude: [
-    '**/*.md',          // 忽略所有 markdown 文件
-    'src/dev-only/**'   // 忽略开发专用目录
-  ]
+	exclude: [
+		"**/*.md", // 忽略所有 markdown 文件
+		"src/dev-only/**", // 忽略开发专用目录
+	],
 });
 ```
 
@@ -499,22 +495,22 @@ export default defineConfig({
 
 ```ts
 // 子项目配置
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  extends: '../shared/lecp.base.config.ts',
-  // 子项目特定配置
-  format: [{ type: "esm" }]
+	extends: "../shared/lecp.base.config.ts",
+	// 子项目特定配置
+	format: [{ type: "esm" }],
 });
 ```
 
 ```ts
 // 基础配置文件 (lecp.base.config.ts)
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  targets: { chrome: 87 },
-  dts: true,
-  sourcemap: true
+	targets: { chrome: 87 },
+	dts: true,
+	sourcemap: true,
 });
 ```

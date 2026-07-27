@@ -100,13 +100,13 @@ Projects configure builds using `defineConfig()` from `@shined/lecp`:
 import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  format: [{ type: "esm" }, { type: "cjs" }],
-  dts: { mode: "bundless", builder: "ts" },
-  css: { cssModules: true, lessCompile: true },
-  react: { jsxRuntime: "automatic" },
-  define: { __DEV__: JSON.stringify(true) },
-  alias: { "@": "./src" },
-  targets: { chrome: 55 }
+	format: [{ type: "esm" }, { type: "cjs" }],
+	dts: { mode: "bundless", builder: "ts" },
+	css: { cssModules: true, lessCompile: true },
+	react: { jsxRuntime: "automatic" },
+	define: { __DEV__: JSON.stringify(true) },
+	alias: { "@": "./src" },
+	targets: { chrome: 55 },
 });
 ```
 
@@ -127,6 +127,7 @@ Three DTS builder engines are available (`dts.builder`):
 - **`"tsgo"`**: Go-native TypeScript compiler (tsgo), fastest, requires `@typescript/native-preview` as optional peer dependency
 
 Builder selection logic in bundless mode:
+
 1. `builder === "tsgo"` → tsgo CLI path
 2. `tsconfig.isolatedDeclarations === true` → per-file transform (supports both swc/ts)
 3. Otherwise → traditional tsc full emit

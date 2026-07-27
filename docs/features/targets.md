@@ -8,10 +8,10 @@ LECP 通过 `targets` 配置项来指定代码的兼容目标环境，支持现�
 import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  targets: {
-    chrome: 55,
-    node: "20.11.0"
-  }
+	targets: {
+		chrome: 55,
+		node: "20.11.0",
+	},
 });
 ```
 
@@ -40,7 +40,7 @@ targets: {
 
 ```typescript
 targets: {
-  node: "20.11.0"  // Node.js 20.11.0+
+	node: "20.11.0"; // Node.js 20.11.0+
 }
 ```
 

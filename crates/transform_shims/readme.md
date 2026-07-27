@@ -7,29 +7,28 @@
 write `__filename`, `__dirname` and `require()` in your code, and this plugin will transform them to right code in esm module.
 
 ```js
-__filename
+__filename;
 // -> node@20.11+
-import.meta.filename
+import.meta.filename;
 // or
-import { fileURLToPath } from 'url'
-const __filename = fileURLToPath(import.meta.url)
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
-__dirname
+__dirname;
 // ->
-import.meta.dirname
+import.meta.dirname;
 // or node@20.11+
-import path from 'node:path';
-const __dirname = path.dirname(__filename)
+import path from "node:path";
+const __dirname = path.dirname(__filename);
 // or
-import { fileURLToPath } from 'url'
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+import { fileURLToPath } from "url";
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
-require()
+require();
 // ->
-import { createRequire } from 'node:module'
-const _require = createRequire(import.meta.url)
+import { createRequire } from "node:module";
+const _require = createRequire(import.meta.url);
 // All require() calls are transformed to _require()
-
 ```
 
 ### CommonJS Shims
@@ -41,28 +40,29 @@ write `import.meta.url` and `import.meta.dirname`,`import.meta.filename`,`import
 > 但暂不支持 `const { dirname, filename,url } = import.meta` 这种解构写法
 
 ```js
-import.meta.url
+import.meta.url;
 // ->
-require("url").pathToFileURL(__filename).toString()
+require("url").pathToFileURL(__filename).toString();
 
-import.meta.dirname
+import.meta.dirname;
 // ->
-__dirname
+__dirname;
 
-import.meta.filename
+import.meta.filename;
 // ->
-__filename
+__filename;
 
-import.meta.resolve
+import.meta.resolve;
 // ->
-require.resolve()
+require.resolve();
 
-import.meta.main
+import.meta.main;
 // ->
-require.main === module
+require.main === module;
 
-const { dirname: d1, filename: f1, url: u1 } = import.meta
+const { dirname: d1, filename: f1, url: u1 } = import.meta;
 // ->
-const d1 = __dirname, f1 = __filename, u1 = require("url").pathToFileURL(__filename).toString();
-
+const d1 = __dirname,
+	f1 = __filename,
+	u1 = require("url").pathToFileURL(__filename).toString();
 ```

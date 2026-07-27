@@ -31,7 +31,7 @@ export interface SystemConfig {
 	tsconfig?: CompilerOptions;
 }
 
-interface Watcher {
+export interface Watcher {
 	close(): Promise<void> | void;
 }
 
@@ -139,7 +139,9 @@ export const build = async (
 	const allTaskWatchers = await Promise.all(taskPromises);
 	const watchers = allTaskWatchers.flat();
 	return {
-		close: async () => { await Promise.allSettled(watchers.map(w => w.close())); },
+		close: async () => {
+			await Promise.allSettled(watchers.map(w => w.close()));
+		},
 	};
 };
 

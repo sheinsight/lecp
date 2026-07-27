@@ -148,13 +148,16 @@ async function postProcessTsgoOutput(options: {
 			ts.ScriptKind.TS,
 		);
 
-		// @ts-expect-error 兼容 cjs,esm 加载
-		const pathsTransformer = (
-			tsPathsTransformer?.default ?? tsPathsTransformer
-		)(undefined, undefined, undefined, {
-			fileNames: [originalSourcePath],
-			compilerOptions: tsconfig,
-		});
+		const pathsTransformer = // @ts-expect-error 兼容 cjs,esm 加载
+			(tsPathsTransformer?.default ?? tsPathsTransformer)(
+				undefined,
+				undefined,
+				undefined,
+				{
+					fileNames: [originalSourcePath],
+					compilerOptions: tsconfig,
+				},
+			);
 
 		const extensionTransformer = createExtensionRewriteTransformer({
 			ext: `.${outJsExt}`,

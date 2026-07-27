@@ -19,11 +19,11 @@ LECP 提供 shims 功能，实现 ESM 和 CommonJS 模块系统之间的变量�
 
 ```ts
 interface ShimsOptions {
-  /**
-   * 是否使用兼容模式
-   * @default false
-   */
-  legacy?: boolean;
+	/**
+	 * 是否使用兼容模式
+	 * @default false
+	 */
+	legacy?: boolean;
 }
 ```
 
@@ -40,11 +40,11 @@ interface ShimsOptions {
 
 ```ts
 // 在 ESM 模块中使用 CJS 变量
-console.log(__dirname);   // 当前目录路径
-console.log(__filename);  // 当前文件路径
+console.log(__dirname); // 当前目录路径
+console.log(__filename); // 当前文件路径
 
 // 动态导入 CJS 模块
-const pkg = require('./package.json');
+const pkg = require("./package.json");
 ```
 
 ### 标准模式 (Node.js 20.11+)
@@ -57,26 +57,26 @@ console.log(import.meta.dirname);
 console.log(import.meta.filename);
 
 // require
-import { createRequire } from 'node:module';
+import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const pkg = require('./package.json');
+const pkg = require("./package.json");
 ```
 
 ### legacy 模式 (Node.js 10.12+)
 
 ```ts
 // __dirname
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // __filename
 const __filename = fileURLToPath(import.meta.url);
 
 // require
-import { createRequire } from 'node:module';
+import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const pkg = require('./package.json');
+const pkg = require("./package.json");
 ```
 
 ## CJS 产物中的 ESM 兼容
@@ -87,8 +87,8 @@ const pkg = require('./package.json');
 
 ```ts
 // 在 CJS 模块中使用 ESM 变量
-console.log(import.meta.url);      // 文件 URL
-console.log(import.meta.dirname);  // 目录路径
+console.log(import.meta.url); // 文件 URL
+console.log(import.meta.dirname); // 目录路径
 console.log(import.meta.filename); // 文件路径
 ```
 
@@ -96,7 +96,7 @@ console.log(import.meta.filename); // 文件路径
 
 ```ts
 // import.meta.url
-console.log(require('url').pathToFileURL(__filename).toString());
+console.log(require("url").pathToFileURL(__filename).toString());
 
 // import.meta.dirname
 console.log(__dirname);
@@ -110,10 +110,10 @@ console.log(__filename);
 ### 启用默认 Shims
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  shims: true  // 启用标准模式 (Node.js 20.11+)
+	shims: true, // 启用标准模式 (Node.js 20.11+)
 });
 ```
 
@@ -121,9 +121,9 @@ export default defineConfig({
 
 ```ts
 export default defineConfig({
-  shims: {
-    legacy: true  // 支持较低版本 Node.js (10.12+)
-  }
+	shims: {
+		legacy: true, // 支持较低版本 Node.js (10.12+)
+	},
 });
 ```
 
@@ -131,11 +131,11 @@ export default defineConfig({
 
 ```ts
 export default defineConfig({
-  format: [{ type: "esm" }, { type: "cjs" }],
-  shims: true,
-  targets: {
-    node: "20.11.0"
-  }
+	format: [{ type: "esm" }, { type: "cjs" }],
+	shims: true,
+	targets: {
+		node: "20.11.0",
+	},
 });
 ```
 
