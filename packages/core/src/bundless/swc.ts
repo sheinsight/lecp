@@ -160,6 +160,7 @@ export const getSwcOptions = (
 				: undefined,
 
 			experimental: {
+				keepImportAttributes: true,
 				plugins,
 				cacheRoot: "node_modules/.cache/swc",
 			},
