@@ -6,5 +6,7 @@ export type {
 	BundleFormat,
 	BundlessFormat,
 	UserConfig,
+	UserConfigExport,
+	UserConfigFn,
 } from "./define-config.ts";
 export { defineConfig } from "./define-config.ts";
