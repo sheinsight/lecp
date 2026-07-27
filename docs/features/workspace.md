@@ -15,12 +15,12 @@ LECP 通过 `extends` 配置支持配置文件的继承和复用，特别适用�
 在子项目的 `lecp.config.ts` 中继承基础配置：
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  extends: '../shared/lecp.base.config.ts',
-  // 子项目特定配置
-  format: [{ type: "esm" }]
+	extends: "../shared/lecp.base.config.ts",
+	// 子项目特定配置
+	format: [{ type: "esm" }],
 });
 ```
 
@@ -30,18 +30,18 @@ export default defineConfig({
 
 ```ts
 // shared/lecp.base.config.ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  targets: { chrome: 55 },
-  dts: { mode: "bundless", builder: "swc" },
-  sourcemap: true,
-  alias: {
-    '@': './src'
-  },
-  react: {
-    jsxRuntime: "automatic"
-  }
+	targets: { chrome: 55 },
+	dts: { mode: "bundless", builder: "swc" },
+	sourcemap: true,
+	alias: {
+		"@": "./src",
+	},
+	react: {
+		jsxRuntime: "automatic",
+	},
 });
 ```
 

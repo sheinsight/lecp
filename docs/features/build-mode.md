@@ -47,14 +47,14 @@ umd/
 **设置示例：**
 
 ```ts
-import { defineConfig } from '@shined/lecp';
+import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-    format: [
-        { type: "umd" },                  // 只能选择 bundle 模式,无需设置
-        { type: "esm", mode: "bundle" },  // 选择 bundle 模式
-        { type: "cjs", mode: "bundle" }   // 选择 bundle 模式
-    ],
+	format: [
+		{ type: "umd" }, // 只能选择 bundle 模式,无需设置
+		{ type: "esm", mode: "bundle" }, // 选择 bundle 模式
+		{ type: "cjs", mode: "bundle" }, // 选择 bundle 模式
+	],
 });
 ```
 

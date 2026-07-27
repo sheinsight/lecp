@@ -336,6 +336,7 @@ impl BundlessOptions {
                 // @refer: https://rspack.rs/plugins/rspack/swc-js-minimizer-rspack-plugin#minimizeroptions
                 "minify": minify_options,
                 "experimental": {
+                    "keepImportAttributes": true,
                     "plugins": self.get_plugins(),
                     "cacheRoot": "node_modules/.cache/swc"
                 }

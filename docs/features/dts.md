@@ -20,22 +20,22 @@ LECP 的 DTS 配置灵活且功能强大：
 
 ```ts
 interface DtsOptions {
-  /**
-   * 生成模式
-   * - "bundle": 使用 @microsoft/api-extractor 生成单个声明文件
-   * - "bundless": 保持源文件结构，生成多个声明文件
-   * @default "bundless"
-   */
-  mode: "bundless" | "bundle";
+	/**
+	 * 生成模式
+	 * - "bundle": 使用 @microsoft/api-extractor 生成单个声明文件
+	 * - "bundless": 保持源文件结构，生成多个声明文件
+	 * @default "bundless"
+	 */
+	mode: "bundless" | "bundle";
 
-  /**
-   * 构建引擎
-   * - "ts": TypeScript 编译器（功能完整，支持 d.ts.map）
-   * - "swc": SWC 编译器（速度更快，但不支持 d.ts.map）
-   * @default "ts"
-   * @description 仅在 bundless + isolatedDeclarations 模式下可选择 swc
-   */
-  builder?: "ts" | "swc";
+	/**
+	 * 构建引擎
+	 * - "ts": TypeScript 编译器（功能完整，支持 d.ts.map）
+	 * - "swc": SWC 编译器（速度更快，但不支持 d.ts.map）
+	 * @default "ts"
+	 * @description 仅在 bundless + isolatedDeclarations 模式下可选择 swc
+	 */
+	builder?: "ts" | "swc";
 }
 ```
 
@@ -45,7 +45,7 @@ interface DtsOptions {
 
 ```ts
 export default defineConfig({
-  dts: { mode: "bundless" }
+	dts: { mode: "bundless" },
 });
 ```
 
@@ -71,9 +71,9 @@ src/
 
 ```json
 {
-  "compilerOptions": {
-    "isolatedDeclarations": true
-  }
+	"compilerOptions": {
+		"isolatedDeclarations": true
+	}
 }
 ```
 
@@ -109,7 +109,7 @@ export default defineConfig({
 
 ```ts
 export default defineConfig({
-  dts: { mode: "bundle" }
+	dts: { mode: "bundle" },
 });
 ```
 

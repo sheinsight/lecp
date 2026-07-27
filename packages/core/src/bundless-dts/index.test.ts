@@ -128,14 +128,10 @@ describe("createDtsHidingSystem", () => {
 			const system = createDtsHidingSystem(OUT_DIR, sys);
 			// symlink 路径 realpath 后落在 outDir 下
 			expect(
-				system.fileExists(
-					"/project/node_modules/@scope/pkg/index.d.ts",
-				),
+				system.fileExists("/project/node_modules/@scope/pkg/index.d.ts"),
 			).toBe(false);
 			expect(
-				system.readFile(
-					"/project/node_modules/@scope/pkg/index.d.ts",
-				),
+				system.readFile("/project/node_modules/@scope/pkg/index.d.ts"),
 			).toBeUndefined();
 		});
 
@@ -153,9 +149,7 @@ describe("createDtsHidingSystem", () => {
 			});
 			const system = createDtsHidingSystem(OUT_DIR, sys);
 			expect(
-				system.fileExists(
-					"/project/node_modules/@scope/other/index.d.ts",
-				),
+				system.fileExists("/project/node_modules/@scope/other/index.d.ts"),
 			).toBe(true);
 		});
 
@@ -164,9 +158,7 @@ describe("createDtsHidingSystem", () => {
 			const system = createDtsHidingSystem(OUT_DIR, sys);
 			// symlink 路径前缀不匹配 outDir, 且无 realpath, 应透传
 			expect(
-				system.fileExists(
-					"/project/node_modules/@scope/pkg/index.d.ts",
-				),
+				system.fileExists("/project/node_modules/@scope/pkg/index.d.ts"),
 			).toBe(true);
 			// 直接 outDir 路径仍被隐藏
 			expect(system.fileExists("/project/es/index.d.ts")).toBe(false);

@@ -19,5 +19,4 @@ features:
   - title: 双模式构建
     details: 支持 bundle,bundless 构建输出 esm, cjs, dts
     icon: 🛠️
-
 ---

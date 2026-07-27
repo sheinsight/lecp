@@ -1,12 +1,10 @@
 # 快速开始
 
-import { PackageManagerTabs } from '@theme'
+import { PackageManagerTabs } from "@theme";
 
 ## 安装
 
-<PackageManagerTabs
-  command="install @shined/lecp -D"
-/>
+<PackageManagerTabs command="install @shined/lecp -D" />
 
 安装完成后，你可以在项目中使用 `lecp` 命令或通过配置文件进行构建。
 
@@ -22,26 +20,26 @@ typescript 几乎是 npm 包的标配。自动生成 dts 文件是必不可少�
 
 ```json
 {
-  "compilerOptions": {
-    /* modules */
-    "target": "ESNext",
-    "module": "Preserve",
-    "verbatimModuleSyntax": true,
-    "allowImportingTsExtensions": true,
+	"compilerOptions": {
+		/* modules */
+		"target": "ESNext",
+		"module": "Preserve",
+		"verbatimModuleSyntax": true,
+		"allowImportingTsExtensions": true,
 
-    /* lint */
-    "strict": true,
-    "noUncheckedSideEffectImports": true,
+		/* lint */
+		"strict": true,
+		"noUncheckedSideEffectImports": true,
 
-    /* perf */
-    "skipLibCheck": true,
-    // "isolatedDeclarations": true,
+		/* perf */
+		"skipLibCheck": true,
+		// "isolatedDeclarations": true,
 
-    /* dts */
-    "noEmit": true,
-    "declaration": true,
-    "declarationMap": true
-  }
+		/* dts */
+		"noEmit": true,
+		"declaration": true,
+		"declarationMap": true
+	}
 }
 ```
 
@@ -87,22 +85,22 @@ LECP 使用 SWC 生成 js，为了获得最佳性能和兼容性，建议使用�
 import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  // 输出格式：支持 ES Module 和 CommonJS
-  format: [
-    { type: "esm" },
-    { type: "cjs" }, // 可选：目前环境是 node 20.19.0+ (require(esm)), 可以关闭
-  ],
+	// 输出格式：支持 ES Module 和 CommonJS
+	format: [
+		{ type: "esm" },
+		{ type: "cjs" }, // 可选：目前环境是 node 20.19.0+ (require(esm)), 可以关闭
+	],
 
-  // 目标环境
-  targets: {
-    node: "20.11.0",
-  },
+	// 目标环境
+	targets: {
+		node: "20.11.0",
+	},
 
-  // 生成 TypeScript 声明文件
-  dts: true,
+	// 生成 TypeScript 声明文件
+	dts: true,
 
-  // 启用 shims 以提供更好的兼容性
-  shims: true,
+	// 启用 shims 以提供更好的兼容性
+	shims: true,
 });
 ```
 
@@ -148,17 +146,14 @@ dist/
 
 ```json
 {
-  "exports": {
-    ".": {
-      "import": "./es/index.js",
-      "require": "./lib/index.cjs"
-    },
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "es",
-    "lib"
-  ]
+	"exports": {
+		".": {
+			"import": "./es/index.js",
+			"require": "./lib/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"files": ["es", "lib"]
 }
 ```
 
@@ -166,17 +161,14 @@ dist/
 
 ```json
 {
-  "exports": {
-    ".": {
-      "import": "./es/index.mjs",
-      "require": "./lib/index.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "es",
-    "lib"
-  ]
+	"exports": {
+		".": {
+			"import": "./es/index.mjs",
+			"require": "./lib/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"files": ["es", "lib"]
 }
 ```
 
@@ -188,14 +180,14 @@ dist/
 
 ```json
 {
-  "exports": {
-    "./lib/*": "./lib/*.js",
-    "./lib/*.js": "./lib/*.js",
-    "./lib/*.cjs": "./lib/*.cjs",
-    "./es/*": "./es/*.js",
-    "./es/*.js": "./es/*.js",
-    "./es/*.mjs": "./es/*.mjs",
-  }
+	"exports": {
+		"./lib/*": "./lib/*.js",
+		"./lib/*.js": "./lib/*.js",
+		"./lib/*.cjs": "./lib/*.cjs",
+		"./es/*": "./es/*.js",
+		"./es/*.js": "./es/*.js",
+		"./es/*.mjs": "./es/*.mjs"
+	}
 }
 ```
 
@@ -213,30 +205,30 @@ dist/
 import { defineConfig } from "@shined/lecp";
 
 export default defineConfig({
-  // 输出格式：主要支持 ES Module，可选 UMD
-  format: [
-    { type: "esm" },
-    { type: "umd" }, // 可选：用于 CDN 引用
-  ],
+	// 输出格式：主要支持 ES Module，可选 UMD
+	format: [
+		{ type: "esm" },
+		{ type: "umd" }, // 可选：用于 CDN 引用
+	],
 
-  // 目标浏览器
-  targets: {
-    chrome: 55,
-    safari: 12,
-  },
+	// 目标浏览器
+	targets: {
+		chrome: 55,
+		safari: 12,
+	},
 
-  // 生成 TypeScript 声明文件
-  dts: true,
+	// 生成 TypeScript 声明文件
+	dts: true,
 
-  // 需要支持 React 16.x 版本，需要设置为 "classic"
-  // react: {
-  //   jsxRuntime: "classic",
-  // },
+	// 需要支持 React 16.x 版本，需要设置为 "classic"
+	// react: {
+	//   jsxRuntime: "classic",
+	// },
 
-  // CSS 处理
-  css: {
-    cssModules: true,    // 启用 CSS Modules(不推荐)
-  },
+	// CSS 处理
+	css: {
+		cssModules: true, // 启用 CSS Modules(不推荐)
+	},
 });
 ```
 
@@ -267,14 +259,11 @@ dist/
 
 ```json
 {
-  "exports": {
-    ".": "./es/index.js",
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "es",
-    "umd"
-  ]
+	"exports": {
+		".": "./es/index.js",
+		"./package.json": "./package.json"
+	},
+	"files": ["es", "umd"]
 }
 ```
 
@@ -299,10 +288,10 @@ npx lecp
 
 ```json
 {
-  "scripts": {
-    "build": "lecp",
-    "dev": "lecp -w"
-  }
+	"scripts": {
+		"build": "lecp",
+		"dev": "lecp -w"
+	}
 }
 ```
 
