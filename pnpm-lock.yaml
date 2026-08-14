@@ -143,7 +143,7 @@ importers:
         specifier: ^0.1.26
         version: 0.1.26
       '@typescript/native-preview':
-        specifier: '>=7.0.0-dev'
+        specifier: '>=7.0.0-dev.20260707.2'
         version: 7.0.0-dev.20260707.2
       chokidar:
         specifier: ^5.0.0
